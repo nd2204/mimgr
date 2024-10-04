@@ -3,11 +3,11 @@ package dev.mimgr;
 import java.awt.*;
 import java.awt.event.*;
 // import javax.swing.*;
+import dev.mimgr.theme.*;
+import dev.mimgr.theme.builtin.ColorScheme;
 
 class Entry {
-  static final Color COLOR_WHITE = new Color(255, 255, 255);
-  static final Color COLOR_BLACK = new Color(0, 0, 0);
-  static final Color COLOR_GREY = new Color(200, 200, 200);
+  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_DEFAULT);
 
   private double m_aspect_ratio;
   private int    m_width;
@@ -22,12 +22,12 @@ class Entry {
 
     Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
     Panel panel = new Panel();
-    panel.setBackground(COLOR_GREY);
+    panel.setBackground(colors.m_bg_0);
     panel.setBounds(0, 0, m_width / 3, m_height);
 
     Frame frame = new Frame();
     frame.add(panel);
-    frame.setBackground(COLOR_WHITE);
+    frame.setBackground(colors.m_bg_dim);
     frame.setTitle("Mimgr");
     frame.setSize(m_width, m_height);
 

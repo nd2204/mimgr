@@ -1,4 +1,4 @@
-package dev.theme.builtin;
+package dev.mimgr.theme.builtin;
 
 import java.awt.Color;
 

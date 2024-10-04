@@ -4,18 +4,17 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class MySQLCon extends IDBCon {
-    public MySQLCon(String url, String name, String password) {
-         try {
-            // The newInstance() call is a work around for some
-            // broken Java implementations
+  public MySQLCon(String url, String name, String password) {
+    this.m_url = url;
+    this.m_username = name;
+    this.m_username = password;
 
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (Exception ex) {
-            // handle the error
-        }
-        Class.forName("");
-        this.m_url = url;
-        this.m_username = name;
-        this.m_username = name;
+    try {
+      Class.forName("com.mysql.jdbc.Driver");
+      this.m_connection = DriverManager.getConnection(m_url, m_username, m_password);
+    } catch (Exception ex) {
+      System.out.println(ex);
     }
+
+  }
 }
