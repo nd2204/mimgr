@@ -13,3 +13,7 @@ plugins {
 application {
   mainClass = "dev.mimgr.Entry"
 }
+
+dependencies {
+  implementation 'mysql:mysql-connector-java:9.0.0'
+}
