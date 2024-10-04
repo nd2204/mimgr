@@ -1,33 +1,34 @@
 # mimgr
 
 ### HOW TO BUILD
-
 ---
-Windows
 
+#### Windows
 ```shell
 .\gradlew.bat build
 ```
 
----
-Unix
-
+#### Unix
 ```shell
 ./gradlew build
 ```
 
 ### HOW TO RUN
-
 ---
-Windows
 
+#### Windows
 ```shell
 ./gradlew run
 ```
 
----
-Unix
-
+#### Unix
 ```shell
 ./gradlew run
 ```
+
+### Forms
+- Login/Signup
+- Admin Dashboard
+- Product Dashboard
+- Uploads
+- Sales Dashboard
