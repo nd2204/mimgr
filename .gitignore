@@ -26,9 +26,12 @@ replay_pid*
 
 # Ignore Gradle project-specific cache directory
 .gradle
+.settings
 
 # Ignore Gradle build output directory
 build
+*.prefs
+.classpath
 
 # Ignore my nvim session
 .nvim

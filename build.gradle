@@ -8,6 +8,7 @@
 
 plugins {
   id 'application'
+  id 'com.github.michaelruocco.embedded-mysql-plugin' version '2.1.11'
 }
 
 application {
@@ -19,5 +20,11 @@ repositories {
 }
 
 dependencies {
-  implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.33'
+  implementation 'mysql:mysql-connector-java:8.0.33'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }

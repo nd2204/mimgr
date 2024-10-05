@@ -1,7 +1,6 @@
 package dev.mimgr.db;
 
 import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class MySQLCon extends IDBCon {
   public MySQLCon(String url, String name, String password) {
@@ -10,7 +9,6 @@ public class MySQLCon extends IDBCon {
     this.m_username = password;
 
     try {
-      Class.forName("com.mysql.jdbc.Driver");
       this.m_connection = DriverManager.getConnection(m_url, m_username, m_password);
     } catch (Exception ex) {
       System.out.println(ex);
