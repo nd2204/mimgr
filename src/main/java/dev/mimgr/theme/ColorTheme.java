@@ -3,6 +3,8 @@ package dev.mimgr.theme;
 import dev.mimgr.theme.builtin.*;
 
 public class ColorTheme {
+  private static ColorScheme instance = null;
+
   public enum theme {
     THEME_DARK_GRUVBOX,
     THEME_DARK_CATPUCCIN,
@@ -18,23 +20,23 @@ public class ColorTheme {
   public static ColorScheme get_colorscheme(theme t) {
     switch(t) {
       case THEME_DARK_DEFAULT:
-        return new DefaultDark();
+      return new DefaultDark();
       case THEME_DARK_GRUVBOX:
-        return new GruvboxDark();
+      return new GruvboxDark();
       case THEME_DARK_CATPUCCIN:
-        return new CatpuccinDark();
+      return new CatpuccinDark();
       case THEME_DARK_EVERFOREST:
-        return new EverforestDark();
+      return new EverforestDark();
       case THEME_LIGHT_DEFAULT:
-        return new DefaultLight();
+      return new DefaultLight();
       case THEME_LIGHT_GRUVBOX:
-        return new GruvboxLight();
+      return new GruvboxLight();
       case THEME_LIGHT_CATPUCCIN:
-        return new CatpuccinLight();
+      return new CatpuccinLight();
       case THEME_LIGHT_EVERFOREST:
-        return new EverforestLight();
+      return new EverforestLight();
       default:
-        return new DefaultDark();
+      return new DefaultDark();
     }
   }
 }

@@ -12,7 +12,7 @@ plugins {
 }
 
 application {
-  mainClass = "dev.mimgr.Login"
+  mainClass = "dev.mimgr.Entry"
 }
 
 repositories {
