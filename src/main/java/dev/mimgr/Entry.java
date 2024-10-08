@@ -1,105 +1,114 @@
 package dev.mimgr;
-import java.awt.Button;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Label;
-import java.awt.Panel;
-import java.awt.TextField;
-import java.awt.Toolkit;
+// import java.awt.Button;
+// import java.awt.Dimension;
+// import java.awt.Frame;
+// import java.awt.Label;
+// import java.awt.Panel;
+// import java.awt.TextField;
+// import java.awt.Toolkit;
+// import java.awt.event.ActionEvent;
+// import java.awt.event.ActionListener;
+
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import dev.mimgr.theme.ColorTheme;
-import dev.mimgr.theme.builtin.ColorScheme;
-class Entry {
-  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_DEFAULT);
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
 
-  private double m_aspect_ratio;
-  private int    m_width;
-  private int    m_height;
+import dev.mimgr.db.MySQLCon;
+//create CreateLoginForm class to create login form  
+//class extends JFrame to create a window where our component add  
+//class implements ActionListener to perform an action on button click  
 
-  public Entry() {
-    m_aspect_ratio = 16.0f / 10.0f;
-    m_width = 900;
-    m_height = (int) ((float) m_width / m_aspect_ratio);
+class CreateLoginForm extends JFrame implements ActionListener {
+    Connection connection = null;
 
-    System.out.printf("%dx%d%n", m_width, m_height);
+    //initialize button, panel, label, and text field  
+    JButton b1;
+    JPanel newPanel;
+    JLabel userLabel, passLabel;
+    final JTextField textField1, textField2;
 
-    Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
-    Panel panel = new Panel();
-    panel.setBackground(colors.m_grey_0);
-    panel.setBounds(0, 0, m_width / 3, m_height);
+    //calling constructor  
+    CreateLoginForm() {
+        String DB_URL = "jdbc:mysql://127.0.0.1:3306/admin";
+        String userDB = "mimgr";
+        String passwordDB = "mimgr";
+        connection = new MySQLCon(DB_URL, userDB, passwordDB).get_connection();
 
-    TextField url = new TextField();
-    url.setBounds(50, 50, 200, 50);
-    TextField user = new TextField();
-    user.setBounds(50, 100, 200, 50);
-    TextField pass = new TextField();
-    pass.setBounds(50, 150, 200, 50);
+        //create label for username   
+        userLabel = new JLabel();
+        userLabel.setText("Username");      //set label value for textField1  
 
-    Button button = new Button("Connect MySQL");
-    button.setBounds(50, 500, 100, 30);
+        //create text field to get username from the user  
+        textField1 = new JTextField(15);    //set length of the text  
 
-    Label resultLabel = new Label();
-    resultLabel.setBounds(50, 300, 300, 30);
-    resultLabel.setBackground(colors.m_grey_0);
-    button.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-          // Lấy giá trị từ TextField
-          String DB_URL = "jdbc:mysql://localhost:3306";
-          String userName = user.getText();
-          String password = pass.getText();
-          String sql = "select user from mysql.user where user = '" + userName + "'";
-          try {
-            Connection connection = DriverManager.getConnection(DB_URL, userName, password);
+        //create label for password  
+        passLabel = new JLabel();
+        passLabel.setText("Password");      //set label value for textField2  
+
+        //create text field to get password from the user  
+        textField2 = new JPasswordField(15);    //set length for the password  
+
+        //create submit button  
+        b1 = new JButton("SUBMIT"); //set label to button  
+
+        //create panel to put form elements  
+        newPanel = new JPanel(new GridLayout(3, 1));
+        newPanel.add(userLabel);    //set username label to panel  
+        newPanel.add(textField1);   //set text field to panel  
+        newPanel.add(passLabel);    //set password label to panel  
+        newPanel.add(textField2);   //set text field to panel  
+        newPanel.add(b1);           //set button to panel  
+
+        //set border to panel   
+        add(newPanel, BorderLayout.CENTER);
+
+        //perform action on button click   
+        b1.addActionListener(this);     //add action listener to button  
+        setTitle("LOGIN FORM");         //set title to the login form  
+    }
+
+    //define abstract method actionPerformed() which will be called on button click   
+    public void actionPerformed(ActionEvent ae) //pass action listener as a parameter  
+    {
+        String userValue = textField1.getText();        //get user entered username from the textField1  
+        String passValue = textField2.getText();        //get user entered pasword from the textField2  
+
+        String sql = "select username from Users where username = '" + userValue + "' and password = '" + passValue + "'";
+        try {
             // Connection connection = mySQLCon.get_connection();
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(sql);
             if (rs.next()) {
-              System.out.println("True");
+                Dashboard page = new Dashboard();
+                //make page visible to the user  
+                page.setVisible(true);
+            } else {
+                System.out.println("Please enter valid username and password");
             }
-            else {
-              System.out.println("False");
-            }
-            // while (rs.next()) {
-            //   resultLabel.setText("You entered: " + rs.getString(1));
-            // }
-          } catch (Exception erException) {
+        } catch (Exception erException) {
             erException.printStackTrace();
-          }
+        }
+    }
+}
+//create the main class  
 
-          // Hiển thị giá trị trên Label
-          // resultLabel.setText("You entered: " + inputText);
-      }
-  });
-
-    Frame frame = new Frame();
-    // frame.add(url);
-    frame.add(user);
-    frame.add(pass);
-    frame.add(button);
-    frame.add(panel);
-    // frame.add(resultLabel);
-    frame.setBackground(colors.m_bg_dim);
-    frame.setTitle("Mimgr");
-    frame.setSize(m_width, m_height);
-
-    frame.setLocation(
-      (screen_size.width - frame.getWidth()) / 2,
-      (screen_size.height - frame.getHeight()) / 2
-    );
-
-    frame.setLayout(null);
-    frame.setVisible(true);
-    frame.addWindowListener(on_close_handler());
-  }
+class Entry {
+  //main() method start  
 
   static final WindowListener on_close_handler() {
     return new WindowAdapter() {
@@ -109,7 +118,18 @@ class Entry {
     };
   }
 
-  public static void main(String[] args) {
-    new Entry();
+  public static void main(String arg[]) {
+    try {
+      //create instance of the CreateLoginForm  
+      CreateLoginForm form = new CreateLoginForm();
+
+      form.setSize(300, 100);  //set size of the frame  
+      form.setVisible(true);  //make form visible to the user  
+      form.addWindowListener(on_close_handler());
+
+    } catch (Exception e) {
+      //handle exception   
+      JOptionPane.showMessageDialog(null, e.getMessage());
+    }
   }
 }
