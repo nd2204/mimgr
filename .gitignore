@@ -35,3 +35,4 @@ build
 
 # Ignore my nvim session
 .nvim
+.vscode

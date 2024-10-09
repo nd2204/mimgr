@@ -22,9 +22,3 @@ repositories {
 dependencies {
   implementation 'mysql:mysql-connector-java:8.0.33'
 }
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
