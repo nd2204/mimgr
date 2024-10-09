@@ -17,17 +17,17 @@ import java.sql.ResultSet;
 
 import dev.mimgr.theme.builtin.ColorScheme;
 
-public class FormLogin extends JPanel {
+public class FormSignUp extends JPanel{
   JTextField     tf_username;
   JPasswordField pf_password;
+  JPasswordField pf_password_confirm;
   ColorScheme    m_colors;
   JLabel         form_label;
   JButton        login_button;
   JButton        signup_button;
-  JCheckBox      remember;
   Connection     connection;
 
-  FormLogin(ColorScheme colors) {
+  FormSignUp(ColorScheme colors) {
     m_colors = colors;
     // String DB_URL = "jdbc:mysql://127.0.0.1:3306/admin";
     // String userDB = "root";
@@ -53,16 +53,16 @@ public class FormLogin extends JPanel {
     c.gridy = 2;
     input_container.add(pf_password, c);
     c.gridy = 3;
-    input_container.add(remember, c);
+    input_container.add(pf_password_confirm, c);
     c.gridy = 4;
-    input_container.add(login_button, c);
+    input_container.add(signup_button, c);
     c.gridy = 5;
     JSeparator sep = new JSeparator();
     sep.setForeground(m_colors.m_bg_2);
     input_container.add(sep, c);
     c.gridy = 6;
     c.insets = new Insets(5, 20, 20, 20);
-    input_container.add(signup_button, c);
+    input_container.add(login_button, c);
 
     this.setLayout(new GridBagLayout());
     this.setBackground(colors.m_bg_0);
@@ -72,55 +72,34 @@ public class FormLogin extends JPanel {
     c.anchor = GridBagConstraints.CENTER;
     c.weighty = 1.0;
     this.add(input_container, c);
-  }
 
-  private void authenticate(String username, String password) {
-    try {
-      PreparedStatement pst = connection.prepareStatement(
-        "SELECT hash, salt FROM admins WHERE username = '?'"
-      );
-      pst.setString(1, username);
-      ResultSet rs = pst.executeQuery();
-
-      //if (rs.next()) {
-      //  Dashboard page = new Dashboard();
-      //  //make page visible to the user
-      //  page.setVisible(true);
-      //} else {
-      //  System.out.println("Please enter valid username and password");
-      //}
-    } catch (Exception erException) {
-      erException.printStackTrace();
-    }
   }
 
   private void setup_form_style() {
     // ========================= Label =========================
 
-    form_label = new JLabel("Login", JLabel.CENTER);
+    form_label = new JLabel("Sign Up", JLabel.CENTER);
 
     // ========================= Fields =========================
 
     tf_username = FormBuilder.create_text_field(m_colors, "Username", 20);
     pf_password = FormBuilder.create_password_field(m_colors, "Password", 20);
+    pf_password_confirm = FormBuilder.create_password_field(m_colors, "Confirm password", 20);
     Border rounded_border = FormBuilder.create_rounded_border(m_colors.m_bg_5, 2);
 
     this.tf_username.setBorder(rounded_border);
     this.pf_password.setBorder(rounded_border);
+    this.pf_password_confirm.setBorder(rounded_border);
 
     // ========================= Buttons =========================
-
-    this.remember = new JCheckBox("Remember me");
-    remember.setBackground(null);
-
-    this.login_button = new JButton("Login");
-    this.login_button.setBackground(m_colors.m_bg_5);
-    this.login_button.setForeground(m_colors.m_bg_1);
-    this.login_button.setBorder(rounded_border);
-
-    this.signup_button = new JButton("Signup");
-    this.signup_button.setBackground(m_colors.m_bg_0);
-    this.signup_button.setForeground(m_colors.m_bg_5);
+    this.signup_button = new JButton("Create Account");
+    this.signup_button.setBackground(m_colors.m_bg_5);
+    this.signup_button.setForeground(m_colors.m_bg_1);
     this.signup_button.setBorder(rounded_border);
+
+    this.login_button = new JButton("Back to login");
+    this.login_button.setBackground(m_colors.m_bg_0);
+    this.login_button.setForeground(m_colors.m_bg_5);
+    this.login_button.setBorder(rounded_border);
   }
 }

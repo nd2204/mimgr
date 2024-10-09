@@ -34,7 +34,7 @@ class Entry {
     app.setBackground(colors.m_bg_dim);
     app.setTitle("Mimgr");
     app.setSize(m_width, m_height);
-    app.add(new FormLogin(colors));
+    app.add(new FormSignUp(colors));
     app.setLocation(
       (screen_size.width - app.getWidth()) / 2,
       (screen_size.height - app.getHeight()) / 2
