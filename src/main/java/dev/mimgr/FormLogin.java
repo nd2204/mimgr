@@ -1,14 +1,12 @@
 package dev.mimgr;
 
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.JPasswordField;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.BoxLayout;
 
-// import java.nio.file.Paths;
+import java.nio.file.Paths;
+import java.io.*;
 // import java.awt.event.ActionEvent;
 // import java.awt.event.ActionListener;
 
@@ -30,12 +28,18 @@ public class FormLogin extends JPanel {
     // String userDB = "root";
     // String passwordDB = "mimgr";
     // connection = new MySQLCon(DB_URL, userDB, passwordDB).get_connection();
+    this.setLayout(new GridBagLayout());
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.anchor = GridBagConstraints.CENTER; 
+    gbc.weighty = 1.0;
 
     String user_placeholder = "Username";
     String password_placeholder = "Password";
 
-    tf_username = new JTextField();
-    tf_username.setBackground(colors.m_bg_3);
+    tf_username = new JTextField(20);
+    tf_username.setBackground(colors.m_bg_1);
     tf_username.setForeground(colors.m_bg_5);
     tf_username.setText(user_placeholder);
 
@@ -45,7 +49,6 @@ public class FormLogin extends JPanel {
           tf_username.setText("");
           tf_username.setForeground(colors.m_fg_0);
         }
-
       }
       public void focusLost(java.awt.event.FocusEvent evt) {
         if (tf_username.getText().isEmpty()) {
@@ -55,8 +58,8 @@ public class FormLogin extends JPanel {
       }
     });
 
-    pf_password = new JPasswordField();
-    pf_password.setBackground(colors.m_bg_3);
+    pf_password = new JPasswordField(20);
+    pf_password.setBackground(colors.m_bg_1);
     pf_password.setForeground(colors.m_bg_5);
     pf_password.setText(password_placeholder);
     pf_password.setEchoChar('\0');
@@ -67,7 +70,6 @@ public class FormLogin extends JPanel {
           pf_password.setText("");
           pf_password.setForeground(colors.m_fg_0);
         }
-
       }
       public void focusLost(java.awt.event.FocusEvent evt) {
         if (pf_password.getPassword().length == 0) {
@@ -77,11 +79,35 @@ public class FormLogin extends JPanel {
       }
     });
 
-    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-    this.setBackground(colors.m_bg_0);
+    Border inner_padding = BorderFactory.createEmptyBorder(10, 20, 10, 20);
+    Border roundedBorder = BorderFactory.createCompoundBorder(
+        BorderFactory.createLineBorder(colors.m_bg_5, 1, true),
+        inner_padding
+    );
 
-    this.add(tf_username);   //set text field to panel
-    this.add(pf_password);   //set text field to panel
+    tf_username.setBorder(roundedBorder);
+    pf_password.setBorder(roundedBorder);
+
+    JButton login_button = new JButton("Login");
+    JPanel input_container = new JPanel();
+    JLabel login_label = new JLabel("Login", JLabel.CENTER);
+    // input_container.setPreferredSize(new Dimension(200, 100));
+    input_container.setLayout(new BoxLayout(input_container, BoxLayout.Y_AXIS));
+    input_container.add(login_label);
+    input_container.add(Box.createVerticalStrut(20));
+    input_container.add(tf_username);
+    input_container.add(Box.createVerticalStrut(20));
+    input_container.add(pf_password);
+    input_container.add(Box.createVerticalStrut(20));
+    input_container.add(login_button);
+
+    File root = new File(".");
+    for (File file : root.listFiles()) {
+      System.out.println(file.toString());
+    }
+
+    this.setBackground(colors.m_bg_0);
+    this.add(input_container);
   }
 
   private void authenticate(String username, String password) {
@@ -104,4 +130,5 @@ public class FormLogin extends JPanel {
       erException.printStackTrace();
     }
   }
+
 }
