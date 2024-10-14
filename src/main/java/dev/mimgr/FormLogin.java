@@ -17,7 +17,7 @@ import java.sql.ResultSet;
 
 import dev.mimgr.theme.builtin.ColorScheme;
 
-public class FormLogin extends JPanel {
+public class FormLogin extends JPanel implements ActionListener {
   JTextField     tf_username;
   JPasswordField pf_password;
   ColorScheme    m_colors;
@@ -117,10 +117,23 @@ public class FormLogin extends JPanel {
     this.login_button.setBackground(m_colors.m_bg_5);
     this.login_button.setForeground(m_colors.m_bg_1);
     this.login_button.setBorder(rounded_border);
+    this.login_button.addActionListener(this);
 
     this.signup_button = new JButton("Signup");
     this.signup_button.setBackground(m_colors.m_bg_0);
     this.signup_button.setForeground(m_colors.m_bg_5);
     this.signup_button.setBorder(rounded_border);
+    this.signup_button.addActionListener(this);
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == login_button) {
+      return;
+    }
+    if (e.getSource() == signup_button) {
+      this.setVisible(false);
+      return;
+    }
   }
 }

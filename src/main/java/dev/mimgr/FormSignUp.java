@@ -72,7 +72,7 @@ public class FormSignUp extends JPanel{
     c.anchor = GridBagConstraints.CENTER;
     c.weighty = 1.0;
     this.add(input_container, c);
-
+    this.setVisible(false);
   }
 
   private void setup_form_style() {
@@ -102,4 +102,5 @@ public class FormSignUp extends JPanel{
     this.login_button.setForeground(m_colors.m_bg_5);
     this.login_button.setBorder(rounded_border);
   }
+
 }
