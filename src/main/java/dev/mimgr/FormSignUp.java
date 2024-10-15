@@ -16,6 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.db.DBConnection;
+import dev.mimgr.db.DBQueries;
 
 public class FormSignUp extends JPanel implements ActionListener {
   JTextField     tf_username;
@@ -25,10 +27,16 @@ public class FormSignUp extends JPanel implements ActionListener {
   JLabel         form_label;
   JButton        login_button;
   JButton        signup_button;
-  Connection     connection;
+  Connection     m_connection;
+
+  private final String username_placeholder = "Tên người dùng";
+  private final String password_placeholder = "Mật khẩu";
+  private final String password_confirm_placeholder = "Xác nhận mật khẩu";
 
   FormSignUp(ColorScheme colors) {
     m_colors = colors;
+    m_connection = DBConnection.get_instance().get_connection();
+
 
     this.setup_form_style();
 
@@ -74,13 +82,13 @@ public class FormSignUp extends JPanel implements ActionListener {
   private void setup_form_style() {
     // ========================= Label =========================
 
-    form_label = new JLabel("Sign Up", JLabel.CENTER);
+    form_label = new JLabel("Đăng ký", JLabel.CENTER);
 
     // ========================= Fields =========================
 
-    tf_username = FormBuilder.create_text_field(m_colors, "Username", 20);
-    pf_password = FormBuilder.create_password_field(m_colors, "Password", 20);
-    pf_password_confirm = FormBuilder.create_password_field(m_colors, "Confirm password", 20);
+    tf_username = FormBuilder.create_text_field(m_colors, username_placeholder, 20);
+    pf_password = FormBuilder.create_password_field(m_colors, password_placeholder, 20);
+    pf_password_confirm = FormBuilder.create_password_field(m_colors, password_confirm_placeholder, 20);
     Border rounded_border = FormBuilder.create_rounded_border(m_colors.m_bg_5, 2);
 
     this.tf_username.setBorder(rounded_border);
@@ -88,17 +96,94 @@ public class FormSignUp extends JPanel implements ActionListener {
     this.pf_password_confirm.setBorder(rounded_border);
 
     // ========================= Buttons =========================
-    this.signup_button = new JButton("Create Account");
+    this.signup_button = new JButton("Tạo tài khoản");
     this.signup_button.setBackground(m_colors.m_bg_5);
     this.signup_button.setForeground(m_colors.m_bg_1);
     this.signup_button.setBorder(rounded_border);
     this.signup_button.addActionListener(this);
 
-    this.login_button = new JButton("Back to login");
+    this.login_button = new JButton("Trở lại đăng nhập");
     this.login_button.setBackground(m_colors.m_bg_0);
     this.login_button.setForeground(m_colors.m_bg_5);
     this.login_button.setBorder(rounded_border);
     this.login_button.addActionListener(this);
+  }
+
+  private String get_username() {
+    String username = tf_username.getText();
+    if (username == username_placeholder) {
+      return "";
+    }
+    return username;
+  }
+
+  private String get_password() {
+    String password = String.valueOf(pf_password.getPassword());
+    if (password.equals(password_placeholder)) {
+      return "";
+    }
+    return password;
+  }
+
+  private boolean valid_username(String username) {
+    if (DBQueries.select_user(username) != null) {
+      JOptionPane.showMessageDialog(null, "Tên người dùng đã tồn tại");
+      return false;
+    }
+
+    if (!username.matches("^[a-zA-Z0-9._]{5,20}$")) {
+      JOptionPane.showMessageDialog(
+        null,
+        "Tên người dùng phải chứa từ 5-20 ký tự"
+      );
+      return false; 
+    }
+
+    if (!username.matches("^(?!.*[_.]{2}).*$")) {
+      JOptionPane.showMessageDialog(
+        null,
+        "Tên không được bao gồm hai dấu (_) hoặc (.) liền nhau"
+      );
+      return false; 
+    }
+
+    if (!username.matches("^[^_.].*[^_.]$")) {
+      JOptionPane.showMessageDialog(
+        null,
+        "Tên không được bắt đầu bằng ký tự gạch dưới (_) hoặc dấu chấm (.)"
+      );
+      return false; 
+    }
+
+    return true;
+  }
+
+  private boolean valid_password(String password) {
+    if (password.length() < 8) {
+      JOptionPane.showMessageDialog(
+        null,
+        "Mật khẩu phải chứa ít nhất 8 ký tự"
+      );
+      return false;
+    }
+
+    if (!password.matches(".*[!@#$%^&*]")) {
+      JOptionPane.showMessageDialog(
+        null,
+        "Mật khẩu phải chứa ít nhất 1 trong các ký tự đặc biệt: !,@,#,$,%,^,&,*"
+      );
+      return false; 
+    }
+
+    if (!String.valueOf(pf_password_confirm.getPassword()).equals(password)) {
+      JOptionPane.showMessageDialog(
+        null,
+        "Mật khẩu không trùng khớp"
+      );
+      return false; 
+    }
+
+    return true;
   }
 
   @Override
@@ -107,9 +192,16 @@ public class FormSignUp extends JPanel implements ActionListener {
       PanelManager.show("FORM_LOGIN");
       return;
     }
+
     if (e.getSource() == signup_button) {
-      PanelManager.show("FORM_LOGIN");
-      return;
+      String username = get_username();
+      String password = get_password();
+      String salt = Security.generate_salt(16);
+      if (valid_username(username) && valid_password(password)) {
+        DBQueries.insert_user(username, Security.hash_string(password + salt), salt);
+        PanelManager.show("FORM_LOGIN");
+        return;
+      }
     }
   }
 }

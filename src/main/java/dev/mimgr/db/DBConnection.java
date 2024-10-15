@@ -14,7 +14,6 @@ public class DBConnection {
 
   private DBConnection() {
     assert instance == null;
-    instance = new DBConnection();
     try {
       Class.forName("com.mysql.cj.jdbc.Driver");
       connection = DriverManager.getConnection(url, user, password);
@@ -27,6 +26,7 @@ public class DBConnection {
   }
 
   public static synchronized DBConnection get_instance() {
+    if (instance == null) instance = new DBConnection();
     return instance;
   }
 

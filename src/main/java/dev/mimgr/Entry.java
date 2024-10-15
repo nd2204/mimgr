@@ -23,7 +23,6 @@ class Entry extends Frame {
     m_width = 900;
     m_height = (int) ((float) m_width / m_aspect_ratio);
 
-    System.out.printf("%dx%d%n", m_width, m_height);
 
     // Get the screen size
     Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();

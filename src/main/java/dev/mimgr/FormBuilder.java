@@ -21,12 +21,14 @@ public class FormBuilder {
         if (field.getText().equals(placeholder)) {
           field.setText("");
           field.setForeground(colors.m_fg_0);
+          field.setBackground(colors.m_bg_1);
         }
       }
       public void focusLost(FocusEvent evt) {
         if (field.getText().isEmpty()) {
           field.setText(placeholder);
           field.setForeground(colors.m_bg_5);
+          field.setBackground(colors.m_bg_1);
         }
       }
     });
@@ -46,6 +48,7 @@ public class FormBuilder {
         if (String.valueOf(psswd.getPassword()).equals(placeholder)) {
           psswd.setEchoChar('*');
           psswd.setText("");
+          psswd.setBackground(colors.m_bg_1);
           psswd.setForeground(colors.m_fg_0);
         }
       }
@@ -53,6 +56,7 @@ public class FormBuilder {
       public void focusLost(FocusEvent evt) {
         if (psswd.getPassword().length == 0) {
           psswd.setEchoChar('\0');
+          psswd.setBackground(colors.m_bg_1);
           psswd.setForeground(colors.m_bg_5);
           psswd.setText(placeholder);
         }

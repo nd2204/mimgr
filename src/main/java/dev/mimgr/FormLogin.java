@@ -15,7 +15,9 @@ import javax.swing.border.Border;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
+import dev.mimgr.db.DBQueries;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class FormLogin extends JPanel implements ActionListener {
@@ -26,6 +28,9 @@ public class FormLogin extends JPanel implements ActionListener {
   JButton        login_button;
   JButton        signup_button;
   JCheckBox      remember;
+
+  private final String username_placeholder = "Tên người dùng";
+  private final String password_placeholder = "Mật khẩu";
 
   FormLogin(ColorScheme colors) {
     m_colors = colors;
@@ -72,13 +77,36 @@ public class FormLogin extends JPanel implements ActionListener {
   }
 
   private boolean is_valid_credential() {
-    String username = tf_username.getText();
-    String password = pf_password.getPassword().toString();
-    String salt     = Security.generate_salt(16);
-    System.out.println(username);
-    System.out.println(Security.hash_string(password));
-    System.out.println(salt);
+    String username = get_username();
+    String password = get_password();
+    String salt;
+
+    ResultSet result = DBQueries.select_user(username);
+    try {
+      salt = result.getString("salt");
+      if (Security.hash_string(password + salt).equals(result.getString("hash"))) {
+        return true;
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
     return false;
+  }
+
+  private String get_username() {
+    String username = tf_username.getText();
+    if (username == username_placeholder) {
+      return "";
+    }
+    return username;
+  }
+
+  private String get_password() {
+    String password = String.valueOf(pf_password.getPassword());
+    if (password.equals(password_placeholder)) {
+      return "";
+    }
+    return password;
   }
 
   private void setup_form_style() {
@@ -88,8 +116,8 @@ public class FormLogin extends JPanel implements ActionListener {
 
     // ========================= Fields =========================
 
-    tf_username = FormBuilder.create_text_field(m_colors, "Username", 20);
-    pf_password = FormBuilder.create_password_field(m_colors, "Password", 20);
+    tf_username = FormBuilder.create_text_field(m_colors, "Tên người dùng", 20);
+    pf_password = FormBuilder.create_password_field(m_colors, "Mật khẩu", 20);
     Border rounded_border = FormBuilder.create_rounded_border(m_colors.m_bg_5, 2);
 
     this.tf_username.setBorder(rounded_border);
@@ -97,16 +125,16 @@ public class FormLogin extends JPanel implements ActionListener {
 
     // ========================= Buttons =========================
 
-    this.remember = new JCheckBox("Remember me");
+    this.remember = new JCheckBox("Nhớ phiên đăng nhập");
     remember.setBackground(null);
 
-    this.login_button = new JButton("Login");
+    this.login_button = new JButton("Đăng nhập");
     this.login_button.setBackground(m_colors.m_bg_5);
     this.login_button.setForeground(m_colors.m_bg_1);
     this.login_button.setBorder(rounded_border);
     this.login_button.addActionListener(this);
 
-    this.signup_button = new JButton("Signup");
+    this.signup_button = new JButton("Đăng ký");
     this.signup_button.setBackground(m_colors.m_bg_0);
     this.signup_button.setForeground(m_colors.m_bg_5);
     this.signup_button.setBorder(rounded_border);
