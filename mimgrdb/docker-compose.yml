@@ -1,0 +1,13 @@
+services:
+  db:
+    build: .
+    image: custom-mysql
+    environment:
+      MYSQL_USER: mimgr
+      MYSQL_DATABASE: mimgrdb
+      MYSQL_PASSWORD: mimgr-db
+      MYSQL_ROOT_PASSWORD: mimgr-db
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
