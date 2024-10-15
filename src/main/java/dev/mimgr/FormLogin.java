@@ -2,6 +2,7 @@ package dev.mimgr;
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 
@@ -25,14 +26,9 @@ public class FormLogin extends JPanel implements ActionListener {
   JButton        login_button;
   JButton        signup_button;
   JCheckBox      remember;
-  Connection     connection;
 
   FormLogin(ColorScheme colors) {
     m_colors = colors;
-    // String DB_URL = "jdbc:mysql://127.0.0.1:3306/admin";
-    // String userDB = "root";
-    // String passwordDB = "mimgr";
-    // connection = new MySQLCon(DB_URL, userDB, passwordDB).get_connection();
 
     this.setup_form_style();
 
@@ -72,26 +68,17 @@ public class FormLogin extends JPanel implements ActionListener {
     c.anchor = GridBagConstraints.CENTER;
     c.weighty = 1.0;
     this.add(input_container, c);
+    this.setVisible(false);
   }
 
-  private void authenticate(String username, String password) {
-    try {
-      PreparedStatement pst = connection.prepareStatement(
-        "SELECT hash, salt FROM admins WHERE username = '?'"
-      );
-      pst.setString(1, username);
-      ResultSet rs = pst.executeQuery();
-
-      //if (rs.next()) {
-      //  Dashboard page = new Dashboard();
-      //  //make page visible to the user
-      //  page.setVisible(true);
-      //} else {
-      //  System.out.println("Please enter valid username and password");
-      //}
-    } catch (Exception erException) {
-      erException.printStackTrace();
-    }
+  private boolean is_valid_credential() {
+    String username = tf_username.getText();
+    String password = pf_password.getPassword().toString();
+    String salt     = Security.generate_salt(16);
+    System.out.println(username);
+    System.out.println(Security.hash_string(password));
+    System.out.println(salt);
+    return false;
   }
 
   private void setup_form_style() {
@@ -129,10 +116,14 @@ public class FormLogin extends JPanel implements ActionListener {
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == login_button) {
+      if (is_valid_credential()) {
+        PanelManager.unregister_panel("FORM_LOGIN");
+        PanelManager.unregister_panel("FORM_SIGNUP");
+      }
       return;
     }
     if (e.getSource() == signup_button) {
-      this.setVisible(false);
+      PanelManager.show("FORM_SIGNUP");
       return;
     }
   }

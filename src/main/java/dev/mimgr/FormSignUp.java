@@ -17,7 +17,7 @@ import java.sql.ResultSet;
 
 import dev.mimgr.theme.builtin.ColorScheme;
 
-public class FormSignUp extends JPanel{
+public class FormSignUp extends JPanel implements ActionListener {
   JTextField     tf_username;
   JPasswordField pf_password;
   JPasswordField pf_password_confirm;
@@ -29,10 +29,6 @@ public class FormSignUp extends JPanel{
 
   FormSignUp(ColorScheme colors) {
     m_colors = colors;
-    // String DB_URL = "jdbc:mysql://127.0.0.1:3306/admin";
-    // String userDB = "root";
-    // String passwordDB = "mimgr";
-    // connection = new MySQLCon(DB_URL, userDB, passwordDB).get_connection();
 
     this.setup_form_style();
 
@@ -96,11 +92,24 @@ public class FormSignUp extends JPanel{
     this.signup_button.setBackground(m_colors.m_bg_5);
     this.signup_button.setForeground(m_colors.m_bg_1);
     this.signup_button.setBorder(rounded_border);
+    this.signup_button.addActionListener(this);
 
     this.login_button = new JButton("Back to login");
     this.login_button.setBackground(m_colors.m_bg_0);
     this.login_button.setForeground(m_colors.m_bg_5);
     this.login_button.setBorder(rounded_border);
+    this.login_button.addActionListener(this);
   }
 
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == login_button) {
+      PanelManager.show("FORM_LOGIN");
+      return;
+    }
+    if (e.getSource() == signup_button) {
+      PanelManager.show("FORM_LOGIN");
+      return;
+    }
+  }
 }

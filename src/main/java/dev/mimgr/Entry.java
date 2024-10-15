@@ -11,7 +11,7 @@ import java.awt.event.WindowListener;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
-class Entry {
+class Entry extends Frame {
   ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_LIGHT_CATPUCCIN);
 
   private double m_aspect_ratio;
@@ -28,19 +28,24 @@ class Entry {
     // Get the screen size
     Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
 
+    // Register startup panel
+    PanelManager.register_panel(new FormLogin(colors), "FORM_LOGIN");
+    PanelManager.register_panel(new FormSignUp(colors), "FORM_SIGNUP");
+
     // Main window
-    JFrame app = new JFrame();
-    app.setLayout(new BorderLayout());
-    app.setBackground(colors.m_bg_dim);
-    app.setTitle("Mimgr");
-    app.setSize(m_width, m_height);
-    app.add(new FormLogin(colors));
-    app.setLocation(
-      (screen_size.width - app.getWidth()) / 2,
-      (screen_size.height - app.getHeight()) / 2
+    this.setLayout(new BorderLayout());
+    this.setBackground(colors.m_bg_dim);
+    this.setTitle("Mimgr");
+    this.setSize(m_width, m_height);
+    this.add(PanelManager.get_main_panel());
+    this.setLocation(
+      (screen_size.width - this.getWidth()) / 2,
+      (screen_size.height - this.getHeight()) / 2
     );
-    app.setVisible(true);
-    app.addWindowListener(on_close_handler());
+    this.setVisible(true);
+    this.addWindowListener(on_close_handler());
+
+    PanelManager.show("FORM_LOGIN");
   }
 
   static final WindowListener on_close_handler() {
