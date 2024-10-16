@@ -22,3 +22,7 @@ repositories {
 dependencies {
   implementation 'mysql:mysql-connector-java:8.0.33'
 }
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}

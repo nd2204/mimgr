@@ -24,7 +24,6 @@ public class DBConnection {
       System.out.println(ex);
     }
     if (connection == null) {
-      System.out.println("Không thể kết nối đến cơ sở dữ liệu");
       System.exit(1);
     }
   }
