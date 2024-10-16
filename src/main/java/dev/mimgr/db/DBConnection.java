@@ -14,6 +14,7 @@ public class DBConnection {
 
   private DBConnection() {
     assert instance == null;
+    connection = null;
     try {
       Class.forName("com.mysql.cj.jdbc.Driver");
       connection = DriverManager.getConnection(url, user, password);
@@ -22,7 +23,10 @@ public class DBConnection {
     } catch (Exception ex) {
       System.out.println(ex);
     }
-    assert connection != null;
+    if (connection == null) {
+      System.out.println("Không thể kết nối đến cơ sở dữ liệu");
+      System.exit(1);
+    }
   }
 
   public static synchronized DBConnection get_instance() {

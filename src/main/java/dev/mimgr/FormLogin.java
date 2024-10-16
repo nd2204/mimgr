@@ -76,9 +76,7 @@ public class FormLogin extends JPanel implements ActionListener {
     this.setVisible(false);
   }
 
-  private boolean is_valid_credential() {
-    String username = get_username();
-    String password = get_password();
+  private boolean is_valid_credential(String username, String password) {
     String salt;
 
     ResultSet result = DBQueries.select_user(username);
@@ -93,22 +91,6 @@ public class FormLogin extends JPanel implements ActionListener {
     return false;
   }
 
-  private String get_username() {
-    String username = tf_username.getText();
-    if (username == username_placeholder) {
-      return "";
-    }
-    return username;
-  }
-
-  private String get_password() {
-    String password = String.valueOf(pf_password.getPassword());
-    if (password.equals(password_placeholder)) {
-      return "";
-    }
-    return password;
-  }
-
   private void setup_form_style() {
     // ========================= Label =========================
 
@@ -116,8 +98,8 @@ public class FormLogin extends JPanel implements ActionListener {
 
     // ========================= Fields =========================
 
-    tf_username = FormBuilder.create_text_field(m_colors, "Tên người dùng", 20);
-    pf_password = FormBuilder.create_password_field(m_colors, "Mật khẩu", 20);
+    tf_username = FormBuilder.create_text_field(m_colors, username_placeholder, 20);
+    pf_password = FormBuilder.create_password_field(m_colors, password_placeholder, 20);
     Border rounded_border = FormBuilder.create_rounded_border(m_colors.m_bg_5, 2);
 
     this.tf_username.setBorder(rounded_border);
@@ -144,7 +126,19 @@ public class FormLogin extends JPanel implements ActionListener {
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == login_button) {
-      if (is_valid_credential()) {
+      String username = FormBuilder.get_textfield_value(tf_username, username_placeholder);
+      String password = FormBuilder.get_passwordfield_value(pf_password, password_placeholder);
+      if (username.length() == 0) {
+        JOptionPane.showMessageDialog(null, "Tên người dùng không được để trống");
+        return;
+      }
+
+      if (password.length() == 0) {
+        JOptionPane.showMessageDialog(null, "Mật khẩu không được để trống");
+        return;
+      }
+
+      if (is_valid_credential(username, password)) {
         PanelManager.unregister_panel("FORM_LOGIN");
         PanelManager.unregister_panel("FORM_SIGNUP");
       }

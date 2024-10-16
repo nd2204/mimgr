@@ -74,4 +74,20 @@ public class FormBuilder {
     );
     return rounded_border;
   }
+
+  public static String get_textfield_value(JTextField textfield, String placeholder) {
+    String username = textfield.getText();
+    if (username.equals(placeholder)) {
+      return "";
+    }
+    return username;
+  }
+
+  public static String get_passwordfield_value(JPasswordField passwordField, String placeholder) {
+    String password = String.valueOf(passwordField.getPassword());
+    if (password.equals(placeholder)) {
+      return "";
+    }
+    return password;
+  }
 }

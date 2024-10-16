@@ -109,22 +109,6 @@ public class FormSignUp extends JPanel implements ActionListener {
     this.login_button.addActionListener(this);
   }
 
-  private String get_username() {
-    String username = tf_username.getText();
-    if (username == username_placeholder) {
-      return "";
-    }
-    return username;
-  }
-
-  private String get_password() {
-    String password = String.valueOf(pf_password.getPassword());
-    if (password.equals(password_placeholder)) {
-      return "";
-    }
-    return password;
-  }
-
   private boolean valid_username(String username) {
     if (DBQueries.select_user(username) != null) {
       JOptionPane.showMessageDialog(null, "Tên người dùng đã tồn tại");
@@ -194,8 +178,8 @@ public class FormSignUp extends JPanel implements ActionListener {
     }
 
     if (e.getSource() == signup_button) {
-      String username = get_username();
-      String password = get_password();
+      String username = FormBuilder.get_textfield_value(tf_username, username_placeholder);
+      String password = FormBuilder.get_passwordfield_value(pf_password, password_placeholder);
       String salt = Security.generate_salt(16);
       if (valid_username(username) && valid_password(password)) {
         DBQueries.insert_user(username, Security.hash_string(password + salt), salt);
