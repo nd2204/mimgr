@@ -78,12 +78,13 @@ public class FormLogin extends JPanel implements ActionListener {
 
   private boolean is_valid_credential(String username, String password) {
     String salt;
-
     ResultSet result = DBQueries.select_user(username);
     try {
-      salt = result.getString("salt");
-      if (Security.hash_string(password + salt).equals(result.getString("hash"))) {
-        return true;
+      while (result.next()) {
+        salt = result.getString("salt");
+        if (Security.hash_string(password + salt).equals(result.getString("hash"))) {
+          return true;
+        }
       }
     } catch (SQLException e) {
       e.printStackTrace();

@@ -26,11 +26,11 @@ public class DBQueries {
 
   public static ResultSet select_user(String username) {
     ResultSet resultSet = null;
+
     try {
       PreparedStatement preparedStatement = dbcon.prepareStatement(SELECT_USER);
       preparedStatement.setString(1, username);
       resultSet = preparedStatement.executeQuery();
-      if (!resultSet.next()) return null;
     } catch (SQLException e) {
       e.printStackTrace();
     }

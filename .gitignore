@@ -29,6 +29,7 @@ replay_pid*
 .settings
 
 # Ignore Gradle build output directory
+bin
 build
 *.prefs
 .classpath

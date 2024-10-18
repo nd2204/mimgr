@@ -1,4 +1,7 @@
 package dev.mimgr;
 
-public class Dashboard extends javax.swing.JFrame {
+import javax.swing.JPanel;
+
+public class Dashboard extends JPanel {
+  
 }
