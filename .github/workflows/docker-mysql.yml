@@ -18,5 +18,18 @@ jobs:
           sudo apt-get install docker-compose -y
           
       - name: Run docker-compose up
-        working-directory: ./mimgrdb  # Navigate to the directory with docker-compose.yml
-        run: docker-compose up -d  # Run services in detached mode
+        working-directory: ./mimgrdb
+        run: docker-compose up -d
+
+      - name: Ensure containers are still running
+        run: |
+          if [ $(docker-compose ps -q | wc -l) -eq 0 ]; then
+            echo "No containers are running. Exiting..."
+            exit 1  # Explicitly fail the job if no containers are running
+          fi
+        working-directory: ./mimgrdb
+
+      - name: Get Docker logs on failure
+        if: failure()
+        run: docker-compose logs
+        working-directory: ./mimgrdb
