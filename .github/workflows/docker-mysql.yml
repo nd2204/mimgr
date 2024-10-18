@@ -18,14 +18,14 @@ jobs:
           sudo apt-get install docker-compose -y
           
       - name: Run docker-compose up
-        working-directory: ./mimgrdb
-        run: docker-compose up -d
-
-      - name: Ensure containers are still running
         run: |
-          if [ $(docker-compose ps -q | wc -l) -eq 0 ]; then
-            echo "No containers are running. Exiting..."
-            exit 1  # Explicitly fail the job if no containers are running
+          echo "Running docker-compose for 15 seconds..."
+          timeout 15 docker-compose up
+          RESULT=$?  # Capture the exit code of the timeout command
+
+          # Check the exit code
+          if [ $RESULT -ne 124 ]; then
+              exit 1
           fi
         working-directory: ./mimgrdb
 
