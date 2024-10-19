@@ -37,7 +37,6 @@ public class FormSignUp extends JPanel implements ActionListener {
     m_colors = colors;
     m_connection = DBConnection.get_instance().get_connection();
 
-
     this.setup_form_style();
 
     GridBagConstraints c = new GridBagConstraints();
