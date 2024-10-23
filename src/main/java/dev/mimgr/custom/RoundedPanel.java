@@ -13,20 +13,16 @@ import dev.mimgr.theme.ColorTheme.theme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class RoundedPanel extends JPanel {
-  private final ColorScheme colors;
-  private int borderRadius = 15;
-  private int borderWidth = 1;
-
   public RoundedPanel(ColorScheme colors) {
+    super();
     this.colors = colors;
-    setPreferredSize(new Dimension(200, 100));
     this.setBackground(this.colors.m_bg_0);
   }
 
   public RoundedPanel() {
+    super();
     colors = ColorTheme.get_colorscheme(theme.THEME_LIGHT_DEFAULT);
     this.setBackground(colors.m_bg_0);
-    setPreferredSize(new Dimension(200, 100));
     setOpaque(false);
   }
 
@@ -51,4 +47,8 @@ public class RoundedPanel extends JPanel {
     this.borderRadius = width;
     repaint();
   }
+
+  private final ColorScheme colors;
+  private int borderRadius = 15;
+  private int borderWidth = 1;
 }

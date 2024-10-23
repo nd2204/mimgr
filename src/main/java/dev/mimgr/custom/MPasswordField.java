@@ -13,21 +13,21 @@ import java.awt.event.FocusEvent;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JTextField;
+import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.ColorTheme.theme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
-public class MTextField extends JTextField implements FocusListener { 
+public class MPasswordField extends JPasswordField implements FocusListener { 
   // Constructor with default settings
-  public MTextField(int columns) {
+  public MPasswordField(int columns) {
     super(columns);
     Init();
   }
 
-  public MTextField() {
+  public MPasswordField() {
     super();
     Init();
   }
@@ -41,7 +41,7 @@ public class MTextField extends JTextField implements FocusListener {
     this.addFocusListener(this);
     setOpaque(false); // Make the background transparent for custom painting
   }
-  
+
   // Override the paintComponent method to customize the drawing
   @Override
   protected void paintComponent(Graphics g) {
@@ -72,12 +72,14 @@ public class MTextField extends JTextField implements FocusListener {
       );
     }
 
+
     g2d.setColor(this.borderColor);
     if (isFocusOwner()) {
       g2d.setColor(this.focusBorderColor);
     }
     g2d.setStroke(new BasicStroke(this.borderWidth));
     g2d.drawRoundRect(borderWidth, borderWidth, getWidth() - (borderWidth * 2), getHeight() - (borderWidth * 2), borderRadius, borderRadius);
+
     g2d.dispose();
   }
 

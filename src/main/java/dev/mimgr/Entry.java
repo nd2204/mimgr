@@ -1,18 +1,19 @@
 package dev.mimgr;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
-import dev.mimgr.custom.MTextField;
+import javax.swing.JFrame;
+
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
-class Entry extends Frame {
+class Entry extends JFrame {
   ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_LIGHT_DEFAULT);
 
   private double m_aspect_ratio;
@@ -21,9 +22,13 @@ class Entry extends Frame {
 
   Entry() {
     m_aspect_ratio = 16.0f / 10.0f;
-    m_width = 900;
+    m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
 
+    FontManager.loadFont("Roboto", "/fonts/Roboto-Regular.ttf", 12f);
+    FontManager.loadFont("RobotoBold", "/fonts/Roboto-Bold.ttf", 12f);
+    FontManager.loadFont("RobotoMonoBold", "/fonts/RobotoMono-Bold.ttf", 12f);
+    FontManager.loadVariableFont("MontserratBold", "/fonts/Montserrat-VariableFont_wght.ttf", Font.BOLD, 12f);
 
     // Get the screen size
     Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
@@ -31,28 +36,11 @@ class Entry extends Frame {
     // Register startup panel
     PanelManager.register_panel(new FormLogin(colors), "FORM_LOGIN");
     PanelManager.register_panel(new FormSignUp(colors), "FORM_SIGNUP");
-
-    JFrame frame = new JFrame("Custom Component Demo");
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setLayout(new FlowLayout());
-
-    // Create and customize the custom component
-    MTextField customTextField = new MTextField(20);
-    customTextField.setBackground(Color.WHITE); // Set the background color
-    customTextField.setBorderColor(Color.BLUE); // Custom border color
-    customTextField.setBorderRadius(15);        // Rounded corners
-    customTextField.setBorderWidth(2);          // Custom border width
-    customTextField.setFont(new Font("Arial", Font.PLAIN, 14)); // Set custom font
-
-    // Add the custom component to the frame
-    frame.add(customTextField);
-
-    // Display frame
-    frame.pack();
-    frame.setVisible(true);
+    // PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
 
     // Main window
     this.setLayout(new BorderLayout());
+    this.setMinimumSize(new Dimension(854, 480));
     this.setBackground(colors.m_bg_dim);
     this.setTitle("Mimgr");
     this.setSize(m_width, m_height);

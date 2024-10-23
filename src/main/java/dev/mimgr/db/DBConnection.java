@@ -23,9 +23,9 @@ public class DBConnection {
     } catch (Exception ex) {
       System.out.println(ex);
     }
-    if (connection == null) {
-      System.exit(1);
-    }
+    // if (connection == null) {
+    //   System.exit(1);
+    // }
   }
 
   public static synchronized DBConnection get_instance() {

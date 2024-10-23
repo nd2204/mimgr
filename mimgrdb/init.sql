@@ -59,8 +59,7 @@ INSERT INTO categories (category_id, category_name) VALUES
   (4, 'Drums & Percussion'),
   (5, 'String Instruments'),
   (6, 'Wind Instruments'),
-  (7, 'Amplifiers & Effects'),
-  (8, 'Accessories'),
+  (7, 'Accessories'),
   (51, NULL);
 
 -- Add subcategory level 1
@@ -94,8 +93,8 @@ INSERT INTO categories (category_name, parent_id) VALUES
   ('Mouthpieces for Woodwind', 6), ('Mouthpieces for Brasswind', 6), ('Mutes for Winds', 6), ('Pickup Systems for Winds', 6),
   ('Accessories for Winds', 6), ('Music Books for Winds', 6),
 
-  ('Headphones', 8), ('Cables', 8), ('Plugs & Adapters', 8), ('Stands', 8), ('Tuners', 8), ('Metronomes', 8), ('Switches & Buttons', 8),
-  ('Power Adapters & Supplies', 8), ('Cable Clamps, Gaffa Tape, etc.', 8);
+  ('Headphones', 7), ('Cables', 7), ('Plugs & Adapters', 7), ('Stands', 7), ('Tuners', 7), ('Metronomes', 7), ('Switches & Buttons', 7),
+  ('Power Adapters & Supplies', 7), ('Cable Clamps, Gaffa Tape, etc.', 7);
 
 INSERT INTO products (name, price, stock_quantity, category_id, image_url, description) VALUES
   (

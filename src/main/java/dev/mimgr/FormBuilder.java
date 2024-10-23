@@ -8,13 +8,20 @@ import javax.swing.BorderFactory;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
 import java.awt.Color;
+import dev.mimgr.custom.MTextField;
+import dev.mimgr.custom.MPasswordField;
 
 public class FormBuilder {
-  public static JTextField create_text_field(ColorScheme colors, String placeholder, int length) {
-    JTextField field = new JTextField(length);
+  public static MTextField create_text_field(ColorScheme colors, String placeholder, int length) {
+    MTextField field = new MTextField(length);
     field.setBackground(colors.m_bg_1);
     field.setForeground(colors.m_bg_5);
+    field.setFont(FontManager.getFont("RobotoMonoBold", 14f));
     field.setText(placeholder);
+    field.setBorderWidth(2);
+    field.setBorderRadius(15);
+    field.setBorderColor(colors.m_bg_5);
+    field.setFocusBorderColor(colors.m_accent);
 
     field.addFocusListener(new FocusListener() {
       public void focusGained(FocusEvent fe) {
@@ -36,12 +43,17 @@ public class FormBuilder {
     return field;
   };
 
-  public static JPasswordField create_password_field(ColorScheme colors, String placeholder, int length) {
-    JPasswordField psswd = new JPasswordField(length);
+  public static MPasswordField create_password_field(ColorScheme colors, String placeholder, int length) {
+    MPasswordField psswd = new MPasswordField(length);
     psswd.setBackground(colors.m_bg_1);
     psswd.setForeground(colors.m_bg_5);
     psswd.setEchoChar('\0');
     psswd.setText(placeholder);
+    psswd.setFont(FontManager.getFont("RobotoMonoBold", 14f));
+    psswd.setBorderWidth(2);
+    psswd.setBorderRadius(15);
+    psswd.setBorderColor(colors.m_bg_5);
+    psswd.setFocusBorderColor(colors.m_accent);
 
     psswd.addFocusListener(new FocusListener() {
       public void focusGained(FocusEvent fe) {
