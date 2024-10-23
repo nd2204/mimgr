@@ -14,7 +14,7 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 class Entry extends JFrame {
-  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_LIGHT_DEFAULT);
+  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_LIGHT_EVERFOREST);
 
   private double m_aspect_ratio;
   private int    m_width;
@@ -41,15 +41,15 @@ class Entry extends JFrame {
     // Main window
     this.setLayout(new BorderLayout());
     this.setMinimumSize(new Dimension(854, 480));
-    this.setBackground(colors.m_bg_dim);
     this.setTitle("Mimgr");
     this.setSize(m_width, m_height);
     this.add(PanelManager.get_main_panel());
     this.setLocation(
-    (screen_size.width - this.getWidth()) / 2,
-    (screen_size.height - this.getHeight()) / 2
+      (screen_size.width - this.getWidth()) / 2,
+      (screen_size.height - this.getHeight()) / 2
     );
     this.setVisible(true);
+    this.requestFocus();
     this.addWindowListener(on_close_handler());
 
     //     PanelManager.show("FORM_LOGIN");

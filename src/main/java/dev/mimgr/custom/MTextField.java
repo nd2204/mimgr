@@ -33,15 +33,14 @@ public class MTextField extends JTextField implements FocusListener {
   }
 
   private void Init() {
-    this.colors = ColorTheme.get_colorscheme(theme.THEME_LIGHT_DEFAULT);
     this.setPadding(padding);
-    this.setBorderColor(colors.m_fg_0);
-    this.setFocusBorderColor(colors.m_accent);
+    this.setBorderColor(Color.BLACK);
+    this.setFocusBorderColor(Color.BLACK);
     this.setCursor(new Cursor(Cursor.TEXT_CURSOR));
     this.addFocusListener(this);
     setOpaque(false); // Make the background transparent for custom painting
   }
-  
+
   // Override the paintComponent method to customize the drawing
   @Override
   protected void paintComponent(Graphics g) {
@@ -137,44 +136,83 @@ public class MTextField extends JTextField implements FocusListener {
     repaint();
   }
 
-  @Override
-  public void focusLost(FocusEvent e) {
+  public String getPlaceholder() {
+    return this.placeholder;
+  }
+
+  public void setPlaceholder(String text) {
+    this.placeholder = text;
+    this.setText(text);
     repaint();
   }
-  @Override
-  public void focusGained(FocusEvent e) {
-    repaint();
+
+  public Color getPlaceholderForeground() {
+    return this.placeholderForeground;
+  }
+
+  public void setPlaceholderForeground(Color color) {
+    this.placeholderForeground = color;
+  }
+
+
+  public String getTextString() {
+    String username = this.getText();
+    if (username.equals(placeholder)) {
+      return "";
+    }
+    return username;
   }
 
   public Icon getIcon(int direction) {
     switch(direction) {
       case ICON_PREFIX:
-        return this.prefixIcon;
+      return this.prefixIcon;
       case ICON_POSTFIX:
-        return this.postfixIcon;
+      return this.postfixIcon;
       default:
-        return null;
+      return null;
     }
   }
 
   public void setIcon(Icon icon, int direction) {
     switch(direction) {
       case ICON_PREFIX:
-        this.prefixIcon = icon;
-        break;
+      this.prefixIcon = icon;
+      break;
       case ICON_POSTFIX:
-        this.postfixIcon = icon;
-        break;
+      this.postfixIcon = icon;
+      break;
     }
     this.setPadding(padding);
     repaint();
   }
 
-  private ColorScheme colors;
+  @Override
+  public void focusLost(FocusEvent e) {
+    inputForeground = getForeground();
+    if (this.getText().isEmpty()) {
+      this.setText(placeholder);
+      this.setForeground(placeholderForeground);
+    }
+    repaint();
+  }
+
+  @Override
+  public void focusGained(FocusEvent e) {
+    if (this.getText().equals(placeholder)) {
+      this.setText("");
+      this.setForeground(inputForeground);
+    }
+    repaint();
+  }
+
+  private String placeholder;
+  private Color inputForeground;
+  private Color placeholderForeground;
   private Color borderColor;
   private Color focusBorderColor;
   private int borderRadius = 15;
-  private int borderWidth = 1;
+  private int borderWidth  = 1;
   private Insets padding = new Insets(10, 20, 10, 20);
   private Icon prefixIcon;
   private Icon postfixIcon;

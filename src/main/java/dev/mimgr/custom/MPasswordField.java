@@ -33,12 +33,13 @@ public class MPasswordField extends JPasswordField implements FocusListener {
   }
 
   private void Init() {
-    this.colors = ColorTheme.get_colorscheme(theme.THEME_LIGHT_DEFAULT);
     this.setPadding(padding);
-    this.setBorderColor(colors.m_fg_0);
-    this.setFocusBorderColor(colors.m_accent);
+    this.setBorderColor(Color.BLACK);
+    this.setFocusBorderColor(Color.BLACK);
     this.setCursor(new Cursor(Cursor.TEXT_CURSOR));
     this.addFocusListener(this);
+    this.setEchoChar('\0');
+    this.setText(this.placeholder);
     setOpaque(false); // Make the background transparent for custom painting
   }
 
@@ -71,7 +72,6 @@ public class MPasswordField extends JPasswordField implements FocusListener {
         null
       );
     }
-
 
     g2d.setColor(this.borderColor);
     if (isFocusOwner()) {
@@ -139,14 +139,24 @@ public class MPasswordField extends JPasswordField implements FocusListener {
     repaint();
   }
 
-  @Override
-  public void focusLost(FocusEvent e) {
+  public String getPlaceholder() {
+    return this.placeholder;
+  }
+
+  public void setPlaceholder(String text) {
+    this.placeholder = text;
+    this.setText(placeholder);
     repaint();
   }
-  @Override
-  public void focusGained(FocusEvent e) {
-    repaint();
+
+  public Color getPlaceholderForeground() {
+    return this.placeholderForeground;
   }
+
+  public void setPlaceholderForeground(Color color) {
+    this.placeholderForeground = color;
+  }
+
 
   public Icon getIcon(int direction) {
     switch(direction) {
@@ -168,11 +178,42 @@ public class MPasswordField extends JPasswordField implements FocusListener {
         this.postfixIcon = icon;
         break;
     }
-    this.setPadding(padding);
+    this.setPadding(this.padding);
     repaint();
   }
 
-  private ColorScheme colors;
+  public String getTextString() {
+    String password = String.valueOf(this.getPassword());
+    if (password.equals(this.placeholder)) {
+      return "";
+    }
+    return password;
+  }
+
+  @Override
+  public void focusLost(FocusEvent e) {
+    this.inputForeground = this.getForeground(); 
+    if (this.getPassword().length == 0) {
+      this.setEchoChar('\0');
+      this.setForeground(this.placeholderForeground);
+      this.setText(this.placeholder);
+    }
+    repaint();
+  }
+
+  @Override
+  public void focusGained(FocusEvent e) {
+    if (String.valueOf(this.getPassword()).equals(this.placeholder)) {
+      this.setEchoChar('*');
+      this.setText("");
+      this.setForeground(this.inputForeground);
+    }
+    repaint();
+  }
+
+  private String placeholder;
+  private Color placeholderForeground;
+  private Color inputForeground;
   private Color borderColor;
   private Color focusBorderColor;
   private int borderRadius = 15;

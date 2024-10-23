@@ -11,13 +11,14 @@ import dev.mimgr.theme.builtin.ColorScheme;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
-public class MButton extends JButton {
+public class MButton extends JButton implements MouseListener {
   public MButton() {
     super();
     Init();
@@ -30,8 +31,12 @@ public class MButton extends JButton {
 
   private void Init() {
     // Remove the default area border
+    this.setBorder(null);
     super.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    this.setPadding(padding);
     this.setContentAreaFilled(false);
+    this.addMouseListener(this);
+    this.setFocusable(false);
   }
 
   @Override
@@ -54,20 +59,20 @@ public class MButton extends JButton {
   }
 
   private void drawBackground(Graphics2D g2) {
-    if (getModel().isPressed()) {
+    if (this.clickBackgroundColor != null && getModel().isPressed()) {
       g2.setColor(this.clickBackgroundColor);
-    } else if (getModel().isRollover()) {
+    } else if (this.hoverBackgroundColor != null && getModel().isRollover()) {
       g2.setColor(this.hoverBackgroundColor);
     } else {
       g2.setColor(getBackground());
     }
-    g2.fillRoundRect(borderWidth, borderWidth, getWidth() - (borderWidth * 2), getHeight() - (borderWidth * 2), borderRadius, borderRadius);
+    g2.fillRoundRect(this.borderWidth, this.borderWidth, getWidth() - (borderWidth * 2), getHeight() - (borderWidth * 2), borderRadius, borderRadius);
   }
 
   private void drawBorder(Graphics2D g2) {
-    if (getModel().isPressed()) {
+    if (this.clickBorderColor != null && getModel().isPressed()) {
       g2.setColor(this.clickBorderColor);
-    } else if (getModel().isRollover()) {
+    } else if (this.hoverBorderColor != null && getModel().isRollover()) {
       g2.setColor(this.hoverBorderColor);
     } else {
       g2.setColor(this.borderColor);
@@ -77,12 +82,12 @@ public class MButton extends JButton {
   }
 
   private void drawText(Graphics g) {
-    if (getModel().isPressed()) {
+    if (this.clickForegroundColor != null && getModel().isPressed()) {
       this.setForeground(this.clickForegroundColor);
-    } else if (getModel().isRollover()) {
+    } else if (this.hoverForegroundColor != null && getModel().isRollover()) {
       this.setForeground(this.hoverForegroundColor);
     } else {
-      this.setForeground(getForeground());
+      this.setForeground(this.getForeground());
     }
     super.paintComponent(g); // Ensure button text is rendered
   }
@@ -188,17 +193,42 @@ public class MButton extends JButton {
     repaint();
   }
 
+  @Override
+  public void mouseClicked(MouseEvent e) {
+    repaint();
+  }
+
+  @Override
+  public void mouseEntered(MouseEvent e) {
+    repaint();
+  }
+
+  @Override
+  public void mouseExited(MouseEvent e) {
+    repaint();
+  }
+
+  @Override
+  public void mouseReleased(MouseEvent e) {
+    repaint();
+  }
+
+  @Override
+  public void mousePressed(MouseEvent e) {
+    repaint();
+  }
+
   private ColorScheme colors         = ColorTheme.get_colorscheme(theme.THEME_LIGHT_DEFAULT);
 
   private Color borderColor          = colors.m_bg_5;
-  private Color clickBorderColor     = colors.m_bg_5;
-  private Color hoverBorderColor     = colors.m_bg_5;
+  private Color clickBorderColor     = null;
+  private Color hoverBorderColor     = null;
 
-  private Color clickBackgroundColor = colors.m_bg_5;
-  private Color hoverBackgroundColor = colors.m_bg_5;
+  private Color clickBackgroundColor = null;
+  private Color hoverBackgroundColor = null;
 
-  private Color clickForegroundColor = colors.m_fg_0;
-  private Color hoverForegroundColor = colors.m_fg_0;
+  private Color clickForegroundColor = null;
+  private Color hoverForegroundColor = null;
 
   private int borderRadius           = 15;
   private int borderWidth            = 1;
