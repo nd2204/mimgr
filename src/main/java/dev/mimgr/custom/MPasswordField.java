@@ -183,6 +183,10 @@ public class MPasswordField extends JPasswordField implements FocusListener {
     repaint();
   }
 
+  public void setShowingPassword(boolean isShowingPassword) {
+    this.isShowingPassword = isShowingPassword;
+  }
+
   public String getTextString() {
     String password = String.valueOf(this.getPassword());
     if (password.equals(this.placeholder)) {
@@ -204,8 +208,8 @@ public class MPasswordField extends JPasswordField implements FocusListener {
   @Override
   public void focusLost(FocusEvent e) {
     if (this.getPassword().length == 0) {
-      this.setEchoChar('\0');
       this.setForeground(this.placeholderForeground);
+      this.setEchoChar('\0');
       this.setText(this.placeholder);
     }
     repaint();
@@ -213,16 +217,20 @@ public class MPasswordField extends JPasswordField implements FocusListener {
 
   @Override
   public void focusGained(FocusEvent e) {
-    inputForeground = getForeground();
     if (String.valueOf(this.getPassword()).equals(this.placeholder)) {
-      this.setEchoChar('*');
-      this.setText("");
       this.setForeground(this.inputForeground);
+      if (!this.isShowingPassword) {
+        this.setEchoChar('*');
+      } else {
+        this.setEchoChar('\0');
+      }
+      this.setText("");
     }
     repaint();
   }
 
   private String placeholder;
+  private boolean isShowingPassword;
   private Color placeholderForeground;
   private Color inputForeground;
   private Color borderColor;

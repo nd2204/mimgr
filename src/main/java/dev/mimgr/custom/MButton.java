@@ -24,6 +24,11 @@ public class MButton extends JButton implements MouseListener {
     Init();
   }
 
+  public MButton(Icon icon) {
+    super(icon);
+    Init();
+  }
+
   public MButton(String text) {
     super(text);
     Init();

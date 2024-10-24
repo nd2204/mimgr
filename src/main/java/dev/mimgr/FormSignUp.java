@@ -43,24 +43,73 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
 
     int padding = 40;
     input_container.setLayout(new GridBagLayout());
+
+    c.fill = GridBagConstraints.HORIZONTAL;
     c.insets = new Insets(padding, padding, 25, padding);
+    c.gridx = 0;
     c.gridy = 0;
+    c.weightx = 1.0;
+    c.gridwidth = 2;
     input_container.add(form_label, c);
+
+    c.fill = GridBagConstraints.HORIZONTAL;
     c.insets = new Insets(10, padding, 10, padding);
+    c.gridx = 0;
     c.gridy = 1;
+    c.weightx = 1.0;
+    c.gridwidth = 2;
     input_container.add(tf_username, c);
+
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.insets = new Insets(10, padding, 10, padding);
+    c.gridx = 0;
     c.gridy = 2;
+    c.weightx = 1.0;
+    c.gridwidth = 2;
     input_container.add(pf_password, c);
+
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.insets = new Insets(10, padding, 10, padding);
+    c.gridx = 0;
     c.gridy = 3;
+    c.weightx = 1.0;
+    c.gridwidth = 2;
     input_container.add(pf_password_confirm, c);
+
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.insets = new Insets(10, padding, 10, 10);
+    c.gridx = 0;
     c.gridy = 4;
+    c.weightx = 1.0;
+    c.gridwidth = 1;
     input_container.add(signup_button, c);
+
+    c.fill = GridBagConstraints.BOTH;
+    c.insets = new Insets(10, 0, 10, padding);
+    c.gridx = 1;
+    c.gridy = 4;
+    c.weightx = 0;
+    c.weighty = 0.5;
+    c.gridwidth = 1;
+    input_container.add(show_password_button, c);
+
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.insets = new Insets(10, padding, 10, padding);
+    c.gridx = 0;
     c.gridy = 5;
+    c.weightx = 1.0;
+    c.gridwidth = 2;
     JSeparator sep = new JSeparator();
-    sep.setForeground(m_colors.m_bg_2);
+    sep.setForeground(m_colors.m_bg_4);
+    sep.setBackground(null);
     input_container.add(sep, c);
+
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.insets = new Insets(10, padding, padding, padding);
+    c.gridx = 0;
     c.gridy = 6;
-    c.insets = new Insets(5, padding, padding, padding);
+    c.weightx = 1.0;
+    c.gridwidth = 2;
     input_container.add(login_button, c);
 
     this.setLayout(new GridBagLayout());
@@ -130,6 +179,15 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
     pf_password_confirm.getDocument().addDocumentListener(this);
 
     // ========================= Buttons =========================
+    this.show_password_button = new MButton(IconManager.getIcon("eye_closed.png", 20, 16, m_colors.m_grey_0));
+    this.show_password_button.setBorderWidth(2);
+    this.show_password_button.setBackground(m_colors.m_bg_0);
+    this.show_password_button.setBorderColor(m_colors.m_bg_4);
+    this.show_password_button.setForeground(m_colors.m_grey_0);
+    this.show_password_button.setHoverBorderColor(m_colors.m_bg_5);
+    this.show_password_button.setHoverBackgroundColor(m_colors.m_bg_3);
+    this.show_password_button.addActionListener(this);
+
     this.signup_button = new MButton("Tạo tài khoản");
     this.signup_button.setFont(font_bold);
     this.signup_button.setBackground(m_colors.m_bg_4);
@@ -215,6 +273,26 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
 
   @Override
   public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == show_password_button) {
+      if (!isShowingPassword) {
+        pf_password.setShowingPassword(true);
+        pf_password_confirm.setShowingPassword(true);
+        pf_password.setEchoChar('\0');
+        pf_password_confirm.setEchoChar('\0');
+        show_password_button.setIcon(IconManager.getIcon("eye_opened.png", 20, 16, m_colors.m_blue));
+        show_password_button.setHoverBorderColor(m_colors.m_blue);
+      } else {
+        pf_password.setShowingPassword(false);
+        pf_password_confirm.setShowingPassword(false);
+        if (!pf_password.getTextString().isEmpty()) {
+          pf_password.setEchoChar('*');
+          pf_password_confirm.setEchoChar('*');
+        }
+        show_password_button.setIcon(IconManager.getIcon("eye_closed.png", 20, 16, m_colors.m_grey_0));
+        show_password_button.setHoverBorderColor(m_colors.m_grey_0);
+      }
+      isShowingPassword = !isShowingPassword;
+    }
     if (e.getSource() == login_button) {
       PanelManager.show("FORM_LOGIN");
       return;
@@ -274,6 +352,8 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
   private JLabel         form_label;
   private MButton        login_button;
   private MButton        signup_button;
+  private MButton        show_password_button;
+  private boolean        isShowingPassword = false;
   private Connection     m_connection;
 
   private final String username_placeholder = "Tên người dùng";
