@@ -1,10 +1,14 @@
 package dev.mimgr;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -254,6 +258,7 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
       if (is_valid_credential(username, password)) {
         PanelManager.unregister_panel("FORM_LOGIN");
         PanelManager.unregister_panel("FORM_SIGNUP");
+        PanelManager.show("DASHBOARD");
       }
 
       return;

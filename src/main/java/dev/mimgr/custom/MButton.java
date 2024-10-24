@@ -34,6 +34,11 @@ public class MButton extends JButton implements MouseListener {
     Init();
   }
 
+  public MButton(String text, Icon icon) {
+    super(text, icon);
+    Init();
+  }
+
   private void Init() {
     // Remove the default area border
     this.setBorder(null);

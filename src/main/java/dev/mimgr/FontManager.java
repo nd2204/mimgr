@@ -17,9 +17,10 @@ public class FontManager {
       return loadedFonts.get(fontName).deriveFont(style, fontSize);
     }
 
-    try (InputStream fontStream = FontManager.class.getResourceAsStream(resourcePath)) {
+    String resourceURL = "/fonts/" + resourcePath;
+    try (InputStream fontStream = FontManager.class.getResourceAsStream(resourceURL)) {
       if (fontStream == null) {
-        throw new IOException("Font resource not found: " + resourcePath);
+        throw new IOException("Font resource not found: " + resourceURL);
       }
 
       Font font = Font.createFont(Font.TRUETYPE_FONT, fontStream).deriveFont(fontSize);

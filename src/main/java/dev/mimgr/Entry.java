@@ -25,18 +25,19 @@ class Entry extends JFrame {
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
 
-    FontManager.loadFont("Roboto", "/fonts/Roboto-Regular.ttf", 12f);
-    FontManager.loadFont("RobotoBold", "/fonts/Roboto-Bold.ttf", 12f);
-    FontManager.loadFont("RobotoMonoBold", "/fonts/RobotoMono-Bold.ttf", 12f);
-    FontManager.loadVariableFont("MontserratBold", "/fonts/Montserrat-VariableFont_wght.ttf", Font.BOLD, 12f);
+    FontManager.loadFont("Roboto", "Roboto-Regular.ttf", 12f);
+    FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf", 12f);
+    FontManager.loadFont("RobotoMonoBold", "RobotoMono-Bold.ttf", 12f);
+    FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf", 12f);
+    FontManager.loadFont("NunitoBold", "Nunito-Bold.ttf", 12f);
 
     // Get the screen size
     Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
 
     // Register startup panel
-    PanelManager.register_panel(new FormLogin(colors), "FORM_LOGIN");
-    PanelManager.register_panel(new FormSignUp(colors), "FORM_SIGNUP");
-    // PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
+    // PanelManager.register_panel(new FormLogin(colors), "FORM_LOGIN");
+    // PanelManager.register_panel(new FormSignUp(colors), "FORM_SIGNUP");
+    PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
 
     // Main window
     this.setLayout(new BorderLayout());
@@ -51,8 +52,6 @@ class Entry extends JFrame {
     this.setVisible(true);
     this.requestFocus();
     this.addWindowListener(on_close_handler());
-
-    //     PanelManager.show("FORM_LOGIN");
   }
 
   static final WindowListener on_close_handler() {

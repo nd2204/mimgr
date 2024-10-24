@@ -16,6 +16,17 @@ public class PanelManager {
     panelMap.put(id, panel);
   }
 
+  public static void unregister_panel(String id) {
+    JPanel panel = panelMap.remove(id);
+    assert panel != null : 
+      "Error: No panel found with ID '" + id + "'";
+
+    m_main_panel.remove(panel);
+    if(currentPanelId == id) {
+      currentPanelId = null;
+    }
+  }
+
   public static void show(String id) {
     assert panelMap.containsKey(id) :
       "Error: No panel registered with ID '" + id + "'";
@@ -33,16 +44,5 @@ public class PanelManager {
 
   public static JPanel get_panel(String id) {
     return panelMap.get(id);  // Returns null if not found
-  }
-
-  public static void unregister_panel(String id) {
-    JPanel panel = panelMap.remove(id);
-    assert panel != null : 
-      "Error: No panel found with ID '" + id + "'";
-
-    m_main_panel.remove(panel);
-    if(currentPanelId == id) {
-      currentPanelId = null;
-    }
   }
 }

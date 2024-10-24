@@ -17,6 +17,62 @@ public class IconManager {
   private static final String ICONS_PATH = "/icons/";
 
   /**
+     * Retrieve an icon by filename. If the icon is already loaded,
+     * it will return the cached version.
+     * @param iconFileName The filename of the icon (e.g., "save.png", "delete.png")
+     * @param iconFileName The name of the icon
+     * @param width The width to scale to
+     * @param height The height to scale to
+     * @param color The color of the icon
+     * @return The loaded icon, or null if the icon cannot be found
+     */
+  public static Icon getIcon(String iconFileName, int width, int height, Color color) {
+    // Check if the icon is already cached
+    Icon icon = null;
+    if (iconCache.containsKey(iconFileName)) {
+      icon = iconCache.get(iconFileName);
+    } else {
+      // Load the icon from resources
+      String iconPath = ICONS_PATH + iconFileName;  // Example: "/icons/save.png"
+      URL iconURL = IconManager.class.getResource(iconPath);
+
+      if (iconURL == null) {
+        System.err.println("Icon not found: " + iconPath);
+        return null;
+      }
+
+      icon = new ImageIcon(iconURL);
+      iconCache.put(iconFileName, icon);  // Cache the icon for future use
+    }
+
+    if (icon != null) {
+      if (width >= 0 && height >= 0) {
+        icon = changeIconSize(icon, width, height);
+      }
+
+      if (color != null) {
+        icon = changeIconColor(icon, color);
+      }
+    }
+
+    return icon;
+  }
+
+  public static Icon getIcon(String iconName, int width, int height) {
+    return getIcon(iconName, width, height, null);
+  }
+
+  public static Icon getIcon(String iconName) {
+    return getIcon(iconName, -1, -1, null);
+  }
+
+  public static Icon changeIconSize(Icon icon, int width, int height) {
+    ImageIcon imageIcon = (ImageIcon) icon;
+    Image scaledImage = imageIcon.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+    return new ImageIcon(scaledImage);
+  }
+
+  /**
    * ONLY SUPPORT .png IMAGES
    * change the colors of all pixel's RGB chanel with retained Alpha chanel
    * @param icon the icon object
@@ -50,53 +106,6 @@ public class IconManager {
     return new ImageIcon(bi);
   }
 
-  /**
-     * Retrieve an icon by name. If the icon is already loaded, it will return the cached version.
-     * @param iconName The name of the icon (e.g., "save", "delete")
-     * @return The loaded icon, or null if the icon cannot be found
-     */
-  public static Icon getIcon(String iconName) {
-    // Check if the icon is already cached
-    if (iconCache.containsKey(iconName)) {
-      return iconCache.get(iconName);
-    }
-
-    // Load the icon from resources
-    String iconPath = ICONS_PATH + iconName;  // Example: "/icons/save.png"
-    URL iconURL = IconManager.class.getResource(iconPath);
-
-    if (iconURL != null) {
-      Icon icon = new ImageIcon(iconURL);
-      iconCache.put(iconName, icon);  // Cache the icon for future use
-      return icon;
-    }
-
-    System.err.println("Icon not found: " + iconPath);
-    return null;
-  }
-
-  /**
-     * Retrieve a scaled version of the icon by specifying width and height.
-     * @param iconName The name of the icon
-     * @param width The width to scale to
-     * @param height The height to scale to
-     * @param color The color of the icon
-     * @return The scaled icon, or null if the icon cannot be found
-     */
-  public static Icon getIcon(String iconName, int width, int height, Color color) {
-    Icon originalIcon = getIcon(iconName);
-    if (originalIcon != null) {
-      originalIcon = changeIconColor(originalIcon, color);
-      return changeIconSize(originalIcon, width, height);
-    }
-    return null;
-  }
-
-  public static Icon changeIconSize(Icon icon, int width, int height) {
-    ImageIcon imageIcon = (ImageIcon) icon;
-    Image scaledImage = imageIcon.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
-    return new ImageIcon(scaledImage);
-  }
 
   /**
      * Clears the icon cache to free memory.
