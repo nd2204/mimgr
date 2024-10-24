@@ -96,8 +96,7 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
     // ========================= Fields =========================
 
     tf_username = new MTextField(30);
-    tf_username.setForeground(m_colors.m_grey_1);
-    tf_username.setPlaceholderForeground(m_colors.m_grey_1);
+    tf_username.setInputForeground(m_colors.m_fg_0);
     tf_username.setPlaceholder(username_placeholder);
     tf_username.setBackground(m_colors.m_bg_1);
     tf_username.setBorderColor(m_colors.m_bg_4);
@@ -108,10 +107,11 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
       IconManager.getIcon("user.png", 20, 20, m_colors.m_grey_1),
       MPasswordField.ICON_PREFIX
     );
+    tf_username.setPlaceholderForeground(m_colors.m_grey_1);
     tf_username.getDocument().addDocumentListener(this);
 
     pf_password = new MPasswordField(30);
-    pf_password.setForeground(m_colors.m_grey_1);
+    pf_password.setInputForeground(m_colors.m_fg_0);
     pf_password.setPlaceholderForeground(m_colors.m_grey_1);
     pf_password.setPlaceholder(password_placeholder);
     pf_password.setBackground(m_colors.m_bg_1);

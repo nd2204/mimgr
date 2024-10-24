@@ -155,8 +155,9 @@ public class MPasswordField extends JPasswordField implements FocusListener {
 
   public void setPlaceholderForeground(Color color) {
     this.placeholderForeground = color;
+    this.setForeground(color);
+    repaint();
   }
-
 
   public Icon getIcon(int direction) {
     switch(direction) {
@@ -190,9 +191,18 @@ public class MPasswordField extends JPasswordField implements FocusListener {
     return password;
   }
 
+  public Color getInputForeground() {
+    return this.inputForeground;
+  }
+
+  public void setInputForeground(Color color) {
+    this.inputForeground = color;
+    repaint();
+  }
+
+
   @Override
   public void focusLost(FocusEvent e) {
-    this.inputForeground = this.getForeground(); 
     if (this.getPassword().length == 0) {
       this.setEchoChar('\0');
       this.setForeground(this.placeholderForeground);
@@ -203,6 +213,7 @@ public class MPasswordField extends JPasswordField implements FocusListener {
 
   @Override
   public void focusGained(FocusEvent e) {
+    inputForeground = getForeground();
     if (String.valueOf(this.getPassword()).equals(this.placeholder)) {
       this.setEchoChar('*');
       this.setText("");

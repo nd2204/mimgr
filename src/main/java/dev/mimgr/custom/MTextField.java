@@ -13,6 +13,7 @@ import java.awt.event.FocusEvent;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
@@ -36,6 +37,9 @@ public class MTextField extends JTextField implements FocusListener {
     this.setPadding(padding);
     this.setBorderColor(Color.BLACK);
     this.setFocusBorderColor(Color.BLACK);
+    this.setInputForeground(Color.BLACK);
+    this.setPlaceholderForeground(Color.BLACK);
+    this.setPlaceholder("");
     this.setCursor(new Cursor(Cursor.TEXT_CURSOR));
     this.addFocusListener(this);
     setOpaque(false); // Make the background transparent for custom painting
@@ -152,8 +156,18 @@ public class MTextField extends JTextField implements FocusListener {
 
   public void setPlaceholderForeground(Color color) {
     this.placeholderForeground = color;
+    this.setForeground(color);
+    repaint();
   }
 
+  public Color getInputForeground() {
+    return this.inputForeground;
+  }
+
+  public void setInputForeground(Color color) {
+    this.inputForeground = color;
+    repaint();
+  }
 
   public String getTextString() {
     String username = this.getText();
@@ -189,10 +203,9 @@ public class MTextField extends JTextField implements FocusListener {
 
   @Override
   public void focusLost(FocusEvent e) {
-    inputForeground = getForeground();
     if (this.getText().isEmpty()) {
-      this.setText(placeholder);
       this.setForeground(placeholderForeground);
+      this.setText(placeholder);
     }
     repaint();
   }
@@ -200,15 +213,15 @@ public class MTextField extends JTextField implements FocusListener {
   @Override
   public void focusGained(FocusEvent e) {
     if (this.getText().equals(placeholder)) {
-      this.setText("");
       this.setForeground(inputForeground);
+      this.setText("");
     }
     repaint();
   }
 
   private String placeholder;
-  private Color inputForeground;
   private Color placeholderForeground;
+  private Color inputForeground;
   private Color borderColor;
   private Color focusBorderColor;
   private int borderRadius = 15;

@@ -85,7 +85,7 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
     // ========================= Fields =========================
 
     tf_username = new MTextField(30);
-    tf_username.setForeground(m_colors.m_grey_1);
+    tf_username.setInputForeground(m_colors.m_fg_0);
     tf_username.setPlaceholderForeground(m_colors.m_grey_1);
     tf_username.setPlaceholder(username_placeholder);
     tf_username.setBackground(m_colors.m_bg_1);
@@ -100,7 +100,7 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
     tf_username.getDocument().addDocumentListener(this);
 
     pf_password = new MPasswordField(30);
-    pf_password.setForeground(m_colors.m_grey_1);
+    pf_password.setInputForeground(m_colors.m_fg_0);
     pf_password.setPlaceholderForeground(m_colors.m_grey_1);
     pf_password.setPlaceholder(password_placeholder);
     pf_password.setBackground(m_colors.m_bg_1);
@@ -115,7 +115,7 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
     pf_password.getDocument().addDocumentListener(this);
 
     pf_password_confirm = new MPasswordField(30);
-    pf_password_confirm.setForeground(m_colors.m_grey_1);
+    pf_password_confirm.setInputForeground(m_colors.m_fg_0);
     pf_password_confirm.setPlaceholderForeground(m_colors.m_grey_1);
     pf_password_confirm.setPlaceholder(password_confirm_placeholder);
     pf_password_confirm.setBackground(m_colors.m_bg_1);
