@@ -36,11 +36,10 @@ class Entry extends JFrame {
     // Register startup panel
     // PanelManager.register_panel(new FormLogin(colors), "FORM_LOGIN");
     // PanelManager.register_panel(new FormSignUp(colors), "FORM_SIGNUP");
-    // PanelManager.register_panel(new SidebarPanel(colors), "DASHBOARD_SIDEBAR");
-    // PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
-    // PanelManager.register_panel(new FormProduct(colors), "FORM_PRODUCT");
-    // PanelManager.register_panel(new FormAnalytic(colors), "FORM_ANALYTIC");
-    PanelManager.register_panel(new FormUpload(colors), "FORM_UPLOAD");
+    PanelManager.register_panel(new SidebarPanel(colors), "DASHBOARD_SIDEBAR");
+    PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
+    PanelManager.register_panel(new FormProduct(colors), "FORM_PRODUCT");
+    PanelManager.register_panel(new FormAnalytic(colors), "FORM_ANALYTIC");
 
     // Main window
     this.setLayout(new BorderLayout());
