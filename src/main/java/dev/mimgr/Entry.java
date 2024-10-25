@@ -2,7 +2,6 @@ package dev.mimgr;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -37,7 +36,11 @@ class Entry extends JFrame {
     // Register startup panel
     // PanelManager.register_panel(new FormLogin(colors), "FORM_LOGIN");
     // PanelManager.register_panel(new FormSignUp(colors), "FORM_SIGNUP");
-    PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
+    // PanelManager.register_panel(new SidebarPanel(colors), "DASHBOARD_SIDEBAR");
+    // PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
+    // PanelManager.register_panel(new FormProduct(colors), "FORM_PRODUCT");
+    // PanelManager.register_panel(new FormAnalytic(colors), "FORM_ANALYTIC");
+    PanelManager.register_panel(new FormUpload(colors), "FORM_UPLOAD");
 
     // Main window
     this.setLayout(new BorderLayout());

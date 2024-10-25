@@ -21,7 +21,7 @@ public class Dashboard extends JPanel {
 
     // Sidebar
     // Sidebar also control the content panel
-    SidebarPanel sidebarPanel = new SidebarPanel(colors);
+    SidebarPanel sidebarPanel = (SidebarPanel) PanelManager.get_panel("DASHBOARD_SIDEBAR");
     sidebarPanel.setPreferredSize(new Dimension(300, this.getHeight()));
     this.add(sidebarPanel, BorderLayout.WEST);
 
