@@ -1,15 +1,14 @@
 package dev.mimgr;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,8 +23,23 @@ import dev.mimgr.theme.builtin.ColorScheme;
 public class SidebarPanel extends JPanel implements ActionListener{
   SidebarPanel(ColorScheme colors) {
     this.colors = colors;
+    this.content_panel = new JPanel();
+    this.dashboard_panel = PanelManager.get_panel("DASHBOARD");
+
     setLayout(new GridBagLayout());
     setBackground(colors.m_bg_dim);
+
+    int padding_horizontal = 15;
+    int padding_vertical = 1;
+    int icon_size = 16;
+
+    Icon home_icon      = IconManager.getIcon("home_1.png", icon_size, icon_size, colors.m_fg_0);
+    Icon orders_icon    = IconManager.getIcon("shopping_bag.png", icon_size, icon_size, colors.m_fg_0);
+    Icon products_icon  = IconManager.getIcon("tag.png", icon_size, icon_size, colors.m_fg_0);
+    Icon analytics_icon = IconManager.getIcon("analytic.png", icon_size, icon_size, colors.m_fg_0);
+    Icon accounts_icon  = IconManager.getIcon("account.png", icon_size, icon_size, colors.m_fg_0);
+    Icon settings_icon  = IconManager.getIcon("cog.png", icon_size, icon_size, colors.m_fg_0);
+    Icon logout_icon    = IconManager.getIcon("export.png", icon_size, icon_size, colors.m_fg_0);
 
     JSeparator sep = new JSeparator();
     sep.setForeground(colors.m_bg_4);
@@ -39,33 +53,49 @@ public class SidebarPanel extends JPanel implements ActionListener{
     c.fill = GridBagConstraints.HORIZONTAL;
 
     // Top section here
-    c.insets = new Insets(20, 10, 10, 10);
+    c.insets = new Insets(20, padding_horizontal, 10, padding_horizontal);
 
     // Menu Buttons
-    c.insets = new Insets(5, 10, 5, 10);
-    this.add(sep, c);
-    addMenuButton("Home",      IconManager.getIcon("home.png"        , 16, 16, colors.m_fg_0), "FORM 1");
-    addMenuButton("Orders",    IconManager.getIcon("shopping_bag.png", 16, 16, colors.m_fg_0), "FORM 2");
-    addMenuButton("Products",  IconManager.getIcon("tag.png"         , 16, 16, colors.m_fg_0), "FORM 3");
-    addMenuButton("Analytics", IconManager.getIcon("analytic.png"    , 16, 16, colors.m_fg_0), "FORM 4");
+    c.insets = new Insets(padding_vertical, padding_horizontal, padding_vertical, padding_horizontal);
+    addComponent(sep);
+    addMenuButton("Home", home_icon, "FORM 1", null);
+    addMenuButton("Orders", orders_icon, "FORM 2", null);
+    addMenuButton("Products", products_icon, "FORM_PRODUCT", new FormProduct(colors));
+    addMenuButton("Analytics", analytics_icon, "FORM_ANALYTIC", new FormAnalytic(colors));
 
+    for (JPanel panel : PanelManager.getAllPanels()) {
+      System.out.println(panel);
+    }
     // Bottom section
     c.weighty = 1.0;
     c.anchor = GridBagConstraints.PAGE_END;
-    this.add(sep, c);
+    addMenuButton("Account", accounts_icon, "FORM 6", null);
 
-    c.gridy += 1;
     c.weighty = 0.0;
-    c.insets = new Insets(5, 10, 20, 10);
-    log_out_button = setupMenuButton("Log out", IconManager.getIcon("export.png", 16, 16, colors.m_fg_0));
+    sep = new JSeparator();
+    sep.setForeground(colors.m_bg_4);
+    sep.setBackground(null);
+    addMenuButton("Settings", settings_icon, "FORM 5", null);
+    addComponent(sep);
+
+    c.insets = new Insets(padding_vertical, padding_horizontal, 20, padding_horizontal);
+    log_out_button = setupMenuButton("Log out", logout_icon);
     this.add(log_out_button, c);
   }
 
   // Add button to the layout and map that button to a form
-  private void addMenuButton(String text, Icon icon, String formId) {
+  private void addMenuButton(String text, Icon icon, String panelId, JPanel panel) {
     MButton button = setupMenuButton(text, icon);
+    if (panel != null) {
+      PanelManager.register_panel(panel, panelId);
+    }
     this.add(button, c);
-    button_to_form.put(button, formId);
+    button_to_form.put(button, panelId);
+    c.gridy = c.gridy + 1;
+  }
+
+  private void addComponent(Component comp) {
+    this.add(comp, c);
     c.gridy = c.gridy + 1;
   }
 
@@ -92,19 +122,43 @@ public class SidebarPanel extends JPanel implements ActionListener{
       PanelManager.show("FORM_LOGIN");
     }
 
-    String formId = button_to_form.get(e.getSource());
-    if (formId != null) {
-      System.out.println("formID:" + formId);
-      if (pButton != null) {
-        pButton.setBackground(null);
-        pButton = (MButton) e.getSource();
-      } else {
-        pButton = (MButton) e.getSource();
-        pButton.setBackground(colors.m_bg_2);
-      }
+    String panelId = button_to_form.get(e.getSource());
+    if (panelId == null) return;
+
+    System.out.println("formID: " + panelId);
+
+    if (content_panel == null) {
+      System.err.println("content_panel not initialized");
+      return;
     }
+
+    JPanel formPanel = PanelManager.get_panel(panelId);
+    if (formPanel == null) {
+      System.err.println("No panel associated with " + panelId);
+      return;
+    }
+
+    if (pButton != null) {
+      pButton.setBackground(null);
+      pButton = (MButton) e.getSource();
+    } else {
+      pButton = (MButton) e.getSource();
+    }
+    pButton.setBackground(colors.m_bg_0);
+    pButton.setHoverBackgroundColor(colors.m_bg_0);
+    content_panel.setBackground(Color.RED);
   }
 
+  public JPanel getContentPanel() {
+    return this.content_panel;
+  }
+
+  public void setContentPanel(JPanel panel) {
+    this.content_panel = panel;
+  }
+
+  private JPanel dashboard_panel;
+  private JPanel content_panel;
   private ColorScheme colors;
   private MButton log_out_button;
   private GridBagConstraints c;

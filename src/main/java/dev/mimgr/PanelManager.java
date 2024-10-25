@@ -1,6 +1,7 @@
 package dev.mimgr;
 
 import java.awt.CardLayout;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JPanel;
@@ -11,8 +12,13 @@ public class PanelManager {
   private static Map<String, JPanel> panelMap         = new HashMap<>();
   private static String              currentPanelId;
 
+  public static Collection<JPanel> getAllPanels() {
+    return panelMap.values();
+  }
+
   public static void register_panel(JPanel panel, String id) {
     m_main_panel.add(panel, id);
+    System.out.println("Registered panel with id: " + id);
     panelMap.put(id, panel);
   }
 
