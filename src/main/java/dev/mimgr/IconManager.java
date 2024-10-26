@@ -66,6 +66,10 @@ public class IconManager {
     return getIcon(iconName, -1, -1, null);
   }
 
+  public static Icon getIcon(String iconName, Color color) {
+    return getIcon(iconName, -1, -1, color);
+  }
+
   public static Icon changeIconSize(Icon icon, int width, int height) {
     ImageIcon imageIcon = (ImageIcon) icon;
     Image scaledImage = imageIcon.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);

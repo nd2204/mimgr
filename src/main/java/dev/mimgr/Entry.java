@@ -8,12 +8,13 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 class Entry extends JFrame {
-  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_LIGHT_EVERFOREST);
+  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_EVERFOREST);
 
   private double m_aspect_ratio;
   private int    m_width;
@@ -24,11 +25,12 @@ class Entry extends JFrame {
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
 
-    FontManager.loadFont("Roboto", "Roboto-Regular.ttf", 12f);
-    FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf", 12f);
-    FontManager.loadFont("RobotoMonoBold", "RobotoMono-Bold.ttf", 12f);
-    FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf", 12f);
-    FontManager.loadFont("NunitoBold", "Nunito-Bold.ttf", 12f);
+    FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
+    FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
+    FontManager.loadFont("RobotoMonoBold", "RobotoMono-Bold.ttf");
+    FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
+    FontManager.loadFont("NunitoBold", "Nunito-Bold.ttf");
+    FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
 
     // Get the screen size
     Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
@@ -40,6 +42,9 @@ class Entry extends JFrame {
     PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
     PanelManager.register_panel(new FormProduct(colors), "FORM_PRODUCT");
     PanelManager.register_panel(new FormAnalytic(colors), "FORM_ANALYTIC");
+    for (JPanel panel : PanelManager.getAllPanels()) {
+      System.out.println(panel);
+    }
 
     // Main window
     this.setLayout(new BorderLayout());

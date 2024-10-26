@@ -12,10 +12,10 @@ public class Dashboard extends JPanel {
   Dashboard(ColorScheme colors) {
     super();
     this.setLayout(new BorderLayout());
+    this.setBackground(colors.m_bg_dim);
 
     // Header
-    JPanel headerPanel = new JPanel();
-    headerPanel.setBackground(Color.LIGHT_GRAY);
+    HeaderPanel headerPanel = new HeaderPanel(colors);
     headerPanel.setPreferredSize(new Dimension(this.getWidth(), 60));
     this.add(headerPanel, BorderLayout.NORTH);
 

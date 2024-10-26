@@ -40,6 +40,10 @@ public class FontManager {
     return loadVariableFont(fontName, resourcePath, Font.PLAIN, fontSize);
   }
 
+  public static Font loadFont(String fontName, String resourcePath) {
+    return loadVariableFont(fontName, resourcePath, Font.PLAIN, 14f);
+  }
+
   public static Font getVariableFont(String fontName, int style, float fontSize) {
     Font font = loadedFonts.get(fontName);
     if (font != null) {

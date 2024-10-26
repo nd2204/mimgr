@@ -200,6 +200,7 @@ public class MPasswordField extends JPasswordField implements FocusListener {
   }
 
   public void setInputForeground(Color color) {
+    this.setCaretColor(color);
     this.inputForeground = color;
     repaint();
   }

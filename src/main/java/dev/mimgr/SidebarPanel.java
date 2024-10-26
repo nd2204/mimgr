@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
@@ -26,7 +27,7 @@ public class SidebarPanel extends JPanel implements ActionListener {
     setBackground(colors.m_bg_dim);
 
     int padding_horizontal = 15;
-    int padding_vertical = 1;
+    int padding_vertical = 5;
     int icon_size = 16;
 
     Icon home_icon      = IconManager.getIcon("home_1.png", icon_size, icon_size, colors.m_fg_0);
@@ -49,29 +50,26 @@ public class SidebarPanel extends JPanel implements ActionListener {
     c.fill = GridBagConstraints.HORIZONTAL;
 
     // Top section here
-    c.insets = new Insets(20, padding_horizontal, 10, padding_horizontal);
+    c.insets = new Insets(20, padding_horizontal, 5, padding_horizontal);
+    addMenuButton("Home", home_icon, "FORM 1");
 
     // Menu Buttons
     c.insets = new Insets(padding_vertical, padding_horizontal, padding_vertical, padding_horizontal);
     addComponent(sep);
-    addMenuButton("Home", home_icon, "FORM 1");
-    addMenuButton("Orders", orders_icon, "FORM 2");
+    addMenuButton("Orders", orders_icon, "FORM_ORDER");
     addMenuButton("Products", products_icon, "FORM_PRODUCT");
     addMenuButton("Analytics", analytics_icon, "FORM_ANALYTIC");
 
-    for (JPanel panel : PanelManager.getAllPanels()) {
-      System.out.println(panel);
-    }
     // Bottom section
     c.weighty = 1.0;
     c.anchor = GridBagConstraints.PAGE_END;
-    addMenuButton("Account", accounts_icon, "FORM 6");
+    addMenuButton("Account", accounts_icon, "FORM_ACCOUNT");
 
     c.weighty = 0.0;
     sep = new JSeparator();
     sep.setForeground(colors.m_bg_4);
     sep.setBackground(null);
-    addMenuButton("Settings", settings_icon, "FORM 5");
+    addMenuButton("Settings", settings_icon, "FORM_SETTING");
     addComponent(sep);
 
     c.insets = new Insets(padding_vertical, padding_horizontal, 20, padding_horizontal);
@@ -94,12 +92,13 @@ public class SidebarPanel extends JPanel implements ActionListener {
 
   private MButton setupMenuButton(String text, Icon icon) {
     MButton button = new MButton("   " + text, icon);
+    button.setPadding(new Insets(5, 20, 5, 20));
     button.setFont(FontManager.getFont("NunitoBold", 16f));
     button.setForeground(colors.m_fg_0);
     button.setHorizontalAlignment(SwingConstants.LEFT);
     button.setBackground(null);
     button.setBorderColor(null);
-    button.setHoverBackgroundColor(colors.m_bg_4);
+    button.setHoverBackgroundColor(colors.m_bg_1);
     button.addActionListener(this);
     return button;
   }
@@ -143,21 +142,22 @@ public class SidebarPanel extends JPanel implements ActionListener {
     }
 
     pButton.setBackground(colors.m_bg_0);
-    pButton.setHoverBackgroundColor(colors.m_bg_0);
+    pButton.setHoverBackgroundColor(colors.m_bg_1);
     this.setContentPanel(formPanel);
   }
 
   private void setContentPanel(JPanel panel) {
     this.content_panel = panel;
-    dashboard_panel.add(this.content_panel);  
+    dashboard_panel.add(this.content_panel);
     this.content_panel.setVisible(true);
-  } 
+  }
 
   private JPanel getContentPanel() {
     return this.content_panel;
   }
 
   private JPanel dashboard_panel;
+  private JScrollPane content_scroll_pane;
   private JPanel content_panel = null;
   private ColorScheme colors;
   private MButton log_out_button;

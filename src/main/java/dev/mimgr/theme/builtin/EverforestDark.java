@@ -15,7 +15,7 @@ public class EverforestDark extends ColorScheme {
     m_grey_1 = new Color(0x859289);
     m_grey_2 = new Color(0x9DA9A0);
     m_fg_0   = new Color(0xD3C5AA);
-    m_fg_1   = new Color(0xD3C6AA);
+    m_fg_1   = new Color(0x232A2E);
     m_red    = new Color(0xE67E80);
     m_orange = new Color(0xE69875);
     m_yellow = new Color(0xDBBC7F);

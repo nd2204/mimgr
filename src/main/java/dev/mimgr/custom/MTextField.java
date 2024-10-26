@@ -3,6 +3,7 @@ package dev.mimgr.custom;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -17,6 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import dev.mimgr.IconManager;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.ColorTheme.theme;
 import dev.mimgr.theme.builtin.ColorScheme;
@@ -36,7 +38,6 @@ public class MTextField extends JTextField implements FocusListener {
   private void Init() {
     this.setPadding(padding);
     this.setBorderColor(Color.BLACK);
-    this.setFocusBorderColor(Color.BLACK);
     this.setInputForeground(Color.BLACK);
     this.setPlaceholderForeground(Color.BLACK);
     this.setPlaceholder("");
@@ -60,24 +61,26 @@ public class MTextField extends JTextField implements FocusListener {
     // Draw the text
     super.paintComponent(g2d);
 
+    int size = getHeight() - (this.padding.top * 2);
     // Draw Icon
     if (prefixIcon != null) {
+      prefixIcon = IconManager.changeIconSize(prefixIcon, size, size);
       Image image = ((ImageIcon) prefixIcon).getImage();
-      g2d.drawImage(image, this.iconPadding, padding.top, null);
+      g2d.drawImage(image, this.iconPadding, padding.top , null);
     }
     if (postfixIcon != null) {
+      postfixIcon = IconManager.changeIconSize(postfixIcon, size, size);
       Image image = ((ImageIcon) postfixIcon).getImage();
-      g2d.drawImage(
-        image,
-        getWidth() - image.getWidth(this) - this.iconPadding,
-        padding.top,
-        null
-      );
+      g2d.drawImage(image, getWidth() - image.getWidth(this) - this.iconPadding, padding.top, null);
     }
 
     g2d.setColor(this.borderColor);
     if (isFocusOwner()) {
-      g2d.setColor(this.focusBorderColor);
+      if (focusBorderColor == null) {
+        g2d.setColor(this.borderColor);
+      } else {
+        g2d.setColor(this.focusBorderColor);
+      }
     }
     g2d.setStroke(new BasicStroke(this.borderWidth));
     g2d.drawRoundRect(borderWidth, borderWidth, getWidth() - (borderWidth * 2), getHeight() - (borderWidth * 2), borderRadius, borderRadius);
@@ -165,6 +168,7 @@ public class MTextField extends JTextField implements FocusListener {
   }
 
   public void setInputForeground(Color color) {
+    this.setCaretColor(color);
     this.inputForeground = color;
     repaint();
   }
@@ -223,7 +227,7 @@ public class MTextField extends JTextField implements FocusListener {
   private Color placeholderForeground;
   private Color inputForeground;
   private Color borderColor;
-  private Color focusBorderColor;
+  private Color focusBorderColor = null;
   private int borderRadius = 15;
   private int borderWidth  = 1;
   private Insets padding = new Insets(10, 20, 10, 20);

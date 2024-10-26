@@ -30,8 +30,89 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
     super(new Color(0x1379a9), colors.m_blue);
     m_colors = colors;
 
-    this.setup_form_style();
+    Font font_bold = FontManager.getFont("RobotoMonoBold", 14f);
+    // =======================================================
+    // Setup Appearance
+    // =======================================================
 
+    form_label = new JLabel("Đăng nhập", JLabel.CENTER);
+    form_label.setFont(FontManager.getFont("RobotoMonoBold", 20f));
+    form_label.setForeground(m_colors.m_fg_0);
+
+    tf_username = new MTextField(30);
+    tf_username.setInputForeground(m_colors.m_fg_0);
+    tf_username.setPlaceholder(username_placeholder);
+    tf_username.setBackground(m_colors.m_bg_1);
+    tf_username.setBorderColor(m_colors.m_bg_4);
+    tf_username.setFocusBorderColor(m_colors.m_blue);
+    tf_username.setBorderWidth(2);
+    tf_username.setFont(font_bold);
+    tf_username.setIcon(
+      IconManager.getIcon("user.png", 20, 20, m_colors.m_grey_1),
+      MPasswordField.ICON_PREFIX
+    );
+    tf_username.setPlaceholderForeground(m_colors.m_grey_1);
+    tf_username.getDocument().addDocumentListener(this);
+
+    pf_password = new MPasswordField(30);
+    pf_password.setInputForeground(m_colors.m_fg_0);
+    pf_password.setPlaceholderForeground(m_colors.m_grey_1);
+    pf_password.setPlaceholder(password_placeholder);
+    pf_password.setBackground(m_colors.m_bg_1);
+    pf_password.setBorderColor(m_colors.m_bg_4);
+    pf_password.setFocusBorderColor(m_colors.m_blue);
+    pf_password.setBorderWidth(2);
+    pf_password.setFont(font_bold);
+    pf_password.setIcon(
+      IconManager.getIcon("lock_locked.png", 20, 20, m_colors.m_grey_1),
+      MPasswordField.ICON_PREFIX
+    );
+    pf_password.getDocument().addDocumentListener(this);
+
+    this.remember = new MCheckBox("Nhớ phiên đăng nhập");
+    this.remember.setFocusable(false);
+    this.remember.setFont(font_bold);
+    this.remember.setBackground(m_colors.m_bg_1);
+    this.remember.setForeground(m_colors.m_grey_2);
+    this.remember.setBoxColor(m_colors.m_bg_5);
+    this.remember.setBoxHoverColor(m_colors.m_grey_0);
+    this.remember.setCheckColor(m_colors.m_blue);
+
+    this.show_password_button = new MButton(IconManager.getIcon("eye_closed.png", 20, 16, m_colors.m_grey_0));
+    this.show_password_button.setBorderWidth(2);
+    this.show_password_button.setBackground(m_colors.m_bg_0);
+    this.show_password_button.setBorderColor(m_colors.m_bg_4);
+    this.show_password_button.setForeground(m_colors.m_grey_0);
+    this.show_password_button.setHoverBorderColor(m_colors.m_bg_5);
+    this.show_password_button.setHoverBackgroundColor(m_colors.m_bg_3);
+    this.show_password_button.addActionListener(this);
+    // this.show_password_button.setBackground(null);
+    // this.show_password_button.setIcon(IconManager.getIcon("eye_closed.png", 20, 16, m_colors.m_blue));
+    // this.show_password_button.setBorderColor(null);
+
+
+    this.login_button = new MButton("Đăng nhập");
+    this.login_button.setFont(font_bold);
+    this.login_button.setBackground(m_colors.m_bg_4);
+    this.login_button.setBorderColor(m_colors.m_bg_4);
+    this.login_button.setForeground(m_colors.m_grey_1);
+    this.login_button.setBorderWidth(2);
+    this.login_button.setEnabled(false);
+    this.login_button.addActionListener(this);
+
+    this.signup_button = new MButton("Đăng ký");
+    this.signup_button.setFont(font_bold);
+    this.signup_button.setBorderWidth(2);
+    this.signup_button.setBackground(m_colors.m_bg_0);
+    this.signup_button.setBorderColor(m_colors.m_bg_4);
+    this.signup_button.setForeground(m_colors.m_grey_0);
+    this.signup_button.setHoverBorderColor(m_colors.m_bg_5);
+    this.signup_button.setHoverBackgroundColor(m_colors.m_bg_3);
+    this.signup_button.addActionListener(this);
+
+    // =======================================================
+    // Setup Layout
+    // =======================================================
     GridBagConstraints c = new GridBagConstraints();
 
     RoundedPanel input_container = new RoundedPanel();
@@ -133,90 +214,6 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
       e.printStackTrace();
     }
     return false;
-  }
-
-  private void setup_form_style() {
-    Font font_bold = FontManager.getFont("RobotoMonoBold", 14f);
-    // ========================= Label =========================
-
-    form_label = new JLabel("Đăng nhập", JLabel.CENTER);
-    form_label.setFont(FontManager.getFont("RobotoMonoBold", 20f));
-    form_label.setForeground(m_colors.m_fg_0);
-
-    // ========================= Fields =========================
-
-    tf_username = new MTextField(30);
-    tf_username.setInputForeground(m_colors.m_fg_0);
-    tf_username.setPlaceholder(username_placeholder);
-    tf_username.setBackground(m_colors.m_bg_1);
-    tf_username.setBorderColor(m_colors.m_bg_4);
-    tf_username.setFocusBorderColor(m_colors.m_blue);
-    tf_username.setBorderWidth(2);
-    tf_username.setFont(font_bold);
-    tf_username.setIcon(
-      IconManager.getIcon("user.png", 20, 20, m_colors.m_grey_1),
-      MPasswordField.ICON_PREFIX
-    );
-    tf_username.setPlaceholderForeground(m_colors.m_grey_1);
-    tf_username.getDocument().addDocumentListener(this);
-
-    pf_password = new MPasswordField(30);
-    pf_password.setInputForeground(m_colors.m_fg_0);
-    pf_password.setPlaceholderForeground(m_colors.m_grey_1);
-    pf_password.setPlaceholder(password_placeholder);
-    pf_password.setBackground(m_colors.m_bg_1);
-    pf_password.setBorderColor(m_colors.m_bg_4);
-    pf_password.setFocusBorderColor(m_colors.m_blue);
-    pf_password.setBorderWidth(2);
-    pf_password.setFont(font_bold);
-    pf_password.setIcon(
-      IconManager.getIcon("lock_locked.png", 20, 20, m_colors.m_grey_1),
-      MPasswordField.ICON_PREFIX
-    );
-    pf_password.getDocument().addDocumentListener(this);
-
-    // ========================= Buttons =========================
-
-    this.remember = new MCheckBox("Nhớ phiên đăng nhập");
-    this.remember.setFocusable(false);
-    this.remember.setFont(font_bold);
-    this.remember.setBackground(m_colors.m_bg_1);
-    this.remember.setForeground(m_colors.m_grey_2);
-    this.remember.setBoxColor(m_colors.m_bg_5);
-    this.remember.setBoxHoverColor(m_colors.m_grey_0);
-    this.remember.setCheckColor(m_colors.m_blue);
-
-    this.show_password_button = new MButton(IconManager.getIcon("eye_closed.png", 20, 16, m_colors.m_grey_0));
-    this.show_password_button.setBorderWidth(2);
-    this.show_password_button.setBackground(m_colors.m_bg_0);
-    this.show_password_button.setBorderColor(m_colors.m_bg_4);
-    this.show_password_button.setForeground(m_colors.m_grey_0);
-    this.show_password_button.setHoverBorderColor(m_colors.m_bg_5);
-    this.show_password_button.setHoverBackgroundColor(m_colors.m_bg_3);
-    this.show_password_button.addActionListener(this);
-    // this.show_password_button.setBackground(null);
-    // this.show_password_button.setIcon(IconManager.getIcon("eye_closed.png", 20, 16, m_colors.m_blue));
-    // this.show_password_button.setBorderColor(null);
-
-
-    this.login_button = new MButton("Đăng nhập");
-    this.login_button.setFont(font_bold);
-    this.login_button.setBackground(m_colors.m_bg_4);
-    this.login_button.setBorderColor(m_colors.m_bg_4);
-    this.login_button.setForeground(m_colors.m_grey_1);
-    this.login_button.setBorderWidth(2);
-    this.login_button.setEnabled(false);
-    this.login_button.addActionListener(this);
-
-    this.signup_button = new MButton("Đăng ký");
-    this.signup_button.setFont(font_bold);
-    this.signup_button.setBorderWidth(2);
-    this.signup_button.setBackground(m_colors.m_bg_0);
-    this.signup_button.setBorderColor(m_colors.m_bg_4);
-    this.signup_button.setForeground(m_colors.m_grey_0);
-    this.signup_button.setHoverBorderColor(m_colors.m_bg_5);
-    this.signup_button.setHoverBackgroundColor(m_colors.m_bg_3);
-    this.signup_button.addActionListener(this);
   }
 
   @Override
