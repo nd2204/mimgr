@@ -29,6 +29,7 @@ class Entry extends JFrame {
     FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
     FontManager.loadFont("RobotoMonoBold", "RobotoMono-Bold.ttf");
     FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
+    FontManager.loadFont("Nunito", "Nunito-Regular.ttf");
     FontManager.loadFont("NunitoBold", "Nunito-Bold.ttf");
     FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
 
@@ -42,6 +43,8 @@ class Entry extends JFrame {
     PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
     PanelManager.register_panel(new FormProduct(colors), "FORM_PRODUCT");
     PanelManager.register_panel(new FormAnalytic(colors), "FORM_ANALYTIC");
+    PanelManager.register_panel(new FormOrder(colors), "FORM_ORDER");
+    PanelManager.register_panel(new FormMedia(colors), "FORM_MEDIA");
     for (JPanel panel : PanelManager.getAllPanels()) {
       System.out.println(panel);
     }

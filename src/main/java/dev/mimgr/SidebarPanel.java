@@ -37,6 +37,7 @@ public class SidebarPanel extends JPanel implements ActionListener {
     Icon accounts_icon  = IconManager.getIcon("account.png", icon_size, icon_size, colors.m_fg_0);
     Icon settings_icon  = IconManager.getIcon("cog.png", icon_size, icon_size, colors.m_fg_0);
     Icon logout_icon    = IconManager.getIcon("export.png", icon_size, icon_size, colors.m_fg_0);
+    Icon media_icon     = IconManager.getIcon("image.png", icon_size, icon_size, colors.m_fg_0);
 
     JSeparator sep = new JSeparator();
     sep.setForeground(colors.m_bg_4);
@@ -59,6 +60,7 @@ public class SidebarPanel extends JPanel implements ActionListener {
     addMenuButton("Orders", orders_icon, "FORM_ORDER");
     addMenuButton("Products", products_icon, "FORM_PRODUCT");
     addMenuButton("Analytics", analytics_icon, "FORM_ANALYTIC");
+    addMenuButton("Media", media_icon, "FORM_MEDIA");
 
     // Bottom section
     c.weighty = 1.0;

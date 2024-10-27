@@ -1,16 +1,28 @@
 package dev.mimgr;
 
+import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
+import javax.swing.BorderFactory;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 import dev.mimgr.custom.MButton;
+import dev.mimgr.custom.MCheckBox;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
@@ -18,6 +30,7 @@ import dev.mimgr.theme.builtin.ColorScheme;
 
 public class FormProduct extends JPanel {
   public FormProduct(ColorScheme colors) {
+    this.colors = colors;
     Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
     Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
     Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
@@ -69,6 +82,7 @@ public class FormProduct extends JPanel {
       cc.gridy = 1;
       cc.weightx = 1.0;
       cc.weighty = 1.0;
+      cc.insets = new Insets(15, 0, 15, 0);
       cc.fill = GridBagConstraints.BOTH;
       setup_table();
       contentContainer.add(scrollPane, cc);
@@ -119,54 +133,75 @@ public class FormProduct extends JPanel {
     this.filterTextField.setBorderColor(colors.m_bg_5);
     this.filterTextField.setInputForeground(colors.m_fg_0);
     this.filterTextField.setFont(nunito_bold_14);
-  }
 
+    this.scrollPane.setBackground(colors.m_bg_0);
+    this.scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
+    this.checkBoxModel.setCheckColor(colors.m_green);
+    this.checkBoxModel.setBoxColor(colors.m_bg_4);
+    this.checkBoxModel.setBackground(colors.m_bg_0);
+  }
   private void setup_table() {
-    Object[][] data = {
-      {"Kathy", "Smith", "Snowboarding", 5, false},
-      {"John", "Doe", "Rowing", 3, true},
-      {"Sue", "Black", "Knitting", 2, false},
-      {"Jane", "White", "Speed reading", 20, true},
-      {"Kathy", "Smith", "Snowboarding", 5, false},
-      {"John", "Doe", "Rowing", 3, true},
-      {"Sue", "Black", "Knitting", 2, false},
-      {"Kathy", "Smith", "Snowboarding", 5, false},
-      {"John", "Doe", "Rowing", 3, true},
-      {"Sue", "Black", "Knitting", 2, false},
-      {"Jane", "White", "Speed reading", 20, true},
-      {"Kathy", "Smith", "Snowboarding", 5, false},
-      {"Kathy", "Smith", "Snowboarding", 5, false},
-      {"Kathy", "Smith", "Snowboarding", 5, false},
-      {"Kathy", "Smith", "Snowboarding", 5, false},
-      {"Kathy", "Smith", "Snowboarding", 5, false},
-      {"John", "Doe", "Rowing", 3, true},
-      {"Sue", "Black", "Knitting", 2, false},
-      {"Jane", "White", "Speed reading", 20, true},
-      {"John", "Doe", "Rowing", 3, true},
-      {"Sue", "Black", "Knitting", 2, false},
-      {"Jane", "White", "Speed reading", 20, true},
-      {"John", "Doe", "Rowing", 3, true},
-      {"Sue", "Black", "Knitting", 2, false},
-      {"Jane", "White", "Speed reading", 20, true},
-      {"John", "Doe", "Rowing", 3, true},
-      {"Sue", "Black", "Knitting", 2, false},
-      {"Jane", "White", "Speed reading", 20, true},
-      {"John", "Doe", "Rowing", 3, true},
-      {"Sue", "Black", "Knitting", 2, false},
-      {"Jane", "White", "Speed reading", 20, true},
-      {"Jane", "White", "Speed reading", 20, true},
-      {"Joe", "Brown", "Pool", 10, true}
+    table = new MTable(colors);
+    DefaultTableModel model = new DefaultTableModel() {
+      @Override
+      public Class<?> getColumnClass(int columnIndex) {
+        return columnIndex == 0 ? Boolean.class : String.class;
+      }
+
+      @Override
+      public boolean isCellEditable(int row, int column) {
+        return column == 0;
+      }
     };
-    String[] column = {"First Name",
-      "Last Name",
-      "Sport",
-      "# of Years",
-      "Vegetarian"};
-    table = new MTable(data, column);
+    model.addColumn("");
+    model.addColumn("Last Name");
+    model.addColumn("Sport");
+    model.addColumn("# of Years");
+    model.addColumn("Vegetarian");
+    model.addRow(new Object[]{Boolean.FALSE, "Kathy", "Smith", "Snowboarding", 3});
+    model.addRow(new Object[]{Boolean.FALSE, "John", "Doe", "Rowing", 3});
+
+    table.setModel(model);
+    TableColumnModel columnModel = table.getColumnModel();
+    columnModel.getColumn(0).setPreferredWidth(50);
+    columnModel.getColumn(0).setMinWidth(50);
+    columnModel.getColumn(0).setMaxWidth(50);
     scrollPane = new JScrollPane(table);
+    // table.setup_scrollbar(scrollPane);
     table.setFillsViewportHeight(true);
+
+    columnModel.getColumn(0).setCellRenderer(new CustomCheckBoxRenderer());
+    columnModel.getColumn(0).setCellEditor(new DefaultCellEditor(checkBoxModel));
   }
 
+  // Custom renderer that uses CustomCheckBox
+  private class CustomCheckBoxRenderer extends MCheckBox implements TableCellRenderer {
+    @Override
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+      setHorizontalAlignment(SwingConstants.CENTER);
+      setCheckColor(colors.m_green);
+      setBoxColor(colors.m_bg_4);
+      setBackground(colors.m_bg_0);
+      setSelected((Boolean) value);
+      return this;
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+      super.paintComponent(g);
+
+      // Draw the border using the specified color
+      Graphics2D g2 = (Graphics2D) g.create();
+      g2.setColor(colors.m_bg_4);
+      g2.drawLine(0, getHeight(), getWidth(), getHeight()); // Bottom border
+
+      g2.dispose();
+    }
+  }
+
+  private MCheckBox checkBoxModel = new MCheckBox();
+  private ColorScheme colors;
   private RoundedPanel contentContainer = new RoundedPanel();
   private JLabel topLabel = new JLabel("Products");
   private GridBagConstraints c = new GridBagConstraints();

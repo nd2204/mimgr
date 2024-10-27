@@ -6,8 +6,17 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MCheckBox extends JCheckBox {
+  public MCheckBox() {
+    super();
+    Init();
+  }
+
   public MCheckBox(String label) {
     super(label);
+    Init();
+  }
+
+  public void Init() {
     setOpaque(false);
     setFocusPainted(false);
 
@@ -70,8 +79,22 @@ public class MCheckBox extends JCheckBox {
 
     // Determine the size of the checkbox
     int boxSize = boxWidth;
-    int boxX = 2;
+    int boxX = (getWidth() - boxSize) / 2;
     int boxY = (getHeight() - boxSize) / 2;
+    int alignment = getHorizontalAlignment();
+    switch (alignment) {
+      case SwingConstants.CENTER:
+        boxX = (getWidth() - boxSize) / 2;
+        break;
+      case SwingConstants.LEFT:
+        boxX = 2;
+        break;
+      case SwingConstants.RIGHT:
+        boxX = (getWidth() - boxSize - 2);
+        break;
+      default:
+        break;
+    }
 
     g2d.setColor(getBackground());
     g2d.fillRoundRect(boxX + borderWidth, boxY + borderWidth, boxSize - borderWidth, boxSize - borderWidth, this.boxRadius, this.boxRadius);
@@ -94,7 +117,6 @@ public class MCheckBox extends JCheckBox {
       g2d.drawLine(boxX + 6, boxY + boxSize / 2, boxX + boxSize / 2, boxY + boxSize - 4);
       g2d.drawLine(boxX + boxSize / 2, boxY + boxSize - 4, boxX + boxSize - 4, boxY + 6);
     }
-
 
     // Draw the label
     g2d.setColor(getForeground());
