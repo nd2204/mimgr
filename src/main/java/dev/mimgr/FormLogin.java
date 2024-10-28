@@ -256,7 +256,9 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
       if (is_valid_credential(username, password)) {
         PanelManager.unregister_panel("FORM_LOGIN");
         PanelManager.unregister_panel("FORM_SIGNUP");
-        PanelManager.show("DASHBOARD");
+        Entry.registerDashBoard(m_colors);
+      } else {
+        JOptionPane.showMessageDialog(null, "Tài khoản hoặc mật khẩu không hợp lệ");
       }
 
       return;

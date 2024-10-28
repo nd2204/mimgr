@@ -115,7 +115,7 @@ public class SidebarPanel extends JPanel implements ActionListener {
       PanelManager.get_main_panel().setCursor(new Cursor(Cursor.WAIT_CURSOR));
       PanelManager.register_panel(new FormLogin(colors), "FORM_LOGIN");
       PanelManager.register_panel(new FormSignUp(colors), "FORM_SIGNUP");
-      PanelManager.unregister_panel("DASHBOARD");
+      Entry.removeDashBoard();
       PanelManager.get_main_panel().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
       PanelManager.show("FORM_LOGIN");
     }

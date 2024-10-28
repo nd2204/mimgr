@@ -28,6 +28,7 @@ import javax.swing.table.TableColumnModel;
 
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MCheckBox;
+import dev.mimgr.custom.MCheckBoxCellRenderer;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
@@ -165,10 +166,10 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       }
     };
     model.addColumn("");
-    model.addColumn("Last Name");
-    model.addColumn("Sport");
-    model.addColumn("# of Years");
-    model.addColumn("Vegetarian");
+    model.addColumn("File");
+    model.addColumn("Author");
+    model.addColumn("Caption");
+    model.addColumn("Date");
     model.addRow(new Object[]{Boolean.FALSE, "Kathy", "Smith", "Snowboarding", 3});
     model.addRow(new Object[]{Boolean.FALSE, "John", "Doe", "Rowing", 3});
 
@@ -181,33 +182,8 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     // table.setup_scrollbar(scrollPane);
     table.setFillsViewportHeight(true);
 
-    columnModel.getColumn(0).setCellRenderer(new CustomCheckBoxRenderer());
+    columnModel.getColumn(0).setCellRenderer(new MCheckBoxCellRenderer(colors));
     columnModel.getColumn(0).setCellEditor(new DefaultCellEditor(checkBoxModel));
-  }
-
-  // Custom renderer that uses CustomCheckBox
-  private class CustomCheckBoxRenderer extends MCheckBox implements TableCellRenderer {
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-      setHorizontalAlignment(SwingConstants.CENTER);
-      setCheckColor(colors.m_green);
-      setBoxColor(colors.m_bg_4);
-      setBackground(colors.m_bg_0);
-      setSelected((Boolean) value);
-      return this;
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-      super.paintComponent(g);
-
-      // Draw the border using the specified color
-      Graphics2D g2 = (Graphics2D) g.create();
-      g2.setColor(colors.m_bg_4);
-      g2.drawLine(0, getHeight(), getWidth(), getHeight()); // Bottom border
-
-      g2.dispose();
-    }
   }
 
   private class DropPanel extends JPanel {
