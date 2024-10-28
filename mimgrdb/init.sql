@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
   id       INT         AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(50) NOT NULL,
   hash     CHAR(64)    NOT NULL,
-  salt     CHAR(16)    NOT NULL
+  salt     CHAR(64)    NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS categories (
@@ -49,6 +49,14 @@ CREATE TABLE IF NOT EXISTS order_items (
   total_price   DECIMAL(10, 2) NOT NULL,
   FOREIGN KEY (order_id) REFERENCES orders(order_id),
   FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+
+CREATE TABLE IF NOT EXISTS images (
+  id               INT AUTO_INCREMENT PRIMARY KEY,
+  image_url        VARCHAR(255) UNIQUE,
+  image_name       VARCHAR(255),
+  image_caption    TEXT,
+  image_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Add root categories first

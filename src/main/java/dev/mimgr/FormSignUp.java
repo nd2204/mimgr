@@ -194,7 +194,6 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
     this.signup_button.setBorderColor(m_colors.m_bg_4);
     this.signup_button.setForeground(m_colors.m_grey_1);
     this.signup_button.setBorderWidth(2);
-    this.signup_button.addActionListener(this);
     this.signup_button.setEnabled(false);
     this.signup_button.addActionListener(this);
 
@@ -204,16 +203,19 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
     this.login_button.setBackground(m_colors.m_bg_0);
     this.login_button.setBorderColor(m_colors.m_bg_4);
     this.login_button.setForeground(m_colors.m_grey_0);
-    this.login_button.addActionListener(this);
     this.login_button.setHoverBorderColor(m_colors.m_bg_5);
     this.login_button.setHoverBackgroundColor(m_colors.m_bg_3);
     this.login_button.addActionListener(this);
   }
 
   private boolean valid_username(String username) {
-    if (DBQueries.select_user(username) != null) {
-      JOptionPane.showMessageDialog(null, "Tên người dùng đã tồn tại");
-      return false;
+    ResultSet queryResult = DBQueries.select_user(username);
+    try {
+      if (!queryResult.first()) {
+        JOptionPane.showMessageDialog(null, "Tên người dùng đã tồn tại");
+        return false;
+      }
+    } catch (Exception e) {
     }
 
     if (!username.matches("^[a-zA-Z0-9._]{5,20}$")) {
@@ -328,9 +330,8 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
 
   private void checkFields() {
     if (!tf_username.getTextString().isEmpty()
-      && !pf_password.getTextString().isEmpty()
-      && !pf_password_confirm.getTextString().isEmpty())
-    {
+        && !pf_password.getTextString().isEmpty()
+        && !pf_password_confirm.getTextString().isEmpty()) {
       this.signup_button.setBackground(m_colors.m_green);
       this.signup_button.setBorderColor(m_colors.m_green);
       this.signup_button.setForeground(m_colors.m_fg_1);
