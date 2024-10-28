@@ -1,5 +1,6 @@
 package dev.mimgr;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -7,6 +8,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -18,7 +20,7 @@ import dev.mimgr.custom.MTextField;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 // import static dev.mimgr.UploadService.upload_music_instrument;
-public class FormUpload extends JPanel {
+public class FormUpload extends JFrame {
 
     // Declare form components
     JLabel nameLabel, priceLabel, descriptionLabel, quantityLabel, categoryLabel, imageLabel;
@@ -31,6 +33,8 @@ public class FormUpload extends JPanel {
     // ImageDropPanel imageDropPanel;
     public FormUpload(ColorScheme color) {
         m_colors = color;
+        this.setPreferredSize(new Dimension(800, 600));
+        this.setMinimumSize(new Dimension(800, 600));
         this.setup_form_style();
         JPanel leftSJPanel = new JPanel();
         // Create layout for the form
@@ -45,6 +49,7 @@ public class FormUpload extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 0;
         leftSJPanel.add(nameLabel, gbc);
+        
         gbc.gridx = 1;
         leftSJPanel.add(nameField, gbc);
 
@@ -61,12 +66,13 @@ public class FormUpload extends JPanel {
         gbc.gridx = 0;
         gbc.gridy = 2;
         leftSJPanel.add(descriptionLabel, gbc);
+        
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.BOTH;
         JScrollPane scrollPane = new JScrollPane(descriptionArea);
         leftSJPanel.add(scrollPane, gbc);
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Reset to horizontal fill
 
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Reset to horizontal fill
         // Quantity in stock label and field
         quantityLabel = new JLabel("Quantity in Stock:");
         gbc.gridx = 0;

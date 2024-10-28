@@ -1,17 +1,18 @@
 package dev.mimgr;
 
 import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -28,7 +29,7 @@ import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.theme.builtin.ColorScheme;
 
-public class FormProduct extends JPanel {
+public class FormProduct extends JPanel implements ActionListener {
   public FormProduct(ColorScheme colors) {
     this.colors = colors;
     Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
@@ -111,11 +112,13 @@ public class FormProduct extends JPanel {
     this.importButton.setBorderColor(colors.m_bg_2);
     this.importButton.setForeground(colors.m_fg_0);
     this.importButton.setFont(nunito_extrabold_14);
+    this.importButton.addActionListener(this);
 
     this.exportButton.setBackground(colors.m_bg_2);
     this.exportButton.setBorderColor(colors.m_bg_2);
     this.exportButton.setForeground(colors.m_fg_0);
     this.exportButton.setFont(nunito_extrabold_14);
+    this.exportButton.addActionListener(this);
 
     this.addProductButton.setBackground(colors.m_green);
     this.addProductButton.setBorderColor(colors.m_green);
@@ -140,6 +143,7 @@ public class FormProduct extends JPanel {
     this.checkBoxModel.setCheckColor(colors.m_green);
     this.checkBoxModel.setBoxColor(colors.m_bg_4);
     this.checkBoxModel.setBackground(colors.m_bg_0);
+    this.addProductButton.addActionListener(this);
   }
   private void setup_table() {
     table = new MTable(colors);
@@ -197,6 +201,14 @@ public class FormProduct extends JPanel {
       g2.drawLine(0, getHeight(), getWidth(), getHeight()); // Bottom border
 
       g2.dispose();
+    }
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == addProductButton) {
+      JFrame jframe = new FormUpload(colors);
+      jframe.setVisible(true);
     }
   }
 
