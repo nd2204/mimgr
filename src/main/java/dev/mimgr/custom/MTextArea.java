@@ -5,13 +5,10 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
@@ -53,21 +50,6 @@ public class MTextArea extends JTextArea implements FocusListener {
 
     // Draw the text
     super.paintComponent(g2d);
-
-    // Draw Icon
-    if (prefixIcon != null) {
-      Image image = ((ImageIcon) prefixIcon).getImage();
-      g2d.drawImage(image, this.iconPadding, padding.top, null);
-    }
-    if (postfixIcon != null) {
-      Image image = ((ImageIcon) postfixIcon).getImage();
-      g2d.drawImage(
-        image,
-        getWidth() - image.getWidth(this) - this.iconPadding,
-        padding.top,
-        null
-      );
-    }
 
     g2d.setColor(this.borderColor);
     if (isFocusOwner()) {
@@ -114,12 +96,6 @@ public class MTextArea extends JTextArea implements FocusListener {
   }
 
   public void setPadding(Insets padding) {
-    if (prefixIcon != null) {
-      padding.left += prefixIcon.getIconWidth() + (int) padding.left / 2;
-    }
-    if (postfixIcon != null) {
-      padding.right += postfixIcon.getIconWidth() + (int) padding.right / 2;
-    }
     this.padding.set(padding.top + borderWidth, padding.left + borderWidth, padding.bottom + borderWidth, padding.right + borderWidth);
     this.setBorder(new EmptyBorder(padding));
     repaint();
@@ -171,30 +147,6 @@ public class MTextArea extends JTextArea implements FocusListener {
     return username;
   }
 
-  public Icon getIcon(int direction) {
-    switch(direction) {
-      case ICON_PREFIX:
-      return this.prefixIcon;
-      case ICON_POSTFIX:
-      return this.postfixIcon;
-      default:
-      return null;
-    }
-  }
-
-  public void setIcon(Icon icon, int direction) {
-    switch(direction) {
-      case ICON_PREFIX:
-      this.prefixIcon = icon;
-      break;
-      case ICON_POSTFIX:
-      this.postfixIcon = icon;
-      break;
-    }
-    this.setPadding(padding);
-    repaint();
-  }
-
   @Override
   public void focusLost(FocusEvent e) {
     if (this.getText().isEmpty()) {
@@ -221,9 +173,4 @@ public class MTextArea extends JTextArea implements FocusListener {
   private int borderRadius = 0;
   private int borderWidth  = 0;
   private Insets padding = new Insets(10, 20, 10, 20);
-  private Icon prefixIcon;
-  private Icon postfixIcon;
-  private final int iconPadding = 20;
-  public static final int ICON_PREFIX = 1;
-  public static final int ICON_POSTFIX = 2;
 }
