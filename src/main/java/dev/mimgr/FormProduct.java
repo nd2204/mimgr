@@ -23,6 +23,7 @@ import javax.swing.table.TableColumnModel;
 
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MCheckBox;
+import dev.mimgr.custom.MCheckBoxCellRenderer;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
@@ -110,18 +111,27 @@ public class FormProduct extends JPanel {
     this.importButton.setBackground(colors.m_bg_2);
     this.importButton.setBorderColor(colors.m_bg_2);
     this.importButton.setForeground(colors.m_fg_0);
+    this.importButton.setHoverBorderColor(colors.m_bg_1);
+    this.importButton.setHoverBackgroundColor(colors.m_bg_1);
+    this.importButton.setClickBackgroundColor(colors.m_bg_dim);
     this.importButton.setFont(nunito_extrabold_14);
 
     this.exportButton.setBackground(colors.m_bg_2);
     this.exportButton.setBorderColor(colors.m_bg_2);
+    this.exportButton.setHoverBorderColor(colors.m_bg_1);
+    this.exportButton.setHoverBackgroundColor(colors.m_bg_1);
+    this.exportButton.setClickBackgroundColor(colors.m_bg_dim);
     this.exportButton.setForeground(colors.m_fg_0);
     this.exportButton.setFont(nunito_extrabold_14);
 
-    this.addProductButton.setBackground(colors.m_green);
-    this.addProductButton.setBorderColor(colors.m_green);
-    this.addProductButton.setForeground(colors.m_fg_1);
+    this.addProductButton.setBackground(colors.m_bg_2);
+    this.addProductButton.setBorderColor(colors.m_bg_2);
+    this.addProductButton.setHoverBorderColor(colors.m_green);
+    this.addProductButton.setHoverBackgroundColor(colors.m_bg_1);
+    this.addProductButton.setClickBackgroundColor(colors.m_bg_dim);
+    this.addProductButton.setForeground(colors.m_green);
     this.addProductButton.setFont(nunito_extrabold_14);
-    this.addProductButton.setIcon(IconManager.getIcon("add.png", 16, 16, colors.m_fg_1));
+    this.addProductButton.setIcon(IconManager.getIcon("add.png", 16, 16, colors.m_green));
     this.addProductButton.setText(" " + this.addProductButton.getText());
 
     this.filterTextField.setIcon(IconManager.getIcon("search.png", 20, 20, colors.m_grey_0), MTextField.ICON_PREFIX);
@@ -171,33 +181,8 @@ public class FormProduct extends JPanel {
     // table.setup_scrollbar(scrollPane);
     table.setFillsViewportHeight(true);
 
-    columnModel.getColumn(0).setCellRenderer(new CustomCheckBoxRenderer());
+    columnModel.getColumn(0).setCellRenderer(new MCheckBoxCellRenderer(colors));
     columnModel.getColumn(0).setCellEditor(new DefaultCellEditor(checkBoxModel));
-  }
-
-  // Custom renderer that uses CustomCheckBox
-  private class CustomCheckBoxRenderer extends MCheckBox implements TableCellRenderer {
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-      setHorizontalAlignment(SwingConstants.CENTER);
-      setCheckColor(colors.m_green);
-      setBoxColor(colors.m_bg_4);
-      setBackground(colors.m_bg_0);
-      setSelected((Boolean) value);
-      return this;
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-      super.paintComponent(g);
-
-      // Draw the border using the specified color
-      Graphics2D g2 = (Graphics2D) g.create();
-      g2.setColor(colors.m_bg_4);
-      g2.drawLine(0, getHeight(), getWidth(), getHeight()); // Bottom border
-
-      g2.dispose();
-    }
   }
 
   private MCheckBox checkBoxModel = new MCheckBox();

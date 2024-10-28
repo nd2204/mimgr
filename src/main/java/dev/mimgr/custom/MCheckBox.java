@@ -16,6 +16,19 @@ public class MCheckBox extends JCheckBox {
     Init();
   }
 
+  public MCheckBox(MCheckBox other) {
+    this.boxWidth      = other.boxWidth;
+    this.borderWidth   = other.borderWidth;
+    this.boxRadius     = other.boxRadius;
+    this.checkColor    = other.checkColor;
+    this.boxColor      = other.boxColor;
+    this.boxHoverColor = other.boxHoverColor;
+    this.spacing       = other.spacing;
+    this.setBackground(other.getBackground());
+    this.setForeground(other.getForeground());
+    Init();
+  }
+
   public void Init() {
     setOpaque(false);
     setFocusPainted(false);
@@ -33,6 +46,24 @@ public class MCheckBox extends JCheckBox {
         repaint();
       }
     });
+  }
+
+  public int getBoxWidth() {
+    return this.boxWidth;
+  }
+
+  public void setBoxWidth(int width) {
+    this.boxWidth = width;
+    repaint();
+  }
+
+  public Color getBoxBackground() {
+    return this.boxBackground;
+  }
+
+  public void setBoxBackground(Color color) {
+    this.boxBackground = color;
+    repaint();
   }
 
   public Color getBoxColor() {
@@ -84,19 +115,23 @@ public class MCheckBox extends JCheckBox {
     int alignment = getHorizontalAlignment();
     switch (alignment) {
       case SwingConstants.CENTER:
-        boxX = (getWidth() - boxSize) / 2;
-        break;
+      boxX = (getWidth() - boxSize) / 2;
+      break;
       case SwingConstants.LEFT:
-        boxX = 2;
-        break;
+      boxX = 2;
+      break;
       case SwingConstants.RIGHT:
-        boxX = (getWidth() - boxSize - 2);
-        break;
+      boxX = (getWidth() - boxSize - 2);
+      break;
       default:
-        break;
+      break;
     }
 
     g2d.setColor(getBackground());
+    g2d.fillRect(0, 0, getWidth(), getHeight());
+    if (boxBackground != null) {
+      g2d.setColor(boxBackground);
+    }
     g2d.fillRoundRect(boxX + borderWidth, boxY + borderWidth, boxSize - borderWidth, boxSize - borderWidth, this.boxRadius, this.boxRadius);
 
     // Draw the checkbox box
@@ -109,11 +144,10 @@ public class MCheckBox extends JCheckBox {
 
     // Draw the check mark if selected
     if (isSelected()) {
-      g2d.setColor(checkColor);
-      g2d.setStroke(new BasicStroke(borderWidth));
       // g2d.fillRoundRect(boxX + borderWidth, boxY + borderWidth, boxSize - borderWidth, boxSize - borderWidth, this.boxRadius, this.boxRadius);
       // g2d.drawRoundRect(boxX + borderWidth, boxY + borderWidth, boxSize - borderWidth, boxSize - borderWidth, this.boxRadius, this.boxRadius);
       g2d.setColor(checkColor);
+      g2d.setStroke(new BasicStroke(borderWidth));
       g2d.drawLine(boxX + 6, boxY + boxSize / 2, boxX + boxSize / 2, boxY + boxSize - 4);
       g2d.drawLine(boxX + boxSize / 2, boxY + boxSize - 4, boxX + boxSize - 4, boxY + 6);
     }
@@ -130,9 +164,10 @@ public class MCheckBox extends JCheckBox {
 
   private int boxWidth = 16;
   private int borderWidth = 2;
-  private Color boxColor = Color.LIGHT_GRAY;
-  private Color boxHoverColor = Color.DARK_GRAY;
   private int boxRadius = 8;
   private Color checkColor = Color.GREEN;
+  private Color boxColor = Color.LIGHT_GRAY;
+  private Color boxHoverColor = Color.DARK_GRAY;
+  private Color boxBackground = null;
   private int spacing = 15;
 }

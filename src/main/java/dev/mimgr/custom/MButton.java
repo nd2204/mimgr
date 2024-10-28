@@ -66,6 +66,8 @@ public class MButton extends JButton implements MouseListener {
     drawText(g2);
 
     g2.dispose();
+
+    super.paintComponent(g); // Ensure button text is rendered
   }
 
   private void drawBackground(Graphics2D g2) {
@@ -76,7 +78,7 @@ public class MButton extends JButton implements MouseListener {
     } else {
       g2.setColor(getBackground());
     }
-    g2.fillRoundRect(this.borderWidth, this.borderWidth, getWidth() - (borderWidth * 2), getHeight() - (borderWidth * 2), borderRadius, borderRadius);
+    g2.fillRoundRect(0, 0, getWidth(), getHeight(), borderRadius, borderRadius);
   }
 
   private void drawBorder(Graphics2D g2) {
@@ -88,7 +90,7 @@ public class MButton extends JButton implements MouseListener {
       g2.setColor(this.borderColor);
     }
     g2.setStroke(new BasicStroke(this.borderWidth));
-    g2.drawRoundRect(borderWidth, borderWidth, getWidth() - (borderWidth * 2), getHeight() - (borderWidth * 2), borderRadius, borderRadius);
+    g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, borderRadius, borderRadius);
   }
 
   private void drawText(Graphics g) {
@@ -99,7 +101,6 @@ public class MButton extends JButton implements MouseListener {
     } else {
       this.setForeground(this.getForeground());
     }
-    super.paintComponent(g); // Ensure button text is rendered
   }
 
   // Customization methods

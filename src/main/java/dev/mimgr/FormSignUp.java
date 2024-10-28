@@ -308,6 +308,7 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
         DBQueries.insert_user(username, Security.hash_string(password + salt), salt);
         PanelManager.unregister_panel("FORM_LOGIN");
         PanelManager.unregister_panel("FORM_SIGNUP");
+        Entry.registerDashBoard(m_colors);
         return;
       }
     }
