@@ -24,6 +24,7 @@ import dev.mimgr.custom.DropPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MCheckBoxCellEditor;
 import dev.mimgr.custom.MCheckBoxCellRenderer;
+import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MImageCellRenderer;
 import dev.mimgr.custom.MScrollBar;
 import dev.mimgr.custom.MTable;
@@ -79,18 +80,38 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       contentContainer.setLayout(new GridBagLayout());
       contentContainer.setBackground(colors.m_bg_0);
 
+      String[] items = { 
+        "Option 1", "Option 2", "Option 3", "Option 4",
+        "Option 5", "Option 6", "Option 7", "Option 8",
+        "Option 9", "Option 10", "Option 11", "Option 12",
+        "Option 13", "Option 14", "Option 15", "Option 16",
+        "Option 17",
+      };
+      this.bulkAction = new MComboBox<>(items, colors);
+      this.bulkAction.setBackground(colors.m_bg_0);
+      this.bulkAction.setForeground(colors.m_grey_0);
+
       cc.gridx = 0;
       cc.gridy = 0;
       cc.weightx = 1.0;
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
-      cc.fill = GridBagConstraints.HORIZONTAL;
+      cc.fill = GridBagConstraints.BOTH;
       cc.insets = new Insets(15, 15, 15, 15);
+      contentContainer.add(bulkAction, cc);
+
+      cc.gridx = 1;
+      cc.gridy = 0;
+      cc.weightx = 1.0;
+      cc.fill = GridBagConstraints.HORIZONTAL;
+      cc.anchor = GridBagConstraints.FIRST_LINE_END;
       contentContainer.add(filterTextField, cc);
 
+      cc.anchor = GridBagConstraints.FIRST_LINE_START;
       cc.gridx = 0;
       cc.gridy = 1;
       cc.weightx = 1.0;
       cc.weighty = 1.0;
+      cc.gridwidth = 2;
       cc.insets = new Insets(15, 0, 15, 0);
       cc.fill = GridBagConstraints.BOTH;
       setup_table();
@@ -147,6 +168,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     this.selectFilesButton.setForeground(colors.m_accent);
     this.selectFilesButton.setHorizontalAlignment(SwingConstants.CENTER);
     this.selectFilesButton.addActionListener(this);
+
   }
 
   private void setup_table() {
@@ -297,4 +319,5 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   private MButton selectFilesButton = new MButton("Select Files");
   private MediaDropPanel dropPanel = null;
   private Icon emptyImageIcon;
+  private MComboBox<String> bulkAction;
 }

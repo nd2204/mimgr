@@ -11,6 +11,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.awt.color.ColorSpace;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -19,112 +22,173 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.plaf.ComboBoxUI;
 import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.plaf.basic.BasicComboPopup;
+import javax.swing.plaf.basic.ComboPopup;
 
-public class MComboBox<T> extends JComboBox<T> {
-  public MComboBox(T[] items) {
-    super(items);
-    setRenderer(new MComboBoxRenderer());
-    setUI(new MComboBoxUI());
-  }
+import dev.mimgr.theme.ColorTheme;
+import dev.mimgr.theme.builtin.ColorScheme;
 
-  public class MComboBoxUI extends BasicComboBoxUI {
-    @Override
-    protected JButton createArrowButton() {
-      MButton button = new MButton("▼");
-      button.setBorderRadius(0);
-      button.setBorderWidth(2);
-      button.setBorderColor(Color.BLACK);
-      button.setFont(new Font("Arial", Font.BOLD, 12));
-      button.setBackground(Color.DARK_GRAY);
-      button.setForeground(Color.WHITE);
-      return button;
-    }
-
-    @Override
-    public void installUI(JComponent c) {
-      super.installUI(c);
-      comboBox.setBackground(Color.WHITE);
-    }
-  }
-
-  public class MComboBoxRenderer extends JLabel implements ListCellRenderer<Object> {
-    public MComboBoxRenderer() {
-      setOpaque(false);
-      setFont(new Font("Arial", Font.BOLD, 14));
-      setHorizontalAlignment(LEFT);
-      setVerticalAlignment(CENTER);
-      setBorder(new EmptyBorder(new Insets(0, 10, 0, 10)));
-      setCursor(new Cursor(Cursor.HAND_CURSOR));
-    }
-
-    @Override
-    public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-      boolean isSelected, boolean cellHasFocus) {
-      if (isSelected) {
-        setBackground(backgroundColor);
-        setForeground(Color.BLACK);
-      } else {
-        setBackground(cellBackgroundColor);
-        setForeground(Color.WHITE);
-      }
-
-      setText(value != null ? value.toString() : ""); // Display item text
-
-      return this;
-    }
-
-    @Override
-    public void paintComponent(Graphics g) {
-      Graphics2D g2 = (Graphics2D) g.create();
-      if (isFocusOwner()) {
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(backgroundColor);
-        g2.fillRect(0, 0, getWidth(), getHeight());
-
-
-      }
-      // g2.setColor(borderColor);
-      // g2.setStroke(new BasicStroke(borderWidth));
-      // g2.drawLine(0, getHeight(), getWidth(), getHeight());
-
-      super.paintComponent(g);
-      g2.dispose();
-    }
-  }
-
-  @Override
-  public void setBackground(Color colors) {
-    this.backgroundColor = colors;
-    repaint();
-  }
+public class MComboBox<T> extends JComboBox<T> implements FocusListener {
 
   public void setBorderColor(Color colors) {
     this.borderColor = colors;
     repaint();
   }
 
-  public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> {
-      JFrame frame = new JFrame("Custom JComboBox Demo");
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      frame.setSize(300, 200);
-
-      String[] items = {"Option 1", "Option 2", "Option 3", "Option 4"};
-      MComboBox<String> comboBox = new MComboBox<>(items);
-      comboBox.setPreferredSize(new Dimension(200, 30));
-
-      frame.setLayout(new FlowLayout());
-      frame.add(comboBox);
-      frame.setVisible(true);
-    });
+  public MComboBox(T[] items, ColorScheme colors) {
+    super(items);
+    this.colors = colors;
+    setRenderer(new MComboBoxRenderer());
+    setUI(this.comboBoxUI);
+    setEditable(true);
+    JTextField textField = (JTextField) this.getEditor().getEditorComponent();
+    textField.setBackground(colors.m_bg_dim);
+    textField.setForeground(colors.m_grey_2);
+    textField.setCaretColor(colors.m_grey_2);
+    textField.setBorder(BorderFactory.createCompoundBorder(
+      new LineBorder(colors.m_bg_5, 1),
+      new EmptyBorder(0, 10, 0, 10)
+    ));
   }
 
+  public class MComboBoxUI extends BasicComboBoxUI {
+    @Override
+    protected JButton createArrowButton() {
+      return new ArrowButton();
+    }
+
+    @Override
+    public void installUI(JComponent c) {
+      super.installUI(c);
+      comboBox.setBackground(colors.m_bg_0);
+    }
+
+    @Override
+    protected ComboPopup createPopup() {
+      BasicComboPopup pop = new BasicComboPopup(comboBox) {
+        @Override
+        protected JScrollPane createScroller() {
+          JScrollPane scroll = new JScrollPane(
+            list,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+          );
+          list.setFixedCellHeight(30);
+          scroll.setBackground(colors.m_bg_dim);
+          scroll.setBorder(new LineBorder(colors.m_bg_5, 1));
+
+          MScrollBar vsb = new MScrollBar(colors);
+          vsb.setPreferredSize(new Dimension(5, 5));
+          vsb.setForeground(colors.m_grey_0);
+          vsb.setUnitIncrement(30);
+          scroll.setVerticalScrollBar(vsb);
+
+          MScrollBar hsb = new MScrollBar(colors);
+          hsb.setForeground(colors.m_grey_0);
+          hsb.setUnitIncrement(30);
+          hsb.setOrientation(MScrollBar.HORIZONTAL);
+          scroll.setHorizontalScrollBar(hsb);
+
+          return scroll;
+        }
+      };
+      pop.setBorder(new LineBorder(colors.m_bg_5, 1));
+      pop.setBackground(colors.m_bg_dim);
+      pop.setOpaque(true);
+      return pop;
+    }
+  }
+
+  public class MComboBoxRenderer extends JLabel implements ListCellRenderer<Object> {
+    public MComboBoxRenderer() {
+      super();
+      setOpaque(true);
+      setFont(new Font("Arial", Font.BOLD, 14));
+      // setHorizontalAlignment(LEFT);
+      // setVerticalAlignment(CENTER);
+      // setBackground(colors.m_bg_0);
+      // setBorder(new EmptyBorder(new Insets(0, 10, 0, 10)));
+    }
+
+    @Override
+    public Component getListCellRendererComponent(
+      JList<?> list,
+      Object value,
+      int index,
+      boolean isSelected,
+      boolean cellHasFocus
+    ) {
+      setBorder(new EmptyBorder(0, 10, 0, 10));
+      if (index >= 0) {
+        this.setBorder(new EmptyBorder(5, 8, 5, 8));
+      } else {
+        this.setBorder(null);
+      }
+      if (isSelected) {
+        setBackground(colors.m_bg_2);
+        setForeground(colors.m_grey_2);
+      } else {
+        setBackground(colors.m_bg_dim);
+        setForeground(colors.m_grey_0);
+      }
+      setText(value != null ? value.toString() : ""); // Display item text
+      return this;
+    }
+  }
+
+  private class ArrowButton extends MButton {
+    public ArrowButton() {
+      setContentAreaFilled(false);
+      setBackground(colors.m_bg_0);
+      setForeground(colors.m_grey_0);
+      setBorderRadius(0);
+      setBorderWidth(1);
+      setBorder(BorderFactory.createEmptyBorder());
+      setBorderColor(colors.m_bg_5);
+    }
+
+    @Override
+    public void paint(Graphics grphcs) {
+      super.paint(grphcs);
+      Graphics2D g2 = (Graphics2D) grphcs;
+      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      int width = getWidth();
+      int height = getHeight();
+      int size = 10;
+      int x = (width - size) / 2;
+      int y = (height - size) / 2;
+      int px[] = {x, x + size, x + size / 2};
+      int py[] = {y, y, y + size};
+      g2.setColor(getForeground());
+      g2.fillPolygon(px, py, px.length);
+      g2.dispose();
+    }
+  }
+
+  @Override
+  public void focusGained(FocusEvent e) {
+  }
+
+  @Override
+  public void focusLost(FocusEvent e) {
+
+  }
+
+  private ColorScheme colors = ColorTheme.get_currentScheme();
   private Color backgroundColor = Color.BLUE;
   private Color cellBackgroundColor = Color.BLUE;
   private Color borderColor = Color.BLACK;
+  private Color focusBackground = Color.WHITE;
+  private Color focusForeground = Color.BLACK;
+  private Color focusBorderColor = Color.BLACK;
+  private ComboBoxUI comboBoxUI = new MComboBoxUI();
   private int borderWidth = 1;
 }

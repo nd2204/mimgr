@@ -31,7 +31,7 @@ public class MScrollBarUI extends BasicScrollBarUI {
     int width = rect.width;
     int height = rect.height;
     g2.setColor(scrollbar.getForeground());
-    g2.fillRoundRect(x, y, width, height, 6, 6);
+    g2.fillRoundRect(x, y, width, height, 4, 4);
   }
 
   @Override
@@ -41,18 +41,18 @@ public class MScrollBarUI extends BasicScrollBarUI {
   @Override
   protected Dimension getMaximumThumbSize() {
     if (scrollbar.getOrientation() == JScrollBar.VERTICAL) {
-      return new Dimension(0, THUMB_SIZE);
+      return new Dimension(0, THUMB_SIZE_MAX);
     } else {
-      return new Dimension(THUMB_SIZE, 0);
+      return new Dimension(THUMB_SIZE_MAX, 0);
     }
   }
 
   @Override
   protected Dimension getMinimumThumbSize() {
     if (scrollbar.getOrientation() == JScrollBar.VERTICAL) {
-      return new Dimension(0, THUMB_SIZE);
+      return new Dimension(0, THUMB_SIZE_MIN);
     } else {
-      return new Dimension(THUMB_SIZE, 0);
+      return new Dimension(THUMB_SIZE_MIN, 0);
     }
   }
 
@@ -76,6 +76,7 @@ public class MScrollBarUI extends BasicScrollBarUI {
     }
   }
 
-  private final int THUMB_SIZE = 80;
+  private final int THUMB_SIZE_MIN = 10;
+  private final int THUMB_SIZE_MAX = 80;
 }
 
