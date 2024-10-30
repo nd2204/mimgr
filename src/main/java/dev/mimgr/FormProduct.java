@@ -1,24 +1,19 @@
 package dev.mimgr;
 
-import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import dev.mimgr.custom.MButton;
@@ -29,7 +24,7 @@ import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.theme.builtin.ColorScheme;
 
-public class FormProduct extends JPanel {
+public class FormProduct extends JPanel implements ActionListener {
   public FormProduct(ColorScheme colors) {
     this.colors = colors;
     Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
@@ -133,6 +128,7 @@ public class FormProduct extends JPanel {
     this.addProductButton.setFont(nunito_extrabold_14);
     this.addProductButton.setIcon(IconManager.getIcon("add.png", 16, 16, colors.m_green));
     this.addProductButton.setText(" " + this.addProductButton.getText());
+    this.addProductButton.addActionListener(this);;
 
     this.filterTextField.setIcon(IconManager.getIcon("search.png", 20, 20, colors.m_grey_0), MTextField.ICON_PREFIX);
     this.filterTextField.setBackground(colors.m_bg_dim);
@@ -183,6 +179,14 @@ public class FormProduct extends JPanel {
 
     columnModel.getColumn(0).setCellRenderer(new MCheckBoxCellRenderer(colors));
     columnModel.getColumn(0).setCellEditor(new DefaultCellEditor(checkBoxModel));
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == addProductButton) {
+      JFrame jFrame = new FormUpload();
+      jFrame.setVisible(true);
+    }
   }
 
   private MCheckBox checkBoxModel = new MCheckBox();
