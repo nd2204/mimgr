@@ -3,9 +3,9 @@ package dev.mimgr.theme;
 import dev.mimgr.theme.builtin.*;
 
 public class ColorTheme {
-  private static ColorScheme instance = null;
+  private static ColorScheme currentScheme = null;
 
-  public enum theme {
+  public static enum theme {
     THEME_DARK_GRUVBOX,
     THEME_DARK_CATPUCCIN,
     THEME_DARK_EVERFOREST,
@@ -20,23 +20,38 @@ public class ColorTheme {
   public static ColorScheme get_colorscheme(theme t) {
     switch(t) {
       case THEME_DARK_DEFAULT:
-      return new DefaultDark();
+        currentScheme = new DefaultDark();
+        break;
       case THEME_DARK_GRUVBOX:
-      return new GruvboxDark();
+        currentScheme = new GruvboxDark();
+        break;
       case THEME_DARK_CATPUCCIN:
-      return new CatpuccinDark();
+        currentScheme = new CatpuccinDark();
+        break;
       case THEME_DARK_EVERFOREST:
-      return new EverforestDark();
+        currentScheme = new EverforestDark();
+        break;
       case THEME_LIGHT_DEFAULT:
-      return new DefaultLight();
+        currentScheme = new DefaultLight();
+        break;
       case THEME_LIGHT_GRUVBOX:
-      return new GruvboxLight();
+        currentScheme = new GruvboxLight();
+        break;
       case THEME_LIGHT_CATPUCCIN:
-      return new CatpuccinLight();
+        currentScheme = new CatpuccinLight();
+        break;
       case THEME_LIGHT_EVERFOREST:
-      return new EverforestLight();
+        currentScheme = new EverforestLight();
+        break;
       default:
-      return new DefaultDark();
+        currentScheme = new DefaultDark();
+        break;
     }
+    return currentScheme;
+  }
+
+  public static ColorScheme get_currentScheme() {
+    if (currentScheme == null) return new EverforestDark();
+    return currentScheme;
   }
 }

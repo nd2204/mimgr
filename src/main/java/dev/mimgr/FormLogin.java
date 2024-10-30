@@ -78,6 +78,7 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
     this.remember.setBoxHoverColor(m_colors.m_grey_0);
     this.remember.setCheckColor(m_colors.m_blue);
     this.remember.setHorizontalAlignment(SwingConstants.LEFT);
+    this.remember.setBackground(null);
 
     this.show_password_button = new MButton(IconManager.getIcon("eye_closed.png", 20, 16, m_colors.m_grey_0));
     this.show_password_button.setBorderWidth(2);

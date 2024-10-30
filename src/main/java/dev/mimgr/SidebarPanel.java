@@ -120,6 +120,11 @@ public class SidebarPanel extends JPanel implements ActionListener {
       PanelManager.show("FORM_LOGIN");
     }
 
+    // Skip if the pressed menu is the current menu
+    if (e.getSource() == pButton) {
+      return;
+    }
+
     String panelId = button_to_form.get(e.getSource());
     if (panelId == null) return;
 

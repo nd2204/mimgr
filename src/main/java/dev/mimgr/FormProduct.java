@@ -111,18 +111,27 @@ public class FormProduct extends JPanel {
     this.importButton.setBackground(colors.m_bg_2);
     this.importButton.setBorderColor(colors.m_bg_2);
     this.importButton.setForeground(colors.m_fg_0);
+    this.importButton.setHoverBorderColor(colors.m_bg_1);
+    this.importButton.setHoverBackgroundColor(colors.m_bg_1);
+    this.importButton.setClickBackgroundColor(colors.m_bg_dim);
     this.importButton.setFont(nunito_extrabold_14);
 
     this.exportButton.setBackground(colors.m_bg_2);
     this.exportButton.setBorderColor(colors.m_bg_2);
+    this.exportButton.setHoverBorderColor(colors.m_bg_1);
+    this.exportButton.setHoverBackgroundColor(colors.m_bg_1);
+    this.exportButton.setClickBackgroundColor(colors.m_bg_dim);
     this.exportButton.setForeground(colors.m_fg_0);
     this.exportButton.setFont(nunito_extrabold_14);
 
-    this.addProductButton.setBackground(colors.m_green);
-    this.addProductButton.setBorderColor(colors.m_green);
-    this.addProductButton.setForeground(colors.m_fg_1);
+    this.addProductButton.setBackground(colors.m_bg_2);
+    this.addProductButton.setBorderColor(colors.m_bg_2);
+    this.addProductButton.setHoverBorderColor(colors.m_green);
+    this.addProductButton.setHoverBackgroundColor(colors.m_bg_1);
+    this.addProductButton.setClickBackgroundColor(colors.m_bg_dim);
+    this.addProductButton.setForeground(colors.m_green);
     this.addProductButton.setFont(nunito_extrabold_14);
-    this.addProductButton.setIcon(IconManager.getIcon("add.png", 16, 16, colors.m_fg_1));
+    this.addProductButton.setIcon(IconManager.getIcon("add.png", 16, 16, colors.m_green));
     this.addProductButton.setText(" " + this.addProductButton.getText());
 
     this.filterTextField.setIcon(IconManager.getIcon("search.png", 20, 20, colors.m_grey_0), MTextField.ICON_PREFIX);

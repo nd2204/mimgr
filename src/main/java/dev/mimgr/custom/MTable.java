@@ -25,34 +25,40 @@ public class MTable extends JTable {
     super();
     this.colors = colors;
     this.borderColor = colors.m_bg_3;
-    this.headerCellColor = colors.m_bg_0;
+    this.headerCellColor = colors.m_bg_dim;
     this.headerCellTextColor = colors.m_grey_0;
-    this.tableColor = headerCellColor;
+    this.tableColor = colors.m_bg_0;
     borders[0] = borders[1] = borders[2] = borders[3] = false;
     this.borders[2] = true;
 
-    getTableHeader().setDefaultRenderer(new TableHeader());
-    getTableHeader().setPreferredSize(new Dimension(0, 45));
+    this.getTableHeader().setDefaultRenderer(new TableHeader());
+    this.getTableHeader().setPreferredSize(new Dimension(0, 45));
+    this.setShowGrid(false);
+    this.setIntercellSpacing(new Dimension(0, 0));
+    this.setBorder(null);
     this.setDefaultRenderer(Object.class, new TableCell());
     this.setGridColor(tableColor);
     this.setBackground(tableColor);
+    this.setSelectionBackground(colors.m_bg_1);
     setRowHeight(60);
   }
 
-  // public void setup_scrollbar(JScrollPane sp) {
-  //   sp.setVerticalScrollBar(new JScrollPane());
-  //   JPanel panel = new JPanel();
-  //   panel.setBackground(headerCellColor);
-  //   sp.setCorner(JScrollPane.UPPER_RIGHT_CORNER, panel);
-  // }
+  public void setup_scrollbar(JScrollPane sp) {
+    sp.setVerticalScrollBar(new MScrollBar(colors));
+    sp.setHorizontalScrollBar(new MScrollBar(colors));
+    JPanel panel = new JPanel();
+    panel.setBackground(headerCellColor);
+    sp.setCorner(JScrollPane.UPPER_RIGHT_CORNER, panel);
+  }
 
   private class TableHeader extends DefaultTableCellRenderer {
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object o, boolean bln, boolean bln1, int i, int i1) {
-      Component comp = super.getTableCellRendererComponent(table, o, bln, bln1, i, i1);
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+      Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
       comp.setBackground(headerCellColor);
       comp.setForeground(headerCellTextColor);
       comp.setFont(FontManager.getFont("NunitoBold", 14f));
+      borders[0] = true;
       borders[2] = true;
       setBorder(new EmptyBorder(0, 5, 0, 5));
       return comp;
@@ -69,8 +75,8 @@ public class MTable extends JTable {
       // Draw top, left, bottom, and right borders
       if (borders[0]) g2.drawLine(0, 0, getWidth(), 0); // Top border
       if (borders[1]) g2.drawLine(0, 0, 0, getHeight()); // Left border
-      if (borders[2]) g2.drawLine(0, getHeight() - 2, getWidth(), getHeight() - 2); // Bottom border
-      if (borders[3]) g2.drawLine(getWidth() - 2, 0, getWidth() - 2, getHeight()); // Right border
+      if (borders[2]) g2.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1); // Bottom border
+      if (borders[3]) g2.drawLine(getWidth() - 1, 0, getWidth() - 1, getHeight()); // Right border
 
       g2.dispose();
     }
@@ -78,13 +84,22 @@ public class MTable extends JTable {
 
   public class TableCell extends DefaultTableCellRenderer {
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean bln, boolean bln1, int row, int col) {
-      Component comp = super.getTableCellRendererComponent(table, value, bln, bln1, row, col);
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean bln1, int row, int col) {
+      Component comp = super.getTableCellRendererComponent(table, value, isSelected, bln1, row, col);
+      borders[0] = false;
+      borders[2] = true;
       comp.setBackground(tableColor);
       comp.setForeground(colors.m_fg_0);
-      comp.setFont(FontManager.getFont("Nunito", 14f));
-      setSelectionBackground(colors.m_bg_1);
+      comp.setFont(FontManager.getFont("NunitoBold", 14f));
       setBorder(new EmptyBorder(0, 5, 0, 5));
+
+      if (isSelected) {
+        this.setBackground(table.getSelectionBackground());
+        this.setOpaque(true);
+      } else {
+        this.setBackground(table.getBackground());
+        this.setOpaque(false);
+      }
 
       return comp;
     }

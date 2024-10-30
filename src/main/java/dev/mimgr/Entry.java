@@ -31,6 +31,7 @@ class Entry extends JFrame {
     FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
     FontManager.loadFont("Nunito", "Nunito-Regular.ttf");
     FontManager.loadFont("NunitoBold", "Nunito-Bold.ttf");
+    FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
     FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
 
     // Get the screen size
