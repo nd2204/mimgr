@@ -8,11 +8,19 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -21,6 +29,7 @@ import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTextArea;
 import dev.mimgr.custom.MTextField;
+import dev.mimgr.db.DBQueries;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class UploadPanel extends JPanel implements ActionListener, DocumentListener {
@@ -78,6 +87,7 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
         gbc.gridx = 0;
         gbc.gridy = 3;
         this.add(quantityLabel, gbc);
+
         gbc.gridx = 1;
         this.add(quantityField, gbc);
 
@@ -89,55 +99,13 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
         gbc.gridx = 0;
         gbc.gridy = 4;
         this.add(categoryLabel, gbc);
+
         gbc.gridx = 1;
         this.add(categoryField, gbc);
 
-        // Image label and file chooser
-        // imageLabel = new JLabel("Image Path:");
-        // gbc.gridx = 1;
-        // // gbc.gridy = 0;
-        // this.add(imageLabel, gbc);
-
-        // gbc.gridx = 2;
-        // add(browseButton, gbc);
-        // Browse Button ActionListener for selecting an image
-        // browseButton.addActionListener(new ActionListener() {
-        //     @Override
-        //     public void actionPerformed(ActionEvent e) {
-        //         JFileChooser fileChooser = new JFileChooser();
-        //         int result = fileChooser.showOpenDialog(FormUpload.this);
-        //         if (result == JFileChooser.APPROVE_OPTION) {
-        //             File selectedFile = fileChooser.getSelectedFile();
-        //             imagePathField.setText(selectedFile.getAbsolutePath());
-        //         }
-        //     }
-        // });
-        // Upload button
         gbc.gridx = 1;
         gbc.gridy = 7;
         this.add(uploadButton, gbc);
-
-        // Upload Button ActionListener to handle form submission
-        // uploadButton.addActionListener(new ActionListener() {
-        //     @Override
-        //     public void actionPerformed(ActionEvent e) {
-        //         if (nameField.getText().isEmpty() || categoryField.getText().isEmpty() || priceField.getText().isEmpty() || quantityField.getText().isEmpty()) {
-        //             JOptionPane.showMessageDialog(UploadPanel.this, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
-        //             return;
-        //         }
-        //         // Get the form data
-        //         String name = nameField.getText();
-        //         double price = Double.parseDouble(priceField.getText());
-        //         String description = descriptionArea.getText();
-        //         int quantity = Integer.parseInt(quantityField.getText());
-        //         int category = Integer.parseInt(categoryField.getText());
-        //         // String result = UploadService.post_instrument(name, price, description, quantity, category, imgUrl);
-        //         // Display result message
-        //         JOptionPane.showMessageDialog(UploadPanel.this, result, "Upload Status", JOptionPane.INFORMATION_MESSAGE);
-        //         if (result.equals("Music instrument uploaded successfully!")) {
-        //         }
-        //     }
-        // });
     }
 
     public void setup_form_style() {
@@ -180,9 +148,13 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
         quantityField.getDocument().addDocumentListener(this);
 
         // categoryField = new MComboBox(30);
-        String[] options = {"Option 1", "Option 2", "Option 3", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4", "Option 4"};
+        String[] options = get_category_names();
         categoryField = new MComboBox<>(options, m_colors);
-        categoryField.setBorder(new EmptyBorder(new Insets(10, 20, 10, 20)));
+        txt = (JTextField) categoryField.getEditor().getEditorComponent();
+        txt.setBorder(BorderFactory.createCompoundBorder(
+          new LineBorder(m_colors.m_bg_5, 1),
+          new EmptyBorder(new Insets(10, 20, 10, 20))
+        ));
 
         // ========================= Buttons =========================
         this.uploadButton = new MButton("Submit");
@@ -198,6 +170,20 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == uploadButton) {
+          String name = nameField.getTextString();
+          double price = Double.parseDouble(priceField.getTextString());
+          String description = descriptionArea.getTextString();
+          int stock_quantity = Integer.parseInt(quantityField.getTextString());
+          int category_id = get_category_id(txt.getText());
+          String image_url = "";
+          System.out.println(category_id);
+          if (category_id == 0) {
+            JOptionPane.showMessageDialog(null, "Not valid category name");
+          }
+          else {
+            JOptionPane.showMessageDialog(null, "Success");
+            DBQueries.insert_product(name, price, description, stock_quantity, category_id, image_url);
+          }
         }
     }
 
@@ -232,10 +218,41 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
         }
     }
 
+    private String[] get_category_names() {
+      ResultSet queryResult = DBQueries.select_all_categories();
+      List<String> nameList = new ArrayList<>();
+      try {
+        while (queryResult.next()) {
+          nameList.add(queryResult.getString("category_name"));
+        }
+      } catch (SQLException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      String[] namesArray = nameList.toArray(new String[0]);
+      return namesArray;
+    }
+
+    private int get_category_id(String category_name) {
+      ResultSet queryResult = DBQueries.select_id_category(category_name);
+      int id_result = 0;
+      try {
+        while (queryResult.next()) {
+          id_result = queryResult.getInt("category_id");
+        }
+        return id_result;
+      } catch (SQLException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      return id_result;
+    }
+
     // Declare form components
     JLabel nameLabel, priceLabel, descriptionLabel, quantityLabel, categoryLabel, imageLabel;
     MTextField nameField, priceField, quantityField;
-    MComboBox categoryField;
+    JTextField txt;
+    MComboBox<String> categoryField;
     MTextArea descriptionArea;
     MButton uploadButton;
     ColorScheme m_colors;
