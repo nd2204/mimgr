@@ -62,7 +62,6 @@ public class DBQueries {
 
   public static ResultSet select_all_intruments() {
     ResultSet resultSet = null;
-
     try {
       PreparedStatement preparedStatement = dbcon.prepareStatement(SELECT_ALL_INTRUMENTS);
       resultSet = preparedStatement.executeQuery();

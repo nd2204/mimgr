@@ -14,8 +14,8 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
@@ -23,18 +23,17 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.DropPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MCheckBoxCellEditor;
 import dev.mimgr.custom.MCheckBoxCellRenderer;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MImageCellRenderer;
-import dev.mimgr.custom.MScrollBar;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.theme.builtin.ColorScheme;
-import dev.mimgr.utils.MTransferHandler;
 import dev.mimgr.utils.MTransferListener;
 
 public class FormMedia extends JPanel implements ActionListener, MTransferListener {
@@ -62,17 +61,37 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     c.insets = new Insets(20, 5, 20, 5);
     this.add(this.addMediaButton, c);
 
-    dropPanel = new MediaDropPanel();
+    dropPanel = new JPanel();
+    dropPanel.setOpaque(false);
     dropPanel.setVisible(false);
-    // MTransferHandler transferHandler = new MTransferHandler();
-    // transferHandler.addTransferListener(this);
-    dropPanel.addTransferListener(this);
+    dropPanel.setLayout(new GridBagLayout());
+    droppedItemsPanel = new DropContainerPanel(this.colors);
+    droppedItemsPanel.addActionListener(this);
+    {
+      MediaDropPanel dropArea = new MediaDropPanel();
+      dropArea.addTransferListener(this);
+      GridBagConstraints gc = new GridBagConstraints();
+      gc.gridx = 0;
+      gc.gridy = 0;
+      gc.weightx = 1.0;
+      gc.weighty = 1.0;
+      gc.fill = GridBagConstraints.BOTH;
+      dropPanel.add(dropArea, gc);
+
+      gc.gridx = 0;
+      gc.gridy = 1;
+      gc.fill = GridBagConstraints.BOTH;
+      gc.anchor = GridBagConstraints.FIRST_LINE_START;
+      gc.insets = new Insets(0, 0, 0, 0);
+      dropPanel.add(droppedItemsPanel, gc);
+    }
 
     c.insets = new Insets(0, 25, 15, 25);
     c.gridx = 0;
     c.gridy = 1;
     c.weightx = 1.0;
-    c.weighty = 0.2;
+    c.ipady = 245;
+    c.weighty = 0.0;
     c.gridwidth = 2;
     c.fill = GridBagConstraints.BOTH;
     this.add(dropPanel, c);
@@ -296,6 +315,14 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
         dropPanel.setVisible(true);
       }
     }
+    if (e.getSource() == this.droppedItemsPanel.getConfirmButton()) {
+      // Do something with the data
+      for (Object obj : this.droppedItemsPanel.getAllData()) {
+        System.out.println(obj);
+      }
+      // Clear the data
+      this.droppedItemsPanel.clearData();
+    }
     return;
   }
 
@@ -323,6 +350,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   public void onStringImported(String string) {
     System.out.println("Dropped String data");
     System.out.println(string);
+    droppedItemsPanel.addData(string);
     return;
   }
 
@@ -356,8 +384,9 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   private JLabel topLabel = new JLabel("Media Library");
   private MButton addMediaButton = new MButton("Add New Media File");
   private MButton selectFilesButton = new MButton("Select Files");
-  private MediaDropPanel dropPanel = null;
+  private JPanel dropPanel = null;
   private Icon emptyImageIcon;
   private MComboBox<String> bulkAction;
   private MButton applyBulkAction = new MButton("Apply");
+  private DropContainerPanel droppedItemsPanel;
 }
