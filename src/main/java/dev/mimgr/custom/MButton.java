@@ -94,12 +94,15 @@ public class MButton extends JButton implements MouseListener {
   }
 
   private void drawText(Graphics g) {
+    if (this.foregroundColor == null) {
+      this.foregroundColor = this.getForeground();
+    }
     if (this.clickForegroundColor != null && getModel().isPressed()) {
       this.setForeground(this.clickForegroundColor);
     } else if (this.hoverForegroundColor != null && getModel().isRollover()) {
       this.setForeground(this.hoverForegroundColor);
     } else {
-      this.setForeground(this.getForeground());
+      this.setForeground(this.foregroundColor);
     }
   }
 
@@ -238,6 +241,7 @@ public class MButton extends JButton implements MouseListener {
   private Color clickBackgroundColor = null;
   private Color hoverBackgroundColor = null;
 
+  private Color foregroundColor      = null;
   private Color clickForegroundColor = null;
   private Color hoverForegroundColor = null;
 

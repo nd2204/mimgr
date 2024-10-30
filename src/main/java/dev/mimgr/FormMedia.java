@@ -8,10 +8,13 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -61,9 +64,9 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
 
     dropPanel = new MediaDropPanel();
     dropPanel.setVisible(false);
-    MTransferHandler transferHandler = new MTransferHandler();
-    transferHandler.addTransferListener(this);
-    dropPanel.setTransferHandler(transferHandler);
+    // MTransferHandler transferHandler = new MTransferHandler();
+    // transferHandler.addTransferListener(this);
+    dropPanel.addTransferListener(this);
 
     c.insets = new Insets(0, 25, 15, 25);
     c.gridx = 0;
@@ -81,28 +84,34 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       contentContainer.setBackground(colors.m_bg_0);
 
       String[] items = { 
-        "Option 1", "Option 2", "Option 3", "Option 4",
-        "Option 5", "Option 6", "Option 7", "Option 8",
-        "Option 9", "Option 10", "Option 11", "Option 12",
-        "Option 13", "Option 14", "Option 15", "Option 16",
-        "Option 17",
+        "Bulk actions",
+        "Delete Permanently"
       };
+
       this.bulkAction = new MComboBox<>(items, colors);
       this.bulkAction.setBackground(colors.m_bg_0);
       this.bulkAction.setForeground(colors.m_grey_0);
 
       cc.gridx = 0;
       cc.gridy = 0;
-      cc.weightx = 1.0;
+      cc.weightx = 0.0;
+      cc.ipadx = 40;
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
       cc.fill = GridBagConstraints.BOTH;
-      cc.insets = new Insets(15, 15, 15, 15);
+      cc.insets = new Insets(15, 15, 0, 5);
       contentContainer.add(bulkAction, cc);
 
       cc.gridx = 1;
       cc.gridy = 0;
+      cc.weightx = 0.0;
+      cc.insets = new Insets(15, 0, 0, 15);
+      cc.fill = GridBagConstraints.VERTICAL;
+      contentContainer.add(applyBulkAction, cc);
+
+      cc.gridx = 2;
+      cc.gridy = 0;
       cc.weightx = 1.0;
-      cc.fill = GridBagConstraints.HORIZONTAL;
+      cc.fill = GridBagConstraints.VERTICAL;
       cc.anchor = GridBagConstraints.FIRST_LINE_END;
       contentContainer.add(filterTextField, cc);
 
@@ -111,7 +120,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       cc.gridy = 1;
       cc.weightx = 1.0;
       cc.weighty = 1.0;
-      cc.gridwidth = 2;
+      cc.gridwidth = 4;
       cc.insets = new Insets(15, 0, 15, 0);
       cc.fill = GridBagConstraints.BOTH;
       setup_table();
@@ -169,6 +178,14 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     this.selectFilesButton.setHorizontalAlignment(SwingConstants.CENTER);
     this.selectFilesButton.addActionListener(this);
 
+    this.applyBulkAction.setForeground(colors.m_grey_2);
+    this.applyBulkAction.setBackground(colors.m_bg_0);
+    this.applyBulkAction.setBorderColor(colors.m_bg_5);
+    this.applyBulkAction.setHoverBackgroundColor(colors.m_bg_1);
+    this.applyBulkAction.setClickBackgroundColor(colors.m_bg_dim);
+    this.applyBulkAction.setHoverForegroundColor(colors.m_blue);
+    this.applyBulkAction.setHoverBorderColor(colors.m_blue);
+    this.applyBulkAction.setBorderRadius(0);
   }
 
   private void setup_table() {
@@ -282,6 +299,26 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     return;
   }
 
+  private boolean isValidImageFile(File file) {
+    String[] validExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"};
+    String fileName = file.getName().toLowerCase();
+
+    // Check file extension
+    for (String extension : validExtensions) {
+      if (fileName.endsWith(extension)) {
+        return true; // Valid extension found
+      }
+    }
+
+    // Optionally: Check MIME type if extension check fails
+    try {
+      // Check if the file can be read as an image
+      return ImageIO.read(file) != null;
+    } catch (Exception e) {
+      return false; // If an exception occurs, treat as invalid
+    }
+  }
+
   @Override
   public void onStringImported(String string) {
     System.out.println("Dropped String data");
@@ -297,9 +334,11 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   }
 
   @Override
-  public void onFileListImported(List<?> files) {
+  public void onFileListImported(List<File> files) {
     System.out.println("Dropped File list data");
-    System.out.println(files);
+    for (File file : files) {
+      System.out.println("valid: " + isValidImageFile(file)+ " " + file);
+    }
     return;
   }
 
@@ -320,4 +359,5 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   private MediaDropPanel dropPanel = null;
   private Icon emptyImageIcon;
   private MComboBox<String> bulkAction;
+  private MButton applyBulkAction = new MButton("Apply");
 }

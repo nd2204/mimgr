@@ -33,15 +33,11 @@ import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.plaf.basic.ComboPopup;
 
+import dev.mimgr.FontManager;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class MComboBox<T> extends JComboBox<T> implements FocusListener {
-
-  public void setBorderColor(Color colors) {
-    this.borderColor = colors;
-    repaint();
-  }
 
   public MComboBox(T[] items, ColorScheme colors) {
     super(items);
@@ -49,14 +45,15 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
     setRenderer(new MComboBoxRenderer());
     setUI(this.comboBoxUI);
     setEditable(true);
-    JTextField textField = (JTextField) this.getEditor().getEditorComponent();
-    textField.setBackground(colors.m_bg_dim);
-    textField.setForeground(colors.m_grey_2);
-    textField.setCaretColor(colors.m_grey_2);
-    textField.setBorder(BorderFactory.createCompoundBorder(
+    this.comboBoxTextField = (JTextField) this.getEditor().getEditorComponent();
+    comboBoxTextField.setBackground(colors.m_bg_dim);
+    comboBoxTextField.setForeground(colors.m_grey_2);
+    comboBoxTextField.setCaretColor(colors.m_grey_2);
+    comboBoxTextField.setBorder(BorderFactory.createCompoundBorder(
       new LineBorder(colors.m_bg_5, 1),
       new EmptyBorder(0, 10, 0, 10)
     ));
+    comboBoxTextField.addFocusListener(this);
   }
 
   public class MComboBoxUI extends BasicComboBoxUI {
@@ -81,7 +78,7 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
           );
-          list.setFixedCellHeight(30);
+          // list.setFixedCellHeight(50);
           scroll.setBackground(colors.m_bg_dim);
           scroll.setBorder(new LineBorder(colors.m_bg_5, 1));
 
@@ -111,11 +108,7 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
     public MComboBoxRenderer() {
       super();
       setOpaque(true);
-      setFont(new Font("Arial", Font.BOLD, 14));
-      // setHorizontalAlignment(LEFT);
-      // setVerticalAlignment(CENTER);
-      // setBackground(colors.m_bg_0);
-      // setBorder(new EmptyBorder(new Insets(0, 10, 0, 10)));
+      setFont(FontManager.getFont("NunitoBold", 14f));
     }
 
     @Override
@@ -128,7 +121,7 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
     ) {
       setBorder(new EmptyBorder(0, 10, 0, 10));
       if (index >= 0) {
-        this.setBorder(new EmptyBorder(5, 8, 5, 8));
+        this.setBorder(new EmptyBorder(10, 8, 10, 8));
       } else {
         this.setBorder(null);
       }
@@ -175,20 +168,21 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
 
   @Override
   public void focusGained(FocusEvent e) {
+    comboBoxTextField.setBorder(BorderFactory.createCompoundBorder(
+      new LineBorder(colors.m_bg_3, 1),
+      new EmptyBorder(0, 10, 0, 10)
+    ));
   }
 
   @Override
   public void focusLost(FocusEvent e) {
-
+    comboBoxTextField.setBorder(BorderFactory.createCompoundBorder(
+      new LineBorder(colors.m_bg_5, 1),
+      new EmptyBorder(0, 10, 0, 10)
+    ));
   }
 
   private ColorScheme colors = ColorTheme.get_currentScheme();
-  private Color backgroundColor = Color.BLUE;
-  private Color cellBackgroundColor = Color.BLUE;
-  private Color borderColor = Color.BLACK;
-  private Color focusBackground = Color.WHITE;
-  private Color focusForeground = Color.BLACK;
-  private Color focusBorderColor = Color.BLACK;
   private ComboBoxUI comboBoxUI = new MComboBoxUI();
-  private int borderWidth = 1;
+  private JTextField comboBoxTextField;
 }
