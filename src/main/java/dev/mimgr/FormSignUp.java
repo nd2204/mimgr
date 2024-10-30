@@ -281,8 +281,8 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
         pf_password_confirm.setShowingPassword(true);
         pf_password.setEchoChar('\0');
         pf_password_confirm.setEchoChar('\0');
-        show_password_button.setIcon(IconManager.getIcon("eye_opened.png", 20, 16, m_colors.m_blue));
-        show_password_button.setHoverBorderColor(m_colors.m_blue);
+        show_password_button.setIcon(IconManager.getIcon("eye_opened.png", 20, 16, m_colors.m_green));
+        show_password_button.setHoverBorderColor(m_colors.m_green);
       } else {
         pf_password.setShowingPassword(false);
         pf_password_confirm.setShowingPassword(false);

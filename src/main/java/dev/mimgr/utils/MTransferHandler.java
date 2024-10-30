@@ -2,7 +2,6 @@ package dev.mimgr.utils;
 
 import javax.swing.TransferHandler;
 import java.awt.datatransfer.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -39,16 +38,25 @@ public class MTransferHandler extends TransferHandler{
       }
       // Handle image data
       else if (support.isDataFlavorSupported(DataFlavor.imageFlavor)) {
-        Image image = (Image) support.getTransferable().getTransferData(DataFlavor.imageFlavor);
+        Image image = (Image) data.getTransferData(DataFlavor.imageFlavor);
         for (MTransferListener listener : listeners) {
           listener.onImageImported(image);
         }
       }
       // Handle file list (for image files)
       else if (support.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
-        List<?> fileList = (List<?>) support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+        ArrayList<File> dataArrayList = new ArrayList<>();
+        Object transferData = data.getTransferData(DataFlavor.javaFileListFlavor);
+        if (transferData instanceof List) {
+          List<?> dataList = (List<?>) transferData;
+          for (Object d : dataList) {
+            if (d instanceof File) {
+              dataArrayList.add((File) d);
+            }
+          }
+        }
         for (MTransferListener listener : listeners) {
-          listener.onFileListImported(fileList);
+          listener.onFileListImported(dataArrayList);
         }
       }
     } catch (UnsupportedFlavorException | IOException e) {
