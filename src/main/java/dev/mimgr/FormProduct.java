@@ -19,8 +19,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
 
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MCheckBox;
@@ -173,7 +171,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     model.addColumn("Price");
     model.addColumn("Description");
     model.addColumn("Stock Quantity");
-    // get_all_intruments(model);
+    get_all_intruments(model);
 
     table.setModel(model);
     TableColumnModel columnModel = table.getColumnModel();
@@ -200,6 +198,8 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
       JFrame jFrame = new FormUpload();
       jFrame.setVisible(true);
     }
+
+
   }
 
   @Override
@@ -215,6 +215,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   @Override
   public void changedUpdate(DocumentEvent e) {
     get_intruments(model, this.filterTextField.getText());
+
   }
 
 
@@ -231,7 +232,8 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   }
 
   private void get_intruments(DefaultTableModel model, String name) {
-    if (!name.contentEquals("")) {
+    if (name.equals(this.filterTextField.getPlaceholder())) return;
+    if (!name.contentEquals("") ) {
       model.setRowCount(0);
       ResultSet queryResult = DBQueries.select_intruments(name);
       try {
@@ -246,6 +248,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     else {
       get_all_intruments(model);
     }
+    System.out.println(name);
   }
 
 

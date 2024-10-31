@@ -77,7 +77,7 @@ public class DBQueries {
 
     try {
       PreparedStatement preparedStatement = dbcon.prepareStatement(SELECT_INTRUMENTS);
-      preparedStatement.setString(1, name + '%');
+      preparedStatement.setString(1, '%' + name + '%');
       resultSet = preparedStatement.executeQuery();
     } catch (SQLException e) {
       e.printStackTrace();
