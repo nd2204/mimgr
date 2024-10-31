@@ -13,14 +13,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -101,6 +98,7 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
         this.add(categoryLabel, gbc);
 
         gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.BOTH;
         this.add(categoryField, gbc);
 
         gbc.gridx = 1;
@@ -150,11 +148,11 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
         // categoryField = new MComboBox(30);
         String[] options = get_category_names();
         categoryField = new MComboBox<>(options, m_colors);
-        txt = (JTextField) categoryField.getEditor().getEditorComponent();
-        txt.setBorder(BorderFactory.createCompoundBorder(
-          new LineBorder(m_colors.m_bg_5, 1),
-          new EmptyBorder(new Insets(10, 20, 10, 20))
-        ));
+        // txt = (JTextField) categoryField.getEditor().getEditorComponent();
+        // txt.setBorder(BorderFactory.createCompoundBorder(
+        //   new LineBorder(m_colors.m_bg_5, 1),
+        //   new EmptyBorder(new Insets(10, 20, 10, 20))
+        // ));
 
         // ========================= Buttons =========================
         this.uploadButton = new MButton("Submit");
