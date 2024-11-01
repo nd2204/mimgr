@@ -34,6 +34,10 @@ import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 
+/**
+ *
+ * @author dn200
+ */
 public class FormProduct extends JPanel implements ActionListener, DocumentListener, TableModelListener {
 
     public FormProduct(ColorScheme colors) {
@@ -177,7 +181,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
         model.addColumn("Description");
         model.addColumn("Stock Quantity");
         model.addTableModelListener(this);
-        get_all_intruments(model);
+        // get_all_intruments(model);
 
         table.setModel(model);
         TableColumnModel columnModel = table.getColumnModel();

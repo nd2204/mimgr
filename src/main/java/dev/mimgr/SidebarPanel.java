@@ -19,6 +19,10 @@ import javax.swing.SwingConstants;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.theme.builtin.ColorScheme;
 
+/**
+ *
+ * @author dn200
+ */
 public class SidebarPanel extends JPanel implements ActionListener {
   SidebarPanel(ColorScheme colors) {
     this.colors = colors;
@@ -138,6 +142,7 @@ public class SidebarPanel extends JPanel implements ActionListener {
     JPanel formPanel = PanelManager.get_panel(panelId);
     if (formPanel == null) {
       System.err.println("No panel associated with " + panelId);
+      pButton = null;
       return;
     }
 

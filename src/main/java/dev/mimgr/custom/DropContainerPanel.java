@@ -3,6 +3,7 @@ package dev.mimgr.custom;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -11,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -18,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import dev.mimgr.FontManager;
+import dev.mimgr.IconManager;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class DropContainerPanel extends JPanel implements ActionListener {
@@ -74,9 +77,12 @@ public class DropContainerPanel extends JPanel implements ActionListener {
       button = new MButton((String) data);
     }
     else if (data instanceof ImageIcon) {
-      button = new MButton((ImageIcon) data);
+      button = new MButton();
+      setup_button_icon(button, (Icon) data);
     }
     else if (data instanceof File) {
+      button = new MButton();
+      setup_button_icon(button, IconManager.loadIcon((File) data));
     }
     else if (data instanceof List) {
       List<?> dataList = (List<?>) data;
@@ -88,24 +94,70 @@ public class DropContainerPanel extends JPanel implements ActionListener {
     }
     if (button != null) {
       setup_button(button);
-      dataMap.put(button, data);
+      stagedData.put(button, data);
       thisPanel.add(button);
     }
 
-    System.out.println(dataMap);
+    System.out.println(stagedData);
     revalidate();
     repaint();
   }
 
   public void clearData() {
-    for (MButton button : this.dataMap.keySet()) {
+    for (MButton button : this.stagedData.keySet()) {
       thisPanel.remove(button);
     }
-    this.dataMap.clear();
+    this.stagedData.clear();
     this.setVisible(false);
     revalidate();
     repaint();
   }
+
+  public boolean isEmpty() {
+    return stagedData.isEmpty();
+  }
+
+  public JButton getConfirmButton() {
+    return confirmButton;
+  }
+
+  public List<Object> getAllData() {
+    ArrayList<Object> dataList = new ArrayList<>();
+    for (Object obj : stagedData.values()) {
+      dataList.add(obj);
+    }
+    return dataList;
+  }
+
+  public void addActionListener(ActionListener al) {
+    allist.add(al);
+  }
+
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    MButton key = (MButton) e.getSource();
+    Object data = stagedData.get(key);
+    if (data != null) {
+      stagedData.remove(key);
+      thisPanel.remove(key);
+    }
+    if (this.isEmpty()) {
+      this.setVisible(false);
+    }
+    for (ActionListener al : allist) {
+      al.actionPerformed(e);
+    }
+    revalidate();
+    repaint();
+  }
+
+  private void setup_button_icon(MButton button, Icon icon) {
+    int size = 100 - button.getBorderWidth();
+    button.setIcon(
+      IconManager.changeIconSize(icon, size, size)
+    );
+  }
+
 
   private void setup_button(MButton button) {
     button.setBackground(null);
@@ -120,47 +172,10 @@ public class DropContainerPanel extends JPanel implements ActionListener {
     button.addActionListener(this);
   }
 
-  public boolean isEmpty() {
-    return dataMap.isEmpty();
-  }
-
-  public JButton getConfirmButton() {
-    return confirmButton;
-  }
-
-  public List<Object> getAllData() {
-    ArrayList<Object> dataList = new ArrayList<>();
-    for (Object obj : dataMap.values()) {
-      dataList.add(obj);
-    }
-    return dataList;
-  }
-
-  public void addActionListener(ActionListener al) {
-    allist.add(al);
-  }
-
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    MButton key = (MButton) e.getSource();
-    Object data = dataMap.get(key);
-    if (data != null) {
-      dataMap.remove(key);
-      thisPanel.remove(key);
-    }
-    if (this.isEmpty()) {
-      this.setVisible(false);
-    }
-    for (ActionListener al : allist) {
-      al.actionPerformed(e);
-    }
-    revalidate();
-    repaint();
-  }
 
   private ArrayList<ActionListener> allist = new ArrayList<>();
   private MButton confirmButton = new MButton("Confirm");
   private JPanel thisPanel = new JPanel();
   private ColorScheme colors;
-  private HashMap<MButton, Object> dataMap = new HashMap<>();
+  private HashMap<MButton, Object> stagedData = new HashMap<>();
 }

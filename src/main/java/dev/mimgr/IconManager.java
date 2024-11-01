@@ -1,13 +1,20 @@
 package dev.mimgr;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 
 public class IconManager {
   // Cache to store loaded icons
@@ -76,6 +83,32 @@ public class IconManager {
     return new ImageIcon(scaledImage);
   }
 
+  public static Icon loadIcon(File file) {
+    try {
+      // Load the image from the file path
+      var image = ImageIO.read(file);
+      return new ImageIcon(image);
+    } catch (IOException e) {
+      System.err.println("Error loading icon: " + e.getMessage());
+      return null; // Return null if the image couldn't be loaded
+    }
+  }
+
+  public static Icon makeIconRounded(Icon icon, int radius) {
+    // Create a new buffered image with transparency
+    BufferedImage roundedImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g2d = roundedImage.createGraphics();
+
+    // Set rendering hints for better quality
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2d.setClip(new RoundRectangle2D.Float(0, 0, icon.getIconWidth(), icon.getIconHeight(), radius, radius));
+    g2d.drawImage(((ImageIcon) icon).getImage(), 0, 0, null);
+    // icon.paintIcon(null, g2d, 0, 0);
+    g2d.dispose();
+
+    return new ImageIcon(roundedImage);
+  }
+
   /**
    * ONLY SUPPORT .png IMAGES
    * change the colors of all pixel's RGB chanel with retained Alpha chanel
@@ -109,7 +142,6 @@ public class IconManager {
     }
     return new ImageIcon(bi);
   }
-
 
   /**
      * Clears the icon cache to free memory.

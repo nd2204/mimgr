@@ -9,13 +9,17 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Path;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
@@ -35,7 +39,12 @@ import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.MTransferListener;
+import dev.mimgr.utils.ResourceManager;
 
+/**
+ *
+ * @author dn200
+ */
 public class FormMedia extends JPanel implements ActionListener, MTransferListener {
   public FormMedia(ColorScheme colors) {
     this.colors = colors;
@@ -326,6 +335,24 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     return;
   }
 
+  public static boolean isImageUrl(String urlString) {
+    try {
+      URI uri = new URI(urlString);
+      HttpClient client = HttpClient.newHttpClient();
+      HttpRequest request = HttpRequest.newBuilder()
+        .uri(uri)
+        .method("HEAD", HttpRequest.BodyPublishers.noBody())
+        .build();
+      HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+      String contentType = response.headers().firstValue("Content-Type").orElse("");
+
+      return contentType != null && contentType.startsWith("image/");
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
   private boolean isValidImageFile(File file) {
     String[] validExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"};
     String fileName = file.getName().toLowerCase();
@@ -350,7 +377,12 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   public void onStringImported(String string) {
     System.out.println("Dropped String data");
     System.out.println(string);
-    droppedItemsPanel.addData(string);
+    System.out.println("is image url: " + isImageUrl(string));
+    if (isImageUrl(string)) {
+      // System.out.println(rm.getUploadPath());
+      Path fp = ResourceManager.downloadFileToPath(string, rm.getUploadPath());
+      droppedItemsPanel.addData(fp.toFile());
+    }
     return;
   }
 
@@ -389,4 +421,5 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   private MComboBox<String> bulkAction;
   private MButton applyBulkAction = new MButton("Apply");
   private DropContainerPanel droppedItemsPanel;
+  private ResourceManager rm = ResourceManager.getInstance();
 }

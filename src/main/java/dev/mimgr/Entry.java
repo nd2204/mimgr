@@ -12,18 +12,14 @@ import javax.swing.JPanel;
 
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.ResourceManager;
 
 class Entry extends JFrame {
-  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_EVERFOREST);
-
-  private double m_aspect_ratio;
-  private int    m_width;
-  private int    m_height;
-
   Entry() {
     m_aspect_ratio = 16.0f / 10.0f;
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
+
 
     FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
     FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
@@ -98,4 +94,12 @@ class Entry extends JFrame {
   public static void main(String arg[]) {
     new Entry();
   }
+
+  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_EVERFOREST);
+  ResourceManager resman = ResourceManager.getInstance();
+
+  private double m_aspect_ratio;
+  private int    m_width;
+  private int    m_height;
+
 }
