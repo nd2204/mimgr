@@ -52,7 +52,6 @@ import dev.mimgr.utils.ResourceManager;
 public class FormMedia extends JPanel implements ActionListener, MTransferListener {
   public FormMedia(ColorScheme colors) {
     this.colors = colors;
-    this.emptyImageIcon = IconManager.getIcon("image.png", colors.m_grey_0);
     // =======================================================
     // Setup Layout
     // =======================================================
@@ -225,6 +224,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     table.setFillsViewportHeight(true);
     table.setRowHeight(emptyImageIcon.getIconHeight() + 40);
     table.setAutoscrolls(true);
+    this.emptyImageIcon = IconManager.getIcon("image.png", colors.m_grey_0);
     // table.setAutoResizeMode(MTable.AUTO_RESIZE_OFF);
 
     tableScrollPane = new JScrollPane(table);
@@ -321,12 +321,12 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       // Do something with the data
       for (Object obj : this.droppedItemsPanel.getAllData()) {
         if (obj instanceof File file) {
-          moveStagedFileToUploadDir(file);
+          Path newFilePath = moveStagedFileToUploadDir(file);
+          System.out.println(rm.getProjectPath().relativize(newFilePath));
         }
-        // Clean temp file from download
-        rm.cleanTempFiles();
-        System.out.println(obj);
       }
+      // Clean temp file from download
+      rm.cleanTempFiles();
       // Clear the data
       this.droppedItemsPanel.clearData();
     }
@@ -401,15 +401,17 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     }
   }
 
-  private void moveStagedFileToUploadDir(File file) {
+  private Path moveStagedFileToUploadDir(File file) {
+    Path destinationPath = null;
     try {
-      Path destinationPath = ResourceManager.getUniquePath(rm.getUploadPath().resolve(file.getName()));
+      destinationPath = ResourceManager.getUniquePath(rm.getUploadPath().resolve(file.getName()));
       Files.copy(file.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
       System.out.println("Copied to: " + destinationPath);
     } catch (IOException e) {
       System.out.println("Error occurred while copying file.");
       e.printStackTrace();
     }
+    return destinationPath;
   }
 
   private class MediaDropPanel extends DropPanel {

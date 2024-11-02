@@ -16,7 +16,6 @@ public class ProductRecord {
     m_id             = rs.getInt("product_id");
     m_name           = rs.getString("name");
     m_description    = rs.getString("description");
-    m_image_url      = rs.getString("image_url");
     m_price          = rs.getDouble("price");
     m_stock_quantity = rs.getInt("stock_quantity");
     m_category_id    = rs.getInt("category_id");
