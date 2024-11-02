@@ -7,6 +7,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,26 +74,24 @@ public class DropContainerPanel extends JPanel implements ActionListener {
       confirmButton.addActionListener(this);
       thisPanel.add(confirmButton);
     }
+
     MButton button = null;
-    if (data instanceof String) {
-      button = new MButton((String) data);
-    }
-    else if (data instanceof ImageIcon) {
+    if (data instanceof File file) {
       button = new MButton();
-      setup_button_icon(button, (Icon) data);
+      setup_button_icon(button, IconManager.loadIcon(file));
     }
-    else if (data instanceof File) {
+    else if (data instanceof String s) {
+      button = new MButton(s);
+    }
+    else if (data instanceof ImageIcon icon) {
       button = new MButton();
-      setup_button_icon(button, IconManager.loadIcon((File) data));
+      setup_button_icon(button, icon);
     }
-    else if (data instanceof List) {
-      List<?> dataList = (List<?>) data;
-      for (Object d : dataList) {
-        if (d instanceof File) {
-          addData((File) d);
-        }
-      }
+    else if (data instanceof Path path) {
+      button = new MButton();
+      setup_button_icon(button, IconManager.loadIcon(path.toFile()));
     }
+
     if (button != null) {
       setup_button(button);
       stagedData.put(button, data);
@@ -152,17 +152,18 @@ public class DropContainerPanel extends JPanel implements ActionListener {
   }
 
   private void setup_button_icon(MButton button, Icon icon) {
-    int size = 100 - button.getBorderWidth();
+    int size = 100 - button.getBorderWidth() * 4;
     button.setIcon(
-      IconManager.changeIconSize(icon, size, size)
+      IconManager.resizeByAspectRatio(icon, size, size)
     );
   }
 
 
   private void setup_button(MButton button) {
-    button.setBackground(null);
+    button.setBackground(colors.m_bg_dim);
     button.setForeground(colors.m_fg_0);
     button.setBorderWidth(2);
+    button.setBorderRadius(0);
     button.setFont(FontManager.getFont("NunitoBold", 14f));
     button.setPreferredSize(new Dimension(100, 100));
     button.setMaximumSize(new Dimension(100, 100));

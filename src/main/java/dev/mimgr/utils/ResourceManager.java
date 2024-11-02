@@ -8,6 +8,8 @@ import java.net.http.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 
 /**
  *
@@ -39,9 +41,11 @@ public class ResourceManager {
 
     projectPath = Paths.get("").toAbsolutePath();
     uploadPath = Paths.get("uploads").toAbsolutePath();
+    tempPath = Path.of(System.getProperty("java.io.tmpdir")).toAbsolutePath().resolve(APP_NAME);
 
     createDirIfNotExists(appDataPath.toFile());
     createDirIfNotExists(uploadPath.toFile());
+    createDirIfNotExists(tempPath.toFile());
   }
 
   public static ResourceManager getInstance() {
@@ -66,9 +70,28 @@ public class ResourceManager {
     return this.uploadPath;
   }
 
+  public Path getTempPath() {
+    return this.tempPath;
+  }
+
   public Path downloadTempFile(String urlString) {
-    Path tempDir = Path.of(System.getProperty("java.io.tmpdir"));
-    return downloadFileToPath(urlString, tempDir);
+    Path tempDir = this.tempPath;
+    Path path = downloadFileToPath(urlString, tempDir);
+    if (tempFiles == null) {
+      tempFiles = new ArrayList<File>();
+    }
+    tempFiles.add(path.toFile());
+    return path;
+  }
+
+  public void cleanTempFiles() {
+    if (tempFiles == null || tempFiles.isEmpty()) return;
+    for (File file : tempFiles) {
+      if (file.exists()) {
+        file.delete();
+      }
+    }
+    tempFiles = null;
   }
 
   public static Path downloadFileToPath(String urlString, Path saveDirectory) {
@@ -90,7 +113,7 @@ public class ResourceManager {
       filePath = saveDirectory.resolve(fileName); // Use the extracted filename
 
       try (InputStream inputStream = response.body()) {
-        Files.copy(inputStream, filePath);
+        Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
       } catch (IOException e) {
         System.err.println("Error writing to file: " + e.getMessage());
       }
@@ -105,6 +128,22 @@ public class ResourceManager {
 
     return filePath;
   }
+
+  public static Path getUniquePath(Path destinationPath) {
+    int copyNumber = 1;
+    Path newPath = destinationPath;
+
+    // Check if the destination file exists, add a suffix if it does
+    while (Files.exists(newPath)) {
+      String filename = destinationPath.getFileName().toString();
+      String newFilename = filename.replaceFirst("(\\.[^.]+)?$", "_" + copyNumber + "$1"); // Adds "_copy" before the file extension
+      newPath = destinationPath.resolveSibling(newFilename);
+      copyNumber++;
+    }
+
+    return newPath;
+  }
+
 
   private static String getFileNameFromResponse(HttpResponse<InputStream> response) {
     // Check the Content-Disposition header for the filename
@@ -134,6 +173,7 @@ public class ResourceManager {
     private static final ResourceManager INSTANCE = new ResourceManager();
   }
 
+  private ArrayList<File> tempFiles = null;
   private Path appDataPath;
   private Path tempPath;
   private Path uploadPath;

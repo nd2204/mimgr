@@ -9,11 +9,14 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -279,6 +282,110 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     }
   }
 
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    if (e.getSource() == this.addMediaButton) {
+      if (dropPanel.isVisible()) {
+        dropPanel.setVisible(false);
+      } else {
+        dropPanel.setVisible(true);
+      }
+    }
+    if (e.getSource() == this.droppedItemsPanel.getConfirmButton()) {
+      // Do something with the data
+      for (Object obj : this.droppedItemsPanel.getAllData()) {
+        if (obj instanceof File file) {
+          moveStagedFileToUploadDir(file);
+        }
+        // Clean temp file from download
+        rm.cleanTempFiles();
+        System.out.println(obj);
+      }
+      // Clear the data
+      this.droppedItemsPanel.clearData();
+    }
+    return;
+  }
+
+  public static boolean isImageUrl(String urlString) {
+    try {
+      URI uri = new URI(urlString);
+      HttpClient client = HttpClient.newHttpClient();
+      HttpRequest request = HttpRequest.newBuilder()
+        .uri(uri)
+        .method("HEAD", HttpRequest.BodyPublishers.noBody())
+        .build();
+      HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+      String contentType = response.headers().firstValue("Content-Type").orElse("");
+
+      return contentType != null && contentType.startsWith("image/");
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  @Override
+  public void onStringImported(String string) {
+    System.out.println("Dropped String data");
+    System.out.println(string);
+    System.out.println("is image url: " + isImageUrl(string));
+    if (isImageUrl(string)) {
+      // System.out.println(rm.getUploadPath());
+      Path fp = rm.downloadTempFile(string);
+      droppedItemsPanel.addData(fp.toFile());
+    }
+    return;
+  }
+
+  @Override
+  public void onImageImported(Image image) {
+    System.out.println("Dropped Image data");
+    System.out.println(image);
+    return;
+  }
+
+  @Override
+  public void onFileListImported(List<File> files) {
+    System.out.println("Dropped File list data");
+    for (File file : files) {
+      System.out.println("valid: " + isValidImageFile(file) + " " + file);
+      droppedItemsPanel.addData(file);
+    }
+    return;
+  }
+
+  private boolean isValidImageFile(File file) {
+    String[] validExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"};
+    String fileName = file.getName().toLowerCase();
+
+    // Check file extension
+    for (String extension : validExtensions) {
+      if (fileName.endsWith(extension)) {
+        return true; // Valid extension found
+      }
+    }
+
+    // Optionally: Check MIME type if extension check fails
+    try {
+      // Check if the file can be read as an image
+      return ImageIO.read(file) != null;
+    } catch (Exception e) {
+      return false; // If an exception occurs, treat as invalid
+    }
+  }
+
+  private void moveStagedFileToUploadDir(File file) {
+    try {
+      Path destinationPath = ResourceManager.getUniquePath(rm.getUploadPath().resolve(file.getName()));
+      Files.copy(file.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
+      System.out.println("Copied to: " + destinationPath);
+    } catch (IOException e) {
+      System.out.println("Error occurred while copying file.");
+      e.printStackTrace();
+    }
+  }
+
   private class MediaDropPanel extends DropPanel {
     public MediaDropPanel() {
       super(colors);
@@ -313,93 +420,6 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       gc.gridy = 2;
       this.add(selectFilesButton, gc);
     }
-  }
-
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == this.addMediaButton) {
-      if (dropPanel.isVisible()) {
-        dropPanel.setVisible(false);
-      } else {
-        dropPanel.setVisible(true);
-      }
-    }
-    if (e.getSource() == this.droppedItemsPanel.getConfirmButton()) {
-      // Do something with the data
-      for (Object obj : this.droppedItemsPanel.getAllData()) {
-        System.out.println(obj);
-      }
-      // Clear the data
-      this.droppedItemsPanel.clearData();
-    }
-    return;
-  }
-
-  public static boolean isImageUrl(String urlString) {
-    try {
-      URI uri = new URI(urlString);
-      HttpClient client = HttpClient.newHttpClient();
-      HttpRequest request = HttpRequest.newBuilder()
-        .uri(uri)
-        .method("HEAD", HttpRequest.BodyPublishers.noBody())
-        .build();
-      HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
-      String contentType = response.headers().firstValue("Content-Type").orElse("");
-
-      return contentType != null && contentType.startsWith("image/");
-    } catch (Exception e) {
-      e.printStackTrace();
-      return false;
-    }
-  }
-
-  private boolean isValidImageFile(File file) {
-    String[] validExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"};
-    String fileName = file.getName().toLowerCase();
-
-    // Check file extension
-    for (String extension : validExtensions) {
-      if (fileName.endsWith(extension)) {
-        return true; // Valid extension found
-      }
-    }
-
-    // Optionally: Check MIME type if extension check fails
-    try {
-      // Check if the file can be read as an image
-      return ImageIO.read(file) != null;
-    } catch (Exception e) {
-      return false; // If an exception occurs, treat as invalid
-    }
-  }
-
-  @Override
-  public void onStringImported(String string) {
-    System.out.println("Dropped String data");
-    System.out.println(string);
-    System.out.println("is image url: " + isImageUrl(string));
-    if (isImageUrl(string)) {
-      // System.out.println(rm.getUploadPath());
-      Path fp = ResourceManager.downloadFileToPath(string, rm.getUploadPath());
-      droppedItemsPanel.addData(fp.toFile());
-    }
-    return;
-  }
-
-  @Override
-  public void onImageImported(Image image) {
-    System.out.println("Dropped Image data");
-    System.out.println(image);
-    return;
-  }
-
-  @Override
-  public void onFileListImported(List<File> files) {
-    System.out.println("Dropped File list data");
-    for (File file : files) {
-      System.out.println("valid: " + isValidImageFile(file)+ " " + file);
-    }
-    return;
   }
 
   private Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);

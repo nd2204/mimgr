@@ -94,21 +94,6 @@ public class IconManager {
     }
   }
 
-  public static Icon makeIconRounded(Icon icon, int radius) {
-    // Create a new buffered image with transparency
-    BufferedImage roundedImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g2d = roundedImage.createGraphics();
-
-    // Set rendering hints for better quality
-    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g2d.setClip(new RoundRectangle2D.Float(0, 0, icon.getIconWidth(), icon.getIconHeight(), radius, radius));
-    g2d.drawImage(((ImageIcon) icon).getImage(), 0, 0, null);
-    // icon.paintIcon(null, g2d, 0, 0);
-    g2d.dispose();
-
-    return new ImageIcon(roundedImage);
-  }
-
   /**
    * ONLY SUPPORT .png IMAGES
    * change the colors of all pixel's RGB chanel with retained Alpha chanel
@@ -141,6 +126,50 @@ public class IconManager {
       }
     }
     return new ImageIcon(bi);
+  }
+
+  public static Icon resizeByAspectRatio(Icon icon, int targetWidth, int targetHeight) {
+    BufferedImage originalImage = iconToBufferedImage(icon);
+    int originalWidth = originalImage.getWidth();
+    int originalHeight = originalImage.getHeight();
+
+    float aspectRatio = (float) originalWidth / originalHeight;
+
+    if (originalWidth > originalHeight) {
+      targetHeight = -1;
+    } else {
+      targetWidth = -1;
+    }
+
+    // Calculate new dimensions while preserving aspect ratio
+    if (targetWidth > 0 && targetHeight == -1) {
+      // If targetWidth is specified, calculate targetHeight based on aspect ratio
+      targetHeight = (int) (targetWidth / aspectRatio);
+    } else if (targetHeight > 0 && targetWidth == -1) {
+      // If targetHeight is specified, calculate targetWidth based on aspect ratio
+      targetWidth = (int) (targetHeight * aspectRatio);
+    } else if (targetWidth == -1 && targetHeight == -1) {
+      throw new IllegalArgumentException("Either targetWidth or targetHeight must be specified.");
+    }
+
+    // Create a new BufferedImage with the calculated dimensions
+    BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, originalImage.getType());
+
+    // Draw the original image into the resized image
+    Graphics2D g = resizedImage.createGraphics();
+    g.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+    g.dispose();
+
+    return new ImageIcon(resizedImage);
+  }
+
+  private static BufferedImage iconToBufferedImage(Icon icon) {
+    // Create a BufferedImage with the icon's dimensions
+    BufferedImage bufferedImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = bufferedImage.createGraphics();
+    icon.paintIcon(null, g, 0, 0); // Paints the icon onto the BufferedImage
+    g.dispose();
+    return bufferedImage;
   }
 
   /**
