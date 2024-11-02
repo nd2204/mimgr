@@ -22,6 +22,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -201,7 +202,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     this.tableScrollPane.setBackground(colors.m_bg_0);
     this.tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-    this.selectFilesButton.setBackground(colors.m_bg_3);
+    this.selectFilesButton.setBackground(colors.m_bg_dim);
     this.selectFilesButton.setBorderColor(colors.m_bg_3);
     this.selectFilesButton.setHoverBorderColor(colors.m_accent);
     this.selectFilesButton.setClickBackgroundColor(colors.m_bg_1);
@@ -291,6 +292,31 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
         dropPanel.setVisible(true);
       }
     }
+
+    if (e.getSource() == this.selectFilesButton) {
+      JFileChooser fileChooser = new JFileChooser();
+      fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+      fileChooser.setDialogTitle("Select Files");
+      fileChooser.setMultiSelectionEnabled(true);
+      fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "gif"));
+
+      // Show the file chooser dialog and wait for user action
+      int userSelection = fileChooser.showOpenDialog(null);
+
+      // Handle the user selection
+      if (userSelection == JFileChooser.APPROVE_OPTION) {
+        // Get the selected file
+        File[] selectedFile = fileChooser.getSelectedFiles();
+        for (File file : selectedFile) {
+          if (isValidImageFile(file)) {
+            droppedItemsPanel.addData(file);
+          }
+        }
+      } else {
+        System.out.println("No file selected.");
+      }
+    }
+
     if (e.getSource() == this.droppedItemsPanel.getConfirmButton()) {
       // Do something with the data
       for (Object obj : this.droppedItemsPanel.getAllData()) {
@@ -312,9 +338,9 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       URI uri = new URI(urlString);
       HttpClient client = HttpClient.newHttpClient();
       HttpRequest request = HttpRequest.newBuilder()
-        .uri(uri)
-        .method("HEAD", HttpRequest.BodyPublishers.noBody())
-        .build();
+      .uri(uri)
+      .method("HEAD", HttpRequest.BodyPublishers.noBody())
+      .build();
       HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
       String contentType = response.headers().firstValue("Content-Type").orElse("");
 
