@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS product_images (
   product_id     INT            NOT NULL,
   image_id_fk    INT,
   is_main_image  BOOLEAN        DEFAULT FALSE,
-  FOREIGN KEY(product_id) REFERENCES products(product_id),
-  FOREIGN KEY(image_id_fk) REFERENCES images(id)
+  FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE,
+  FOREIGN KEY(image_id_fk) REFERENCES images(id)  ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS orders (
