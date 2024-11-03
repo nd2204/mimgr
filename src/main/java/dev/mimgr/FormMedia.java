@@ -9,21 +9,13 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
@@ -285,7 +277,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
         // Get the selected file
         File[] selectedFile = fileChooser.getSelectedFiles();
         for (File file : selectedFile) {
-          if (isValidImageFile(file)) {
+          if (rm.isValidImageFile(file)) {
             droppedItemsPanel.addData(file);
           }
         }
@@ -298,7 +290,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       // Do something with the data
       for (Object obj : this.droppedItemsPanel.getAllData()) {
         if (obj instanceof File file) {
-          Path newFilePath = moveStagedFileToUploadDir(file);
+          Path newFilePath = rm.moveStagedFileToUploadDir(file);
           System.out.println(rm.getProjectPath().relativize(newFilePath));
           DBQueries.insert_image(String.valueOf(rm.getProjectPath().relativize(newFilePath)), file.getName(), "");
           get_all_images(model);
@@ -313,31 +305,9 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     return;
   }
 
-  public static boolean isImageUrl(String urlString) {
-    try {
-      URI uri = new URI(urlString);
-      HttpClient client = HttpClient.newHttpClient();
-      HttpRequest request = HttpRequest.newBuilder()
-      .uri(uri)
-      .method("HEAD", HttpRequest.BodyPublishers.noBody())
-      .build();
-      HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
-      String contentType = response.headers().firstValue("Content-Type").orElse("");
-
-      return contentType != null && contentType.startsWith("image/");
-    } catch (Exception e) {
-      e.printStackTrace();
-      return false;
-    }
-  }
-
   @Override
   public void onStringImported(String string) {
-    System.out.println("Dropped String data");
-    System.out.println(string);
-    System.out.println("is image url: " + isImageUrl(string));
-    if (isImageUrl(string)) {
-      // System.out.println(rm.getUploadPath());
+    if (ResourceManager.isImageUrl(string)) {
       Path fp = rm.downloadTempFile(string);
       droppedItemsPanel.addData(fp.toFile());
     }
@@ -355,43 +325,10 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   public void onFileListImported(List<File> files) {
     System.out.println("Dropped File list data");
     for (File file : files) {
-      System.out.println("valid: " + isValidImageFile(file) + " " + file);
+      System.out.println("valid: " + rm.isValidImageFile(file) + " " + file);
       droppedItemsPanel.addData(file);
     }
     return;
-  }
-
-  private boolean isValidImageFile(File file) {
-    String[] validExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"};
-    String fileName = file.getName().toLowerCase();
-
-    // Check file extension
-    for (String extension : validExtensions) {
-      if (fileName.endsWith(extension)) {
-        return true; // Valid extension found
-      }
-    }
-
-    // Optionally: Check MIME type if extension check fails
-    try {
-      // Check if the file can be read as an image
-      return ImageIO.read(file) != null;
-    } catch (Exception e) {
-      return false; // If an exception occurs, treat as invalid
-    }
-  }
-
-  private Path moveStagedFileToUploadDir(File file) {
-    Path destinationPath = null;
-    try {
-      destinationPath = ResourceManager.getUniquePath(rm.getUploadPath().resolve(file.getName()));
-      Files.copy(file.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
-      System.out.println("Copied to: " + destinationPath);
-    } catch (IOException e) {
-      System.out.println("Error occurred while copying file.");
-      e.printStackTrace();
-    }
-    return destinationPath;
   }
 
   private class MediaDropPanel extends DropPanel {

@@ -9,14 +9,14 @@ import javax.swing.JFrame;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
-class FormUpload extends JFrame {
+class FormAddProduct extends JFrame {
   ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_EVERFOREST);
 
   private double m_aspect_ratio;
   private int    m_width;
   private int    m_height;
 
-  FormUpload() {
+  FormAddProduct() {
     m_aspect_ratio = 16.0f / 10.0f;
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
@@ -47,6 +47,6 @@ class FormUpload extends JFrame {
   }
 
   public static void main(String arg[]) {
-    new FormUpload();
+    new FormAddProduct();
   }
 }

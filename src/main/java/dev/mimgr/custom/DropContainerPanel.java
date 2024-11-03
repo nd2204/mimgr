@@ -32,7 +32,7 @@ public class DropContainerPanel extends JPanel implements ActionListener {
     thisPanel.setSize(0, 140);
     thisPanel.setBorder(new EmptyBorder(5, 0, 5, 0));
 
-    JScrollPane sp = new JScrollPane(
+    scrollPane = new JScrollPane(
       thisPanel,
       JScrollPane.VERTICAL_SCROLLBAR_NEVER,
       JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
@@ -43,16 +43,16 @@ public class DropContainerPanel extends JPanel implements ActionListener {
 
     MScrollBar hsb = new MScrollBar(colors);
     hsb.setOrientation(MScrollBarUI.HORIZONTAL);
-    sp.setHorizontalScrollBar(hsb);
+    scrollPane.setHorizontalScrollBar(hsb);
 
-    sp.setBorder(BorderFactory.createEmptyBorder());
-    sp.setOpaque(false);
+    scrollPane.setBorder(BorderFactory.createEmptyBorder());
+    scrollPane.setOpaque(false);
 
     this.colors = colors;
     this.setLayout(new BorderLayout());
     this.setBackground(colors.m_bg_0);
     this.setVisible(false);
-    this.add(sp, BorderLayout.CENTER);
+    this.add(scrollPane, BorderLayout.CENTER);
   }
 
   public void addData(Object data) {
@@ -133,6 +133,10 @@ public class DropContainerPanel extends JPanel implements ActionListener {
     allist.add(al);
   }
 
+  public JScrollPane getScrollPaneComponent() {
+    return this.scrollPane;
+  }
+
   @Override
   public void actionPerformed(ActionEvent e) {
     MButton key = (MButton) e.getSource();
@@ -173,7 +177,7 @@ public class DropContainerPanel extends JPanel implements ActionListener {
     button.addActionListener(this);
   }
 
-
+  private JScrollPane scrollPane;
   private ArrayList<ActionListener> allist = new ArrayList<>();
   private MButton confirmButton = new MButton("Confirm");
   private JPanel thisPanel = new JPanel();

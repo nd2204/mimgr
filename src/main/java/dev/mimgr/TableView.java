@@ -1,6 +1,5 @@
 package dev.mimgr;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
@@ -17,7 +16,6 @@ import dev.mimgr.theme.builtin.ColorScheme;
 public class TableView {
   public static BiConsumer<MTable, Integer> setup_checkbox_column(ColorScheme colors) {
     return (table, colIndex) -> {
-      System.out.println("setup_checkbox_column");
       TableColumn column = table.getColumnModel().getColumn(colIndex);
       MCheckBoxHeader checkBoxHeader = new MCheckBoxHeader(colors, table, colIndex);
       checkBoxHeader.getCheckBoxComponent().setCheckColor(colors.m_green);
@@ -41,7 +39,6 @@ public class TableView {
 
   public static BiConsumer<MTable, Integer> setup_image_column(ColorScheme colors) {
     return (table, colIndex) -> {
-      System.out.println("setup_image_column");
       TableColumn column = table.getColumnModel().getColumn(colIndex);
       column.setMinWidth(80);
       column.setPreferredWidth(80);
@@ -52,7 +49,6 @@ public class TableView {
 
   public static BiConsumer<MTable, Integer> setup_default_column() {
     return (table, colIndex) -> {
-      System.out.println("setup_default_column");
       TableColumn column = table.getColumnModel().getColumn(colIndex);
       column.setPreferredWidth(150);
     };

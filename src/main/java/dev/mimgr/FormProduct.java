@@ -218,7 +218,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     tv.add_column(table, "", TableView.setup_checkbox_column(colors));
     tv.add_column(table, "Name", TableView.setup_default_column());
     tv.add_column(table, "Price", TableView.setup_default_column());
-    tv.add_column(table, "Stock Quantity", TableView.setup_default_column());
+    tv.add_column(table, "Stock", TableView.setup_default_column());
     tv.add_column(table, "Description", TableView.setup_default_column());
     tv.load_column(table, model);
     model.addTableModelListener(this);
@@ -237,14 +237,11 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
           int row = table.getSelectedRow();
           if (row != -1) {
             // Retrieve data for the selected row
-            String name = table.getValueAt(row, 1).toString();
-            String quantity = table.getValueAt(row, 2).toString();
-            String price = table.getValueAt(row, 3).toString();
-            String description = table.getValueAt(row, 4).toString();
+            ProductRecord pr = productList.get(row);
 
             // Display the data in a dialog
             JOptionPane.showMessageDialog(null,
-                "Details:\nName: " + name + "\nQuantity: " + quantity + "\nPrice: " + price + "\nDescription: " + description,
+                "Details:\nName: " + pr.m_name + "\nQuantity: " + pr.m_stock_quantity + "\nPrice: " + pr.m_price + "\nDescription: " + pr.m_description,
                 "Intrument Details", JOptionPane.INFORMATION_MESSAGE);
           }
         }
@@ -255,7 +252,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == this.addProductButton) {
-      JFrame jFrame = new FormUpload();
+      JFrame jFrame = new FormAddProduct();
       jFrame.setVisible(true);
     }
 
@@ -295,10 +292,6 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
           }
         }
         break;
-      case TableModelEvent.INSERT:
-        break;
-      case TableModelEvent.DELETE:
-        break;
     }
   }
 
@@ -318,8 +311,8 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
         model.addRow(new Object[] {
             Boolean.FALSE,
             pr.m_name,
-            pr.m_stock_quantity,
             pr.m_price,
+            pr.m_stock_quantity,
             pr.m_description
         });
       }

@@ -160,6 +160,7 @@ public class DropPanel extends JPanel implements DropTargetListener {
     listeners.add(listener);
   }
 
+  private BasicStroke stroke = new BasicStroke(2);
   private ArrayList<MTransferListener> listeners = new ArrayList<>();
   private ColorScheme colors;
   private Color borderColor;

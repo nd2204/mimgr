@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+
 /**
  *
  * @author dn200
@@ -129,6 +131,57 @@ public class ResourceManager {
     return filePath;
   }
 
+  public static boolean isImageUrl(String urlString) {
+    try {
+      URI uri = new URI(urlString);
+      HttpClient client = HttpClient.newHttpClient();
+      HttpRequest request = HttpRequest.newBuilder()
+      .uri(uri)
+      .method("HEAD", HttpRequest.BodyPublishers.noBody())
+      .build();
+      HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+      String contentType = response.headers().firstValue("Content-Type").orElse("");
+
+      return contentType != null && contentType.startsWith("image/");
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  public boolean isValidImageFile(File file) {
+    String[] validExtensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp"};
+    String fileName = file.getName().toLowerCase();
+
+    // Check file extension
+    for (String extension : validExtensions) {
+      if (fileName.endsWith(extension)) {
+        return true; // Valid extension found
+      }
+    }
+
+    // Optionally: Check MIME type if extension check fails
+    try {
+      // Check if the file can be read as an image
+      return ImageIO.read(file) != null;
+    } catch (Exception e) {
+      return false; // If an exception occurs, treat as invalid
+    }
+  }
+
+  public Path moveStagedFileToUploadDir(File file) {
+    Path destinationPath = null;
+    try {
+      destinationPath = ResourceManager.getUniquePath(this.getUploadPath().resolve(file.getName()));
+      Files.copy(file.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
+      System.out.println("Copied to: " + destinationPath);
+    } catch (IOException e) {
+      System.out.println("Error occurred while copying file.");
+      e.printStackTrace();
+    }
+    return destinationPath;
+  }
+
   public static Path getUniquePath(Path destinationPath) {
     int copyNumber = 1;
     Path newPath = destinationPath;
@@ -143,7 +196,6 @@ public class ResourceManager {
 
     return newPath;
   }
-
 
   private static String getFileNameFromResponse(HttpResponse<InputStream> response) {
     // Check the Content-Disposition header for the filename
