@@ -16,7 +16,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -41,6 +45,8 @@ import dev.mimgr.custom.MImageCellRenderer;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
+import dev.mimgr.db.DBQueries;
+import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.MTransferListener;
 import dev.mimgr.utils.ResourceManager;
@@ -220,17 +226,17 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   }
 
   private void setup_table() {
+    this.emptyImageIcon = IconManager.getIcon("image.png", colors.m_grey_0);
     table = new MTable(colors);
     table.setFillsViewportHeight(true);
     table.setRowHeight(emptyImageIcon.getIconHeight() + 40);
     table.setAutoscrolls(true);
-    this.emptyImageIcon = IconManager.getIcon("image.png", colors.m_grey_0);
     // table.setAutoResizeMode(MTable.AUTO_RESIZE_OFF);
 
     tableScrollPane = new JScrollPane(table);
     table.setup_scrollbar(tableScrollPane);
 
-    DefaultTableModel model = new DefaultTableModel() {
+    model = new DefaultTableModel() {
       @Override
       public Class<?> getColumnClass(int columnIndex) {
         return columnIndex == 0 ? Boolean.class : String.class;
@@ -252,9 +258,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     model.addColumn("Author");
     model.addColumn("Caption");
 
-    for (int i = 0; i < 20; ++i) {
-      model.addRow(new Object[]{Boolean.FALSE, emptyImageIcon, "Smith", "Snowboarding", 3});
-    }
+    // get_all_images(model);
 
     TableColumnModel tcm = table.getColumnModel();
     // Setup checkbox column
@@ -323,6 +327,9 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
         if (obj instanceof File file) {
           Path newFilePath = moveStagedFileToUploadDir(file);
           System.out.println(rm.getProjectPath().relativize(newFilePath));
+          DBQueries.insert_image(String.valueOf(rm.getProjectPath().relativize(newFilePath)), file.getName(), "");
+          get_all_images(model);
+          dropPanel.setVisible(false);
         }
       }
       // Clean temp file from download
@@ -450,6 +457,35 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     }
   }
 
+  private void get_all_images(DefaultTableModel model) {
+    updateTable(DBQueries.select_all_images(), model);
+  }
+
+  private void updateTable(ResultSet queryResult, DefaultTableModel model) {
+    model.setRowCount(0);
+    if (!imageList.isEmpty()) {
+      imageList = new ArrayList<>();
+    }
+    try {
+      while (queryResult.next()) {
+        ImageRecord pr = new ImageRecord(queryResult);
+        imageList.add(pr);
+        model.addRow(new Object[] {
+            Boolean.FALSE,
+            this.emptyImageIcon = IconManager.loadIcon(Paths.get(pr.m_url).toAbsolutePath().toFile()),
+            pr.m_name,
+            pr.m_url.substring(pr.m_url.lastIndexOf("\\") + 1),
+            pr.m_created_at,
+            pr.m_author,
+            pr.m_caption
+        });
+      }
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
+
   private Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
@@ -470,4 +506,6 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   private MButton applyBulkAction = new MButton("Apply");
   private DropContainerPanel droppedItemsPanel;
   private ResourceManager rm = ResourceManager.getInstance();
+  DefaultTableModel model;
+  private ArrayList<ImageRecord> imageList = new ArrayList<>();
 }

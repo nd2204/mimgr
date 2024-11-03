@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.DocumentEvent;
@@ -22,6 +25,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import dev.mimgr.custom.MButton;
@@ -75,7 +79,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     this.add(addProductButton, c);
 
     // Content
-  {
+    {
       GridBagConstraints cc = new GridBagConstraints();
       contentContainer.setLayout(new GridBagLayout());
       contentContainer.setBackground(colors.m_bg_0);
@@ -141,7 +145,8 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     this.addProductButton.setFont(nunito_extrabold_14);
     this.addProductButton.setIcon(IconManager.getIcon("add.png", 16, 16, colors.m_green));
     this.addProductButton.setText(" " + this.addProductButton.getText());
-    this.addProductButton.addActionListener(this);;
+    this.addProductButton.addActionListener(this);
+    ;
 
     this.filterTextField.setIcon(IconManager.getIcon("search.png", 20, 20, colors.m_grey_0), MTextField.ICON_PREFIX);
     this.filterTextField.setBackground(colors.m_bg_dim);
@@ -160,6 +165,10 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     this.checkBoxModel.setCheckColor(colors.m_green);
     this.checkBoxModel.setBoxColor(colors.m_bg_4);
     this.checkBoxModel.setBackground(colors.m_bg_0);
+
+    this.checkBoxModelHeader.setCheckColor(colors.m_green);
+    this.checkBoxModelHeader.setBoxColor(colors.m_bg_4);
+    this.checkBoxModelHeader.setBackground(colors.m_bg_dim);
   }
 
   private void setup_table() {
@@ -175,6 +184,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
         return column == 0;
       }
     };
+
     model.addColumn("");
     model.addColumn("Name");
     model.addColumn("Price");
@@ -184,6 +194,17 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     // get_all_intruments(model);
 
     table.setModel(model);
+
+    // Set up the header renderer for the first column to be a checkbox
+    TableColumn selectColumn = table.getColumnModel().getColumn(0);
+    selectColumn.setHeaderRenderer((table1, value, isSelected, hasFocus, row, column) -> checkBoxModelHeader);
+    checkBoxModelHeader.addActionListener(e -> {
+      System.out.println("lmao");
+      boolean isSelected = checkBoxModelHeader.isSelected();
+      for (int i = 0; i < model.getRowCount(); i++) {
+        model.setValueAt(isSelected, i, 0); // Set the value for each row
+      }
+    });
     TableColumnModel columnModel = table.getColumnModel();
     columnModel.getColumn(0).setPreferredWidth(50);
     columnModel.getColumn(0).setMinWidth(50);
@@ -197,6 +218,28 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     scrollPane = new JScrollPane(table);
     // table.setup_scrollbar(scrollPane);
     table.setFillsViewportHeight(true);
+    table.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        // Check if it's a double-click
+        if (e.getClickCount() == 2) {
+          // Get the selected row
+          int row = table.getSelectedRow();
+          if (row != -1) {
+            // Retrieve data for the selected row
+            String name = table.getValueAt(row, 1).toString();
+            String quantity = table.getValueAt(row, 2).toString();
+            String price = table.getValueAt(row, 3).toString();
+            String description = table.getValueAt(row, 4).toString();
+
+            // Display the data in a dialog
+            JOptionPane.showMessageDialog(null,
+                "Details:\nName: " + name + "\nQuantity: " + quantity + "\nPrice: " + price + "\nDescription: " + description,
+                "Intrument Details", JOptionPane.INFORMATION_MESSAGE);
+          }
+        }
+      }
+    });
 
     columnModel.getColumn(0).setCellRenderer(new MCheckBoxCellRenderer(colors));
     columnModel.getColumn(0).setCellEditor(new DefaultCellEditor(checkBoxModel));
@@ -231,25 +274,25 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     int column = e.getColumn();
     switch (e.getType()) {
       case TableModelEvent.UPDATE:
-      Object newValue = model.getValueAt(row, column);
-      if (column == 0) {
-        if (newValue instanceof Boolean) {
-          if ((Boolean) newValue) {
-            selectedProducts.put(row, productList.get(row));
-          } else {
-            selectedProducts.remove(row);
+        Object newValue = model.getValueAt(row, column);
+        if (column == 0) {
+          if (newValue instanceof Boolean) {
+            if ((Boolean) newValue) {
+              selectedProducts.put(row, productList.get(row));
+            } else {
+              selectedProducts.remove(row);
+            }
+          }
+          for (ProductRecord o : selectedProducts.values()) {
+            System.out.println(o.m_id);
           }
         }
-        for (Object o : selectedProducts.values()) {
-          System.out.println(o);
-        }
-      }
-      System.out.println("");
-      break;
+        System.out.println("");
+        break;
       case TableModelEvent.INSERT:
-      break;
+        break;
       case TableModelEvent.DELETE:
-      break;
+        break;
     }
   }
 
@@ -267,13 +310,12 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
         ProductRecord pr = new ProductRecord(queryResult);
         productList.add(pr);
         model.addRow(new Object[] {
-          Boolean.FALSE, 
-          pr.m_name, 
-          pr.m_stock_quantity,
-          pr.m_price,
-          pr.m_description
-        }
-        );
+            Boolean.FALSE,
+            pr.m_name,
+            pr.m_stock_quantity,
+            pr.m_price,
+            pr.m_description
+        });
       }
     } catch (SQLException e) {
       // TODO Auto-generated catch block
@@ -295,6 +337,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   private HashMap<Integer, ProductRecord> selectedProducts = new HashMap<>();
   private ArrayList<ProductRecord> productList = new ArrayList<>();
   private MCheckBox checkBoxModel = new MCheckBox();
+  private MCheckBox checkBoxModelHeader = new MCheckBox();
   private ColorScheme colors;
   private RoundedPanel contentContainer = new RoundedPanel();
   private JLabel topLabel = new JLabel("Products");

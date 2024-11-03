@@ -98,7 +98,7 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
         this.add(categoryLabel, gbc);
 
         gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.BOTH;
+        gbc.ipady = 30;
         this.add(categoryField, gbc);
 
         gbc.gridx = 1;
@@ -173,14 +173,13 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
           String description = descriptionArea.getTextString();
           int stock_quantity = Integer.parseInt(quantityField.getTextString());
           int category_id = get_category_id(txt.getText());
-          String image_url = "";
           System.out.println(category_id);
           if (category_id == 0) {
             JOptionPane.showMessageDialog(null, "Not valid category name");
           }
           else {
             JOptionPane.showMessageDialog(null, "Success");
-            DBQueries.insert_product(name, price, description, stock_quantity, category_id, image_url);
+            DBQueries.insert_product(name, price, description, stock_quantity, category_id);
           }
         }
     }
