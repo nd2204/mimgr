@@ -51,7 +51,7 @@ public class MTable extends JTable {
     sp.setCorner(JScrollPane.UPPER_RIGHT_CORNER, panel);
   }
 
-  private class TableHeader extends DefaultTableCellRenderer {
+  public class TableHeader extends DefaultTableCellRenderer {
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
       Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);

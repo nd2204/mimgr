@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -25,12 +24,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MCheckBox;
-import dev.mimgr.custom.MCheckBoxCellRenderer;
+import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
@@ -48,7 +45,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     this.colors = colors;
     Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
     Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
-    Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
+    // Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
     Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
 
     // =======================================================
@@ -84,18 +81,44 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
       contentContainer.setLayout(new GridBagLayout());
       contentContainer.setBackground(colors.m_bg_0);
 
+      String[] items = { 
+        "Bulk actions",
+        "Delete Permanently",
+        "Edit"
+      };
+
+      this.bulkAction = new MComboBox<>(items, colors);
+      this.bulkAction.setBackground(colors.m_bg_0);
+      this.bulkAction.setForeground(colors.m_grey_0);
+
       cc.gridx = 0;
       cc.gridy = 0;
-      cc.weightx = 1.0;
+      cc.weightx = 0.0;
+      cc.ipadx = 50;
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
-      cc.fill = GridBagConstraints.HORIZONTAL;
-      cc.insets = new Insets(15, 15, 15, 15);
+      cc.fill = GridBagConstraints.BOTH;
+      cc.insets = new Insets(15, 15, 0, 5);
+      contentContainer.add(bulkAction, cc);
+
+      cc.gridx = 1;
+      cc.gridy = 0;
+      cc.weightx = 0.0;
+      cc.insets = new Insets(15, 0, 0, 15);
+      cc.fill = GridBagConstraints.VERTICAL;
+      contentContainer.add(applyBulkAction, cc);
+
+      cc.gridx = 2;
+      cc.gridy = 0;
+      cc.weightx = 1.0;
+      cc.fill = GridBagConstraints.VERTICAL;
+      cc.anchor = GridBagConstraints.FIRST_LINE_END;
       contentContainer.add(filterTextField, cc);
 
       cc.gridx = 0;
       cc.gridy = 1;
       cc.weightx = 1.0;
       cc.weighty = 1.0;
+      cc.gridwidth = 4;
       cc.insets = new Insets(15, 0, 15, 0);
       cc.fill = GridBagConstraints.BOTH;
       setup_table();
@@ -166,9 +189,14 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     this.checkBoxModel.setBoxColor(colors.m_bg_4);
     this.checkBoxModel.setBackground(colors.m_bg_0);
 
-    this.checkBoxModelHeader.setCheckColor(colors.m_green);
-    this.checkBoxModelHeader.setBoxColor(colors.m_bg_4);
-    this.checkBoxModelHeader.setBackground(colors.m_bg_dim);
+    this.applyBulkAction.setForeground(colors.m_grey_2);
+    this.applyBulkAction.setBackground(colors.m_bg_0);
+    this.applyBulkAction.setBorderColor(colors.m_bg_5);
+    this.applyBulkAction.setHoverBackgroundColor(colors.m_bg_1);
+    this.applyBulkAction.setClickBackgroundColor(colors.m_bg_dim);
+    this.applyBulkAction.setHoverForegroundColor(colors.m_blue);
+    this.applyBulkAction.setHoverBorderColor(colors.m_blue);
+    this.applyBulkAction.setBorderRadius(0);
   }
 
   private void setup_table() {
@@ -185,39 +213,21 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
       }
     };
 
-    model.addColumn("");
-    model.addColumn("Name");
-    model.addColumn("Price");
-    model.addColumn("Description");
-    model.addColumn("Stock Quantity");
+    table.setModel(model);
+
+    tv.add_column(table, "", TableView.setup_checkbox_column(colors));
+    tv.add_column(table, "Name", TableView.setup_default_column());
+    tv.add_column(table, "Price", TableView.setup_default_column());
+    tv.add_column(table, "Stock Quantity", TableView.setup_default_column());
+    tv.add_column(table, "Description", TableView.setup_default_column());
+    tv.load_column(table, model);
     model.addTableModelListener(this);
     // get_all_intruments(model);
 
-    table.setModel(model);
-
-    // Set up the header renderer for the first column to be a checkbox
-    TableColumn selectColumn = table.getColumnModel().getColumn(0);
-    selectColumn.setHeaderRenderer((table1, value, isSelected, hasFocus, row, column) -> checkBoxModelHeader);
-    checkBoxModelHeader.addActionListener(e -> {
-      System.out.println("lmao");
-      boolean isSelected = checkBoxModelHeader.isSelected();
-      for (int i = 0; i < model.getRowCount(); i++) {
-        model.setValueAt(isSelected, i, 0); // Set the value for each row
-      }
-    });
-    TableColumnModel columnModel = table.getColumnModel();
-    columnModel.getColumn(0).setPreferredWidth(50);
-    columnModel.getColumn(0).setMinWidth(50);
-    columnModel.getColumn(0).setMaxWidth(50);
-    columnModel.getColumn(2).setPreferredWidth(100);
-    columnModel.getColumn(2).setMinWidth(100);
-    columnModel.getColumn(2).setMaxWidth(100);
-    columnModel.getColumn(4).setPreferredWidth(70);
-    columnModel.getColumn(4).setMinWidth(70);
-    columnModel.getColumn(4).setMaxWidth(70);
     scrollPane = new JScrollPane(table);
-    // table.setup_scrollbar(scrollPane);
+    table.setup_scrollbar(scrollPane);
     table.setFillsViewportHeight(true);
+
     table.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
@@ -240,16 +250,16 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
         }
       }
     });
-
-    columnModel.getColumn(0).setCellRenderer(new MCheckBoxCellRenderer(colors));
-    columnModel.getColumn(0).setCellEditor(new DefaultCellEditor(checkBoxModel));
   }
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == addProductButton) {
+    if (e.getSource() == this.addProductButton) {
       JFrame jFrame = new FormUpload();
       jFrame.setVisible(true);
+    }
+
+    if (e.getSource() == this.applyBulkAction) {
     }
   }
 
@@ -283,11 +293,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
               selectedProducts.remove(row);
             }
           }
-          for (ProductRecord o : selectedProducts.values()) {
-            System.out.println(o.m_id);
-          }
         }
-        System.out.println("");
         break;
       case TableModelEvent.INSERT:
         break;
@@ -334,10 +340,10 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     }
   }
 
+  private TableView tv = new TableView();
   private HashMap<Integer, ProductRecord> selectedProducts = new HashMap<>();
   private ArrayList<ProductRecord> productList = new ArrayList<>();
   private MCheckBox checkBoxModel = new MCheckBox();
-  private MCheckBox checkBoxModelHeader = new MCheckBox();
   private ColorScheme colors;
   private RoundedPanel contentContainer = new RoundedPanel();
   private JLabel topLabel = new JLabel("Products");
@@ -349,4 +355,6 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   private MButton exportButton = new MButton("Export");
   private MButton addProductButton = new MButton("Add product");
   private DefaultTableModel model;
+  private MComboBox<String> bulkAction;
+  private MButton applyBulkAction = new MButton("Apply");
 }

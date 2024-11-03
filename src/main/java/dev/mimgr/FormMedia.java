@@ -32,16 +32,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
 import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.DropPanel;
 import dev.mimgr.custom.MButton;
-import dev.mimgr.custom.MCheckBoxCellEditor;
-import dev.mimgr.custom.MCheckBoxCellRenderer;
 import dev.mimgr.custom.MComboBox;
-import dev.mimgr.custom.MImageCellRenderer;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
@@ -132,7 +127,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       cc.gridx = 0;
       cc.gridy = 0;
       cc.weightx = 0.0;
-      cc.ipadx = 40;
+      cc.ipadx = 50;
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
       cc.fill = GridBagConstraints.BOTH;
       cc.insets = new Insets(15, 15, 0, 5);
@@ -250,42 +245,20 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
 
     table.setModel(model);
 
-    model.addColumn("");
-    model.addColumn("");
-    model.addColumn("Image name");
-    model.addColumn("Filename");
-    model.addColumn("Date");
-    model.addColumn("Author");
-    model.addColumn("Caption");
+    tv.add_column(table, "", TableView.setup_checkbox_column(colors));
+    tv.add_column(table, "", TableView.setup_image_column(colors));
+    tv.add_column(table, "Image name", TableView.setup_default_column());
+    tv.add_column(table, "Filename", TableView.setup_default_column());
+    tv.add_column(table, "Date", TableView.setup_default_column());
+    tv.add_column(table, "Author", TableView.setup_default_column());
+    tv.add_column(table, "Caption", TableView.setup_default_column());
+    tv.load_column(table, model);
 
-    // get_all_images(model);
-
-    TableColumnModel tcm = table.getColumnModel();
-    // Setup checkbox column
-    TableColumn column = tcm.getColumn(0);
-    MCheckBoxCellRenderer checkBoxRenderer = new MCheckBoxCellRenderer(colors);
-    checkBoxRenderer.setCheckColor(colors.m_green);
-    checkBoxRenderer.setBoxColor(colors.m_bg_3);
-    checkBoxRenderer.setBackground(colors.m_bg_0);
-    column.setCellRenderer(checkBoxRenderer);
-    column.setPreferredWidth(30);
-    column.setMinWidth(30);
-
-    MCheckBoxCellEditor.CustomCheckBox editorCheckbox = new MCheckBoxCellEditor.CustomCheckBox(checkBoxRenderer, colors);
-    MCheckBoxCellEditor checkBoxCellEditor = new MCheckBoxCellEditor(editorCheckbox, colors);
-    column.setCellEditor(checkBoxCellEditor);
-
-    // Setup image column
-    column = tcm.getColumn(1);
-    column.setMinWidth(80);
-    column.setPreferredWidth(80);
-    column.setCellRenderer(new MImageCellRenderer(colors));
-
-    for(int i = 2; i < table.getColumnCount() - 1; ++i) {
-      column = tcm.getColumn(i);
-      column.setPreferredWidth(150);
+    for (int i = 0; i < 20; ++i) {
+      model.addRow(new Object[]{Boolean.FALSE, emptyImageIcon, "Smith", "Snowboarding", 3});
     }
   }
+
 
   @Override
   public void actionPerformed(ActionEvent e) {
@@ -486,10 +459,12 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     }
   }
 
+  private TableView tv = new TableView();
   private Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
   private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
+
 
   private ColorScheme colors;
   private RoundedPanel contentContainer = new RoundedPanel();
