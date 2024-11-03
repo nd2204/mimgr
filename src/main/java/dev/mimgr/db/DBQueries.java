@@ -1,11 +1,14 @@
 package dev.mimgr.db;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DBQueries {
+  private static String sqlPath = "mimgrdb/init.sql";
   public static final String INSERT_USER = "INSERT INTO users (username, hash, salt) VALUES (?, ?, ?)";
   public static final String SELECT_USER = "SELECT hash, salt FROM users WHERE username=?";
   public static final String INSERT_INSTRUMENT = "INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES (?, ?, ?, ?, ?)";
@@ -26,6 +29,12 @@ public class DBQueries {
       preparedStatement.setString(3, salt);
       int result = preparedStatement.executeUpdate();
       System.out.println(result + " row(s) affected");
+      String generatedInsertSQL = String.format(
+          "INSERT INTO users (username, hash, salt) VALUES ('%s', '%s', '%s');",
+          username, hash, salt);
+
+      // Ghi câu lệnh SQL vào file init.sql
+      writeSQLToFile(sqlPath, generatedInsertSQL);
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -45,7 +54,8 @@ public class DBQueries {
     return resultSet;
   }
 
-  public static void insert_product(String name, Double price, String description, int stock_quantity, int category_id) {
+  public static void insert_product(String name, Double price, String description, int stock_quantity,
+      int category_id) {
     try {
       PreparedStatement preparedStatement = dbcon.prepareStatement(INSERT_INSTRUMENT);
       preparedStatement.setString(1, name);
@@ -56,6 +66,12 @@ public class DBQueries {
 
       int result = preparedStatement.executeUpdate();
       System.out.println(result + " row(s) affected");
+      String generatedInsertSQL = String.format(
+          "INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES ('%s', %.2f, '%s', %d, %d);",
+          name, price, description, stock_quantity, category_id);
+
+      // Ghi câu lệnh SQL vào file init.sql
+      writeSQLToFile(sqlPath, generatedInsertSQL);
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -100,7 +116,6 @@ public class DBQueries {
     return resultSet;
   }
 
-
   public static ResultSet select_id_category(String category_name) {
     ResultSet resultSet = null;
 
@@ -125,6 +140,12 @@ public class DBQueries {
 
       int result = preparedStatement.executeUpdate();
       System.out.println(result + " row(s) affected");
+      String generatedInsertSQL = String.format(
+          "INSERT INTO images (image_url, image_name, image_caption) VALUES ('%s', '%s', '%s');",
+          image_url, image_name, image_caption);
+
+      // Ghi câu lệnh SQL vào file init.sql
+      writeSQLToFile(sqlPath, generatedInsertSQL);
     } catch (SQLException e) {
       e.printStackTrace();
     }
@@ -141,5 +162,13 @@ public class DBQueries {
     }
 
     return resultSet;
+  }
+
+  public static void writeSQLToFile(String filePath, String sql) {
+    try (FileWriter fileWriter = new FileWriter(filePath, true)) { // Mở tệp ở chế độ ghi nối tiếp (append)
+      fileWriter.write(sql + "\n"); // Thêm câu lệnh SQL vào tệp
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }
