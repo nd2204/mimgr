@@ -44,6 +44,34 @@ import dev.mimgr.utils.ResourceManager;
 
 public class UploadPanel extends JPanel implements ActionListener, DocumentListener {
 
+  public MComboBox<String> getCategoryComponent() {
+    return this.cbCategory;
+  }
+
+  public JLabel getLabelComponent() {
+    return this.lblAddProduct;
+  }
+
+  public MTextArea getDescriptionComponent() {
+    return this.taDescription;
+  }
+
+  public MTextField getTitleComponent() {
+    return this.tfTitle;
+  }
+
+  public MTextField getPriceComponent() {
+    return this.tfPrice;
+  }
+
+  public MTextField getStockComponent() {
+    return this.tfStock;
+  }
+
+  public MTextField getDeleteComponent() {
+    return this.tfStock;
+  }
+
   UploadPanel(ColorScheme colors) {
     this.colors = colors;
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -84,20 +112,28 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     gbc.gridwidth = 2;
     thisPanel.add(new MediaDropPanel(), gbc);
 
+    gbc.insets = new Insets(0, 10, 10, 5);
     gbc.gridx = 0;
     gbc.gridy = 3;
     gbc.gridwidth = 1;
     thisPanel.add(new PricingPanel(), gbc);
 
+    gbc.insets = new Insets(0, 5, 10, 10);
     gbc.gridx = 1;
     gbc.gridy = 3;
     thisPanel.add(new InventoryPanel(), gbc);
 
-    gbc.insets = new Insets(10, 10, 40, 10);
+    gbc.insets = new Insets(0, 10, 40, 5);
     gbc.gridx = 0;
     gbc.gridy = 5;
-    gbc.gridwidth = 2;
-    thisPanel.add(uploadButton, gbc);
+    gbc.gridwidth = 1;
+    thisPanel.add(btnDelete, gbc);
+
+    gbc.insets = new Insets(0, 5, 40, 10);
+    gbc.gridx = 1;
+    gbc.gridy = 5;
+    gbc.gridwidth = GridBagConstraints.REMAINDER;
+    thisPanel.add(btnSubmit, gbc);
   }
 
   public void setup_form_style() {
@@ -138,29 +174,40 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     cbCategory = new MComboBox<>(options, colors);
 
     // ========================= Buttons =========================
-    this.uploadButton = new MButton("Submit");
-    this.uploadButton.setFont(font_bold);
-    this.uploadButton.setBackground(colors.m_bg_dim);
-    this.uploadButton.setBorderColor(colors.m_bg_3);
-    this.uploadButton.setForeground(colors.m_bg_3);
-    this.uploadButton.setBorderWidth(2);
-    this.uploadButton.setEnabled(false);
-    this.uploadButton.addActionListener(this);
+    this.btnSubmit = new MButton("Submit");
+    this.btnSubmit.setFont(nunito_bold_14);
+    this.btnSubmit.setBackground(colors.m_bg_dim);
+    this.btnSubmit.setBorderColor(colors.m_bg_3);
+    this.btnSubmit.setForeground(colors.m_bg_3);
+    this.btnSubmit.setBorderWidth(2);
+    this.btnSubmit.setEnabled(false);
+    this.btnSubmit.addActionListener(this);
+
+    this.btnDelete = new MButton("Cancel");
+    this.btnDelete.setFont(nunito_bold_14);
+    this.btnDelete.setBackground(colors.m_bg_dim);
+    this.btnDelete.setBorderColor(colors.m_red);
+    this.btnDelete.setForeground(colors.m_red);
+    this.btnDelete.setHoverForegroundColor(colors.m_fg_1);
+    this.btnDelete.setHoverBackgroundColor(colors.m_red);
+    this.btnDelete.setBorderWidth(2);
+    this.btnDelete.addActionListener(this);
+    this.btnDelete.setVisible(false);
   }
 
   private void checkFields() {
     if (!tfTitle.getText().isEmpty() && !tfPrice.getText().isEmpty() && !tfStock.getText().isEmpty() && !taDescription.getText().isEmpty()) {
-      this.uploadButton.setBackground(colors.m_blue);
-      this.uploadButton.setBorderColor(colors.m_blue);
-      this.uploadButton.setForeground(colors.m_fg_1);
-      this.uploadButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
-      this.uploadButton.setEnabled(true);
+      this.btnSubmit.setBackground(colors.m_blue);
+      this.btnSubmit.setBorderColor(colors.m_blue);
+      this.btnSubmit.setForeground(colors.m_fg_1);
+      this.btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+      this.btnSubmit.setEnabled(true);
     } else {
-      this.uploadButton.setEnabled(false);
-      this.uploadButton.setBackground(colors.m_bg_4);
-      this.uploadButton.setBorderColor(colors.m_bg_4);
-      this.uploadButton.setForeground(colors.m_grey_1);
-      this.uploadButton.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+      this.btnSubmit.setEnabled(false);
+      this.btnSubmit.setBackground(colors.m_bg_4);
+      this.btnSubmit.setBorderColor(colors.m_bg_4);
+      this.btnSubmit.setForeground(colors.m_grey_1);
+      this.btnSubmit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
   }
 
@@ -502,12 +549,12 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == uploadButton) {
+    if (e.getSource() == btnSubmit) {
       String name = tfTitle.getTextString();
       double price = Double.parseDouble(tfPrice.getTextString());
       String description = taDescription.getTextString();
       int stock_quantity = Integer.parseInt(tfStock.getTextString());
-      int category_id = get_category_id(txt.getText());
+      int category_id = get_category_id((String) cbCategory.getSelectedItem());
       System.out.println(category_id);
       if (category_id == 0) {
         JOptionPane.showMessageDialog(null, "Not valid category name");
@@ -524,39 +571,13 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
   private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
-  private Font font_bold = FontManager.getFont("RobotoMonoBold", 14f);
 
   private ResourceManager rm = ResourceManager.getInstance();
   private JPanel thisPanel = new JPanel();
   private JLabel lblAddProduct = new JLabel("Add Product");
   private MTextField tfTitle, tfPrice, tfStock;
-  private JTextField txt;
   private MComboBox<String> cbCategory;
   private MTextArea taDescription;
-  private MButton uploadButton;
+  private MButton btnSubmit, btnDelete;
   private ColorScheme colors;
-
-  public JTextField getCategoryComponent() {
-    return this.txt;
-  }
-
-  public JLabel getLabelComponent() {
-    return this.lblAddProduct;
-  }
-
-  public MTextArea getDescriptionComponent() {
-    return this.taDescription;
-  }
-
-  public MTextField getTitleComponent() {
-    return this.tfTitle;
-  }
-
-  public MTextField getPriceComponent() {
-    return this.tfPrice;
-  }
-
-  public MTextField getStockComponent() {
-    return this.tfStock;
-  }
 }

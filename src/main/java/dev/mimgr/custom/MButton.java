@@ -152,6 +152,11 @@ public class MButton extends JButton implements MouseListener {
     repaint();
   }
 
+  public void setDefaultForeground(Color color) {
+    this.foregroundColor = color;
+    repaint();
+  }
+
   public Color getClickForegroundColor() {
     return this.clickForegroundColor;
   }

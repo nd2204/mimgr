@@ -211,11 +211,12 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
   private boolean valid_username(String username) {
     ResultSet queryResult = DBQueries.select_user(username);
     try {
-      if (!queryResult.first()) {
+      if (queryResult.next()) {
         JOptionPane.showMessageDialog(null, "Tên người dùng đã tồn tại");
         return false;
       }
     } catch (Exception e) {
+      return false;
     }
 
     if (!username.matches("^[a-zA-Z0-9._]{5,20}$")) {
@@ -306,11 +307,10 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
       String salt = Security.generate_salt(16);
       if (valid_username(username) && valid_password(password)) {
         DBQueries.insert_user(username, Security.hash_string(password + salt), salt);
-        PanelManager.unregister_panel("FORM_LOGIN");
-        PanelManager.unregister_panel("FORM_SIGNUP");
+        Entry.removeLoginSignup();
         Entry.registerDashBoard(m_colors);
-        return;
       }
+      return;
     }
   }
 
@@ -333,17 +333,17 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
     if (!tf_username.getTextString().isEmpty()
         && !pf_password.getTextString().isEmpty()
         && !pf_password_confirm.getTextString().isEmpty()) {
+      this.signup_button.setEnabled(true);
       this.signup_button.setBackground(m_colors.m_green);
       this.signup_button.setBorderColor(m_colors.m_green);
-      this.signup_button.setForeground(m_colors.m_fg_1);
+      this.signup_button.setDefaultForeground(m_colors.m_fg_1);
       this.signup_button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-      this.signup_button.setEnabled(true);
     } else {
-      this.signup_button.setEnabled(false);
       this.signup_button.setBackground(m_colors.m_bg_4);
       this.signup_button.setBorderColor(m_colors.m_bg_4);
-      this.signup_button.setForeground(m_colors.m_grey_1);
+      this.signup_button.setDefaultForeground(m_colors.m_grey_1);
       this.signup_button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+      this.signup_button.setEnabled(false);
     }
   }
 

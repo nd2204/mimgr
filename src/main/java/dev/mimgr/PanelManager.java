@@ -28,14 +28,16 @@ public class PanelManager {
       "Error: No panel found with ID '" + id + "'";
 
     m_main_panel.remove(panel);
-    if(currentPanelId == id) {
+    if (currentPanelId.equals(id)) {
       currentPanelId = null;
     }
+    m_main_panel.revalidate();
+    m_main_panel.repaint();
   }
 
   public static void show(String id) {
     assert panelMap.containsKey(id) :
-      "Error: No panel registered with ID '" + id + "'";
+    "Error: No panel registered with ID '" + id + "'";
     m_panel_switcher.show(m_main_panel, id);
     currentPanelId = id;
   }

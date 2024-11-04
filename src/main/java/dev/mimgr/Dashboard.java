@@ -99,8 +99,7 @@ public class Dashboard extends JPanel {
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == log_out_button) {
         PanelManager.get_main_panel().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        PanelManager.register_panel(new FormLogin(colors), "FORM_LOGIN");
-        PanelManager.register_panel(new FormSignUp(colors), "FORM_SIGNUP");
+        Entry.registerLoginSignup(colors);
         Entry.removeDashBoard();
         PanelManager.get_main_panel().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         PanelManager.show("FORM_LOGIN");

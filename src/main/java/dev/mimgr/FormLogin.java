@@ -241,10 +241,6 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
       isShowingPassword = !isShowingPassword;
     }
 
-    if (e.getSource() == tf_username) {
-      System.out.println("Changed");
-    }
-
     if (e.getSource() == login_button) {
       String username = tf_username.getTextString();
       String password = pf_password.getTextString();
@@ -255,8 +251,7 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
       }
 
       if (is_valid_credential(username, password)) {
-        PanelManager.unregister_panel("FORM_LOGIN");
-        PanelManager.unregister_panel("FORM_SIGNUP");
+        Entry.removeLoginSignup();
         Entry.registerDashBoard(m_colors);
       } else {
         JOptionPane.showMessageDialog(null, "Tài khoản hoặc mật khẩu không hợp lệ");
@@ -269,6 +264,23 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
       return;
     }
   }
+
+  private void checkFields() {
+    if (!tf_username.getTextString().isEmpty() && !pf_password.getTextString().isEmpty()) {
+      this.login_button.setBackground(m_colors.m_blue);
+      this.login_button.setBorderColor(m_colors.m_blue);
+      this.login_button.setDefaultForeground(m_colors.m_fg_1);
+      this.login_button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+      this.login_button.setEnabled(true);
+    } else {
+      this.login_button.setEnabled(false);
+      this.login_button.setBackground(m_colors.m_bg_4);
+      this.login_button.setBorderColor(m_colors.m_bg_4);
+      this.login_button.setDefaultForeground(m_colors.m_grey_1);
+      this.login_button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }
+  }
+
 
   @Override
   public void insertUpdate(DocumentEvent e) {
@@ -283,22 +295,6 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
   @Override
   public void changedUpdate(DocumentEvent e) {
     checkFields();
-  }
-
-  private void checkFields() {
-    if (!tf_username.getTextString().isEmpty() && !pf_password.getTextString().isEmpty()) {
-      this.login_button.setBackground(m_colors.m_blue);
-      this.login_button.setBorderColor(m_colors.m_blue);
-      this.login_button.setForeground(m_colors.m_fg_1);
-      this.login_button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-      this.login_button.setEnabled(true);
-    } else {
-      this.login_button.setEnabled(false);
-      this.login_button.setBackground(m_colors.m_bg_4);
-      this.login_button.setBorderColor(m_colors.m_bg_4);
-      this.login_button.setForeground(m_colors.m_grey_1);
-      this.login_button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-    }
   }
 
   private MTextField     tf_username;
