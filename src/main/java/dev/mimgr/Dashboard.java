@@ -33,13 +33,7 @@ public class Dashboard extends JPanel {
     JPanel contentPanel = new JPanel();
     this.add(contentPanel, BorderLayout.CENTER);
 
-    // Sidebar
-    // Sidebar also control the content panel
-    // PanelManager.register_panel(new FormProduct(colors), "FORM_PRODUCT");
-    // PanelManager.register_panel(new FormAnalytic(colors), "FORM_ANALYTIC");
-    // PanelManager.register_panel(new FormOrder(colors), "FORM_ORDER");
-    // PanelManager.register_panel(new FormMedia(colors), "FORM_MEDIA");
-
+    // ContentPanel controller
     SidebarPanel sidebarPanel = new SidebarPanel(contentPanel, colors);
     sidebarPanel.setPreferredSize(new Dimension(300, this.getHeight()));
     this.add(sidebarPanel, BorderLayout.WEST);

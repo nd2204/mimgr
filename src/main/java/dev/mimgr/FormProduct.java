@@ -16,7 +16,6 @@ import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.DocumentEvent;
@@ -67,13 +66,13 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     c.weightx = 1.0;
     c.anchor = GridBagConstraints.FIRST_LINE_END;
     c.insets = new Insets(20, 5, 20, 5);
-    this.add(this.importButton, c);
+    this.add(this.btnImport, c);
     c.weightx = 0.0;
     c.gridx = 2;
-    this.add(this.exportButton, c);
+    this.add(this.btnExport, c);
     c.gridx = 3;
     c.insets = new Insets(20, 5, 20, padding);
-    this.add(addProductButton, c);
+    this.add(btnAddProduct, c);
 
     // Content
     {
@@ -87,9 +86,9 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
         "Edit"
       };
 
-      this.bulkAction = new MComboBox<>(items, colors);
-      this.bulkAction.setBackground(colors.m_bg_0);
-      this.bulkAction.setForeground(colors.m_grey_0);
+      this.cbBulkAction = new MComboBox<>(items, colors);
+      this.cbBulkAction.setBackground(colors.m_bg_0);
+      this.cbBulkAction.setForeground(colors.m_grey_0);
 
       cc.gridx = 0;
       cc.gridy = 0;
@@ -98,14 +97,14 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
       cc.fill = GridBagConstraints.BOTH;
       cc.insets = new Insets(15, 15, 0, 5);
-      contentContainer.add(bulkAction, cc);
+      contentContainer.add(cbBulkAction, cc);
 
       cc.gridx = 1;
       cc.gridy = 0;
       cc.weightx = 0.0;
       cc.insets = new Insets(15, 0, 0, 15);
       cc.fill = GridBagConstraints.VERTICAL;
-      contentContainer.add(applyBulkAction, cc);
+      contentContainer.add(btnApplyBulkAction, cc);
 
       cc.gridx = 2;
       cc.gridy = 0;
@@ -143,33 +142,32 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     this.topLabel.setFont(nunito_bold_20);
     this.topLabel.setForeground(colors.m_fg_0);
 
-    this.importButton.setBackground(colors.m_bg_2);
-    this.importButton.setBorderColor(colors.m_bg_2);
-    this.importButton.setForeground(colors.m_fg_0);
-    this.importButton.setHoverBorderColor(colors.m_bg_1);
-    this.importButton.setHoverBackgroundColor(colors.m_bg_1);
-    this.importButton.setClickBackgroundColor(colors.m_bg_dim);
-    this.importButton.setFont(nunito_extrabold_14);
+    this.btnImport.setBackground(colors.m_bg_2);
+    this.btnImport.setBorderColor(colors.m_bg_2);
+    this.btnImport.setForeground(colors.m_fg_0);
+    this.btnImport.setHoverBorderColor(colors.m_bg_1);
+    this.btnImport.setHoverBackgroundColor(colors.m_bg_1);
+    this.btnImport.setClickBackgroundColor(colors.m_bg_dim);
+    this.btnImport.setFont(nunito_extrabold_14);
 
-    this.exportButton.setBackground(colors.m_bg_2);
-    this.exportButton.setBorderColor(colors.m_bg_2);
-    this.exportButton.setHoverBorderColor(colors.m_bg_1);
-    this.exportButton.setHoverBackgroundColor(colors.m_bg_1);
-    this.exportButton.setClickBackgroundColor(colors.m_bg_dim);
-    this.exportButton.setForeground(colors.m_fg_0);
-    this.exportButton.setFont(nunito_extrabold_14);
+    this.btnExport.setBackground(colors.m_bg_2);
+    this.btnExport.setBorderColor(colors.m_bg_2);
+    this.btnExport.setHoverBorderColor(colors.m_bg_1);
+    this.btnExport.setHoverBackgroundColor(colors.m_bg_1);
+    this.btnExport.setClickBackgroundColor(colors.m_bg_dim);
+    this.btnExport.setForeground(colors.m_fg_0);
+    this.btnExport.setFont(nunito_extrabold_14);
 
-    this.addProductButton.setBackground(colors.m_bg_2);
-    this.addProductButton.setBorderColor(colors.m_bg_2);
-    this.addProductButton.setHoverBorderColor(colors.m_green);
-    this.addProductButton.setHoverBackgroundColor(colors.m_bg_1);
-    this.addProductButton.setClickBackgroundColor(colors.m_bg_dim);
-    this.addProductButton.setForeground(colors.m_green);
-    this.addProductButton.setFont(nunito_extrabold_14);
-    this.addProductButton.setIcon(IconManager.getIcon("add.png", 16, 16, colors.m_green));
-    this.addProductButton.setText(" " + this.addProductButton.getText());
-    this.addProductButton.addActionListener(this);
-    ;
+    this.btnAddProduct.setBackground(colors.m_bg_2);
+    this.btnAddProduct.setBorderColor(colors.m_bg_2);
+    this.btnAddProduct.setHoverBorderColor(colors.m_green);
+    this.btnAddProduct.setHoverBackgroundColor(colors.m_bg_1);
+    this.btnAddProduct.setClickBackgroundColor(colors.m_bg_dim);
+    this.btnAddProduct.setForeground(colors.m_green);
+    this.btnAddProduct.setFont(nunito_extrabold_14);
+    this.btnAddProduct.setIcon(IconManager.getIcon("add.png", 16, 16, colors.m_green));
+    this.btnAddProduct.setText(" " + this.btnAddProduct.getText());
+    this.btnAddProduct.addActionListener(this);
 
     this.filterTextField.setIcon(IconManager.getIcon("search.png", 20, 20, colors.m_grey_0), MTextField.ICON_PREFIX);
     this.filterTextField.setBackground(colors.m_bg_dim);
@@ -189,14 +187,15 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     this.checkBoxModel.setBoxColor(colors.m_bg_4);
     this.checkBoxModel.setBackground(colors.m_bg_0);
 
-    this.applyBulkAction.setForeground(colors.m_grey_2);
-    this.applyBulkAction.setBackground(colors.m_bg_0);
-    this.applyBulkAction.setBorderColor(colors.m_bg_5);
-    this.applyBulkAction.setHoverBackgroundColor(colors.m_bg_1);
-    this.applyBulkAction.setClickBackgroundColor(colors.m_bg_dim);
-    this.applyBulkAction.setHoverForegroundColor(colors.m_blue);
-    this.applyBulkAction.setHoverBorderColor(colors.m_blue);
-    this.applyBulkAction.setBorderRadius(0);
+    this.btnApplyBulkAction.setForeground(colors.m_grey_2);
+    this.btnApplyBulkAction.setBackground(colors.m_bg_0);
+    this.btnApplyBulkAction.setBorderColor(colors.m_bg_5);
+    this.btnApplyBulkAction.setHoverBackgroundColor(colors.m_bg_1);
+    this.btnApplyBulkAction.setClickBackgroundColor(colors.m_bg_dim);
+    this.btnApplyBulkAction.setHoverForegroundColor(colors.m_blue);
+    this.btnApplyBulkAction.setHoverBorderColor(colors.m_blue);
+    this.btnApplyBulkAction.setBorderRadius(0);
+    this.btnApplyBulkAction.addActionListener(this);
   }
 
   private void setup_table() {
@@ -237,8 +236,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
           int row = table.getSelectedRow();
           if (row != -1) {
             // Retrieve data for the selected row
-            ProductRecord pr = productList.get(row);
-            FormEditProduct frame = new FormEditProduct(pr);
+            FormEditProduct frame = new FormEditProduct(productList.get(row));
             frame.setVisible(true);
 
             // // Display the data in a dialog
@@ -253,12 +251,18 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
 
   @Override
   public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == this.addProductButton) {
+    if (e.getSource() == this.btnAddProduct) {
       JFrame jFrame = new FormAddProduct(colors);
       jFrame.setVisible(true);
     }
 
-    if (e.getSource() == this.applyBulkAction) {
+    if (e.getSource() == this.btnApplyBulkAction) {
+      System.out.println(((String) this.cbBulkAction.getSelectedItem()));
+      if (((String) this.cbBulkAction.getSelectedItem()).equals("Edit")) {
+
+        FormEditProduct frame = new FormEditProduct(selectedProducts.values());
+        frame.setVisible(true);
+      }
     }
   }
 
@@ -319,7 +323,6 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
         });
       }
     } catch (SQLException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
@@ -344,12 +347,12 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   private JLabel topLabel = new JLabel("Products");
   private GridBagConstraints c = new GridBagConstraints();
   private MTextField filterTextField = new MTextField(30);
+  private MButton btnImport = new MButton("Import");
+  private MButton btnExport = new MButton("Export");
+  private MButton btnAddProduct = new MButton("Add product");
+  private MButton btnApplyBulkAction = new MButton("Apply");
   private MTable table;
   private JScrollPane scrollPane;
-  private MButton importButton = new MButton("Import");
-  private MButton exportButton = new MButton("Export");
-  private MButton addProductButton = new MButton("Add product");
   private DefaultTableModel model;
-  private MComboBox<String> bulkAction;
-  private MButton applyBulkAction = new MButton("Apply");
+  private MComboBox<String> cbBulkAction;
 }

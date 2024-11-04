@@ -68,12 +68,12 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
 
     lblAddProduct.setFont(nunito_bold_20);
     lblAddProduct.setForeground(colors.m_fg_0);
-    gbc.insets = new Insets(40, 10, 10, 10);
+    gbc.insets = new Insets(40, 10, 20, 10);
     gbc.gridx = 0;
     gbc.gridy = 0;
     thisPanel.add(lblAddProduct, gbc);
 
-    gbc.insets = new Insets(10, 10, 10, 10);
+    gbc.insets = new Insets(0, 10, 10, 10);
     gbc.gridx = 0;
     gbc.gridy = 1;
     gbc.gridwidth = 2;

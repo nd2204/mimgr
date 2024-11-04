@@ -30,9 +30,6 @@ class Entry extends JFrame {
     FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
     FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
 
-    // Get the screen size
-    Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
-
     // Register startup panel
     registerDashBoard(colors);
     for (JPanel panel : PanelManager.getAllPanels()) {
@@ -45,10 +42,7 @@ class Entry extends JFrame {
     this.setTitle("Mimgr");
     this.setSize(m_width, m_height);
     this.add(PanelManager.get_main_panel());
-    this.setLocation(
-      (screen_size.width - this.getWidth()) / 2,
-      (screen_size.height - this.getHeight()) / 2
-    );
+    this.setLocationRelativeTo(null);
     this.setVisible(true);
     this.requestFocus();
     this.addWindowListener(on_close_handler());
