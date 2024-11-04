@@ -238,11 +238,13 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
           if (row != -1) {
             // Retrieve data for the selected row
             ProductRecord pr = productList.get(row);
+            FormEditProduct frame = new FormEditProduct(pr);
+            frame.setVisible(true);
 
-            // Display the data in a dialog
-            JOptionPane.showMessageDialog(null,
-                "Details:\nName: " + pr.m_name + "\nQuantity: " + pr.m_stock_quantity + "\nPrice: " + pr.m_price + "\nDescription: " + pr.m_description,
-                "Intrument Details", JOptionPane.INFORMATION_MESSAGE);
+            // // Display the data in a dialog
+            // JOptionPane.showMessageDialog(null,
+            //     "Details:\nName: " + pr.m_name + "\nQuantity: " + pr.m_stock_quantity + "\nPrice: " + pr.m_price + "\nDescription: " + pr.m_description,
+            //     "Intrument Details", JOptionPane.INFORMATION_MESSAGE);
           }
         }
       }
@@ -252,7 +254,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == this.addProductButton) {
-      JFrame jFrame = new FormAddProduct();
+      JFrame jFrame = new FormAddProduct(colors);
       jFrame.setVisible(true);
     }
 

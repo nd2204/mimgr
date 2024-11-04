@@ -10,13 +10,12 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 class FormAddProduct extends JFrame {
-  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_EVERFOREST);
-
   private double m_aspect_ratio;
   private int    m_width;
   private int    m_height;
 
-  FormAddProduct() {
+  public FormAddProduct(ColorScheme colors) {
+    this.colors = colors;
     m_aspect_ratio = 16.0f / 10.0f;
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
@@ -37,7 +36,7 @@ class FormAddProduct extends JFrame {
     this.setMinimumSize(new Dimension(854, 600));
     this.setTitle("Upload");
     this.setSize(854, m_height);
-    this.add(new UploadPanel(colors));
+    this.add(new UploadPanel(this.colors));
     this.setLocation(
       (screen_size.width - this.getWidth()) / 2,
       (screen_size.height - this.getHeight()) / 2
@@ -47,6 +46,9 @@ class FormAddProduct extends JFrame {
   }
 
   public static void main(String arg[]) {
-    new FormAddProduct();
+    ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_EVERFOREST);
+    new FormAddProduct(colors);
   }
+
+  private ColorScheme colors;
 }

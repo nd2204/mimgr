@@ -63,16 +63,17 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     thisPanel.setBackground(colors.m_bg_dim);
 
     GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(10, 10, 10, 10);
     gbc.anchor = GridBagConstraints.FIRST_LINE_START;
     gbc.fill = GridBagConstraints.HORIZONTAL;
 
     lblAddProduct.setFont(nunito_bold_20);
     lblAddProduct.setForeground(colors.m_fg_0);
+    gbc.insets = new Insets(40, 10, 10, 10);
     gbc.gridx = 0;
     gbc.gridy = 0;
     thisPanel.add(lblAddProduct, gbc);
 
+    gbc.insets = new Insets(10, 10, 10, 10);
     gbc.gridx = 0;
     gbc.gridy = 1;
     gbc.gridwidth = 2;
@@ -92,6 +93,7 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     gbc.gridy = 3;
     thisPanel.add(new InventoryPanel(), gbc);
 
+    gbc.insets = new Insets(10, 10, 40, 10);
     gbc.gridx = 0;
     gbc.gridy = 5;
     gbc.gridwidth = 2;
@@ -103,29 +105,32 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     // ========================= Fields =========================
     Consumer<MTextField> setup_common_textfield = (tf) -> {
       tf.setInputForeground(colors.m_fg_0);
-      tf.setBackground(colors.m_bg_1);
+      tf.setBackground(colors.m_bg_dim);
       tf.setBorderColor(colors.m_bg_4);
       tf.setFocusBorderColor(colors.m_blue);
+      tf.setForeground(colors.m_fg_0);
       tf.setBorderWidth(2);
-      tf.setFont(font_bold);
+      tf.setFont(nunito_bold_14);
       tf.getDocument().addDocumentListener(UploadPanel.this);
     };
 
-    tfTitle = new MTextField(30);
+    tfTitle = new MTextField(20);
     setup_common_textfield.accept(tfTitle);
-    tfPrice = new MTextField(30);
+    tfPrice = new MTextField(20);
     setup_common_textfield.accept(tfPrice);
-    tfStock = new MTextField(30);
+    tfStock = new MTextField(20);
     setup_common_textfield.accept(tfStock);
 
-    taDescription = new MTextArea(8, 80);
+    taDescription = new MTextArea(8, 50);
+    taDescription.setPadding(new Insets(20, 20, 20, 20));
     taDescription.setInputForeground(colors.m_fg_0);
-    taDescription.setBackground(colors.m_bg_1);
+    taDescription.setBackground(colors.m_bg_dim);
     taDescription.setBorderColor(colors.m_bg_4);
     taDescription.setFocusBorderColor(colors.m_blue);
+    taDescription.setForeground(colors.m_fg_0);
     taDescription.setBorderWidth(2);
     taDescription.setBorderRadius(15);
-    taDescription.setFont(font_bold);
+    taDescription.setFont(nunito_bold_14);
     taDescription.setLineWrap(true);
     taDescription.getDocument().addDocumentListener(this);
 
@@ -530,4 +535,28 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
   private MTextArea taDescription;
   private MButton uploadButton;
   private ColorScheme colors;
+
+  public JTextField getCategoryComponent() {
+    return this.txt;
+  }
+
+  public JLabel getLabelComponent() {
+    return this.lblAddProduct;
+  }
+
+  public MTextArea getDescriptionComponent() {
+    return this.taDescription;
+  }
+
+  public MTextField getTitleComponent() {
+    return this.tfTitle;
+  }
+
+  public MTextField getPriceComponent() {
+    return this.tfPrice;
+  }
+
+  public MTextField getStockComponent() {
+    return this.tfStock;
+  }
 }

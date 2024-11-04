@@ -74,21 +74,11 @@ class Entry extends JFrame {
   }
 
   public static void registerDashBoard(ColorScheme colors) {
-    PanelManager.register_panel(new SidebarPanel(colors), "DASHBOARD_SIDEBAR");
     PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
-    PanelManager.register_panel(new FormProduct(colors), "FORM_PRODUCT");
-    PanelManager.register_panel(new FormAnalytic(colors), "FORM_ANALYTIC");
-    PanelManager.register_panel(new FormOrder(colors), "FORM_ORDER");
-    PanelManager.register_panel(new FormMedia(colors), "FORM_MEDIA");
   }
 
   public static void removeDashBoard() {
-    PanelManager.unregister_panel("DASHBOARD_SIDEBAR");
     PanelManager.unregister_panel("DASHBOARD");
-    PanelManager.unregister_panel("FORM_PRODUCT");
-    PanelManager.unregister_panel("FORM_ANALYTIC");
-    PanelManager.unregister_panel("FORM_ORDER");
-    PanelManager.unregister_panel("FORM_MEDIA");
   }
 
   public static void main(String arg[]) {
