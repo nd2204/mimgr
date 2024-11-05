@@ -27,6 +27,8 @@ public class Dashboard extends JPanel {
     // Header
     HeaderPanel headerPanel = new HeaderPanel(colors);
     headerPanel.setPreferredSize(new Dimension(this.getWidth(), 60));
+    btnToggleSidebar = headerPanel.getToggleSidebarComponent();
+    btnToggleSidebar.addActionListener(new HeaderBarListener());
     this.add(headerPanel, BorderLayout.NORTH);
 
     // Content Panel
@@ -34,7 +36,7 @@ public class Dashboard extends JPanel {
     this.add(contentPanel, BorderLayout.CENTER);
 
     // ContentPanel controller
-    SidebarPanel sidebarPanel = new SidebarPanel(contentPanel, colors);
+    sidebarPanel = new SidebarPanel(contentPanel, colors);
     sidebarPanel.setPreferredSize(new Dimension(300, this.getHeight()));
     this.add(sidebarPanel, BorderLayout.WEST);
     {
@@ -86,18 +88,18 @@ public class Dashboard extends JPanel {
       sidebarPanel.addComponent(sep, c);
 
       c.insets = new Insets(padding_vertical, padding_horizontal, 20, padding_horizontal);
-      log_out_button = sidebarPanel.setupMenuButton("Log out", logout_icon);
-      sidebarPanel.add(log_out_button, c);
+      btnLogOut = sidebarPanel.setupMenuButton("Log out", logout_icon);
+      sidebarPanel.add(btnLogOut, c);
 
       SidebarMenuListener sml = new SidebarMenuListener();
-      log_out_button.addActionListener(sml);
+      btnLogOut.addActionListener(sml);
     }
   }
 
   private class SidebarMenuListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (e.getSource() == log_out_button) {
+      if (e.getSource() == btnLogOut) {
         PanelManager.get_main_panel().setCursor(new Cursor(Cursor.WAIT_CURSOR));
         Entry.registerLoginSignup(colors);
         Entry.removeDashBoard();
@@ -108,6 +110,17 @@ public class Dashboard extends JPanel {
     }
   }
 
+  private class HeaderBarListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      if (e.getSource() == btnToggleSidebar) {
+        sidebarPanel.setVisible(!sidebarPanel.isVisible());
+      }
+    }
+  }
+
+  private SidebarPanel sidebarPanel;
   private ColorScheme colors; 
-  private MButton log_out_button;
+  private MButton btnToggleSidebar;
+  private MButton btnLogOut;
 }

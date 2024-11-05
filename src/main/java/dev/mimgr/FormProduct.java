@@ -16,6 +16,7 @@ import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.DocumentEvent;
@@ -263,6 +264,18 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
         FormEditProduct frame = new FormEditProduct(selectedProducts.values());
         frame.setVisible(true);
       }
+
+      if (((String) this.cbBulkAction.getSelectedItem()).equals("Delete Permanently")) {
+        int response = JOptionPane.showConfirmDialog(
+          this,
+          "Delete " + selectedProducts.size() + " items?",
+          "Confirm Delete",
+          JOptionPane.YES_NO_OPTION);
+
+        if (response == JOptionPane.YES_OPTION) {
+          // TODO Delete
+        }
+      }
     }
   }
 
@@ -287,17 +300,17 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     int column = e.getColumn();
     switch (e.getType()) {
       case TableModelEvent.UPDATE:
-        Object newValue = model.getValueAt(row, column);
-        if (column == 0) {
-          if (newValue instanceof Boolean) {
-            if ((Boolean) newValue) {
-              selectedProducts.put(row, productList.get(row));
-            } else {
-              selectedProducts.remove(row);
-            }
+      Object newValue = model.getValueAt(row, column);
+      if (column == 0) {
+        if (newValue instanceof Boolean) {
+          if ((Boolean) newValue) {
+            selectedProducts.put(row, productList.get(row));
+          } else {
+            selectedProducts.remove(row);
           }
         }
-        break;
+      }
+      break;
     }
   }
 
@@ -315,11 +328,11 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
         ProductRecord pr = new ProductRecord(queryResult);
         productList.add(pr);
         model.addRow(new Object[] {
-            Boolean.FALSE,
-            pr.m_name,
-            pr.m_price,
-            pr.m_stock_quantity,
-            pr.m_description
+          Boolean.FALSE,
+          pr.m_name,
+          pr.m_price,
+          pr.m_stock_quantity,
+          pr.m_description
         });
       }
     } catch (SQLException e) {

@@ -292,7 +292,9 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
         if (obj instanceof File file) {
           Path newFilePath = rm.moveStagedFileToUploadDir(file);
           System.out.println(rm.getProjectPath().relativize(newFilePath));
-          DBQueries.insert_image(String.valueOf(rm.getProjectPath().relativize(newFilePath)), file.getName(), "");
+          DBQueries.insert_image(String.valueOf(
+            rm.getProjectPath().relativize(newFilePath)
+          ), file.getName(), "");
           get_all_images(model);
           dropPanel.setVisible(false);
         }

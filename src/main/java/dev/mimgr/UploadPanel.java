@@ -21,13 +21,9 @@ import java.util.function.Consumer;
 import javax.swing.BoxLayout;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.DropPanel;
@@ -42,10 +38,14 @@ import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.MTransferListener;
 import dev.mimgr.utils.ResourceManager;
 
-public class UploadPanel extends JPanel implements ActionListener, DocumentListener {
+public class UploadPanel extends JPanel {
 
   public MComboBox<String> getCategoryComponent() {
     return this.cbCategory;
+  }
+
+  public MButton getSubmitComponent() {
+    return this.btnSubmit;
   }
 
   public JLabel getLabelComponent() {
@@ -68,8 +68,8 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     return this.tfStock;
   }
 
-  public MTextField getDeleteComponent() {
-    return this.tfStock;
+  public MButton getDeleteComponent() {
+    return this.btnDelete;
   }
 
   UploadPanel(ColorScheme colors) {
@@ -147,7 +147,6 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
       tf.setForeground(colors.m_fg_0);
       tf.setBorderWidth(2);
       tf.setFont(nunito_bold_14);
-      tf.getDocument().addDocumentListener(UploadPanel.this);
     };
 
     tfTitle = new MTextField(20);
@@ -168,7 +167,6 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     taDescription.setBorderRadius(15);
     taDescription.setFont(nunito_bold_14);
     taDescription.setLineWrap(true);
-    taDescription.getDocument().addDocumentListener(this);
 
     String[] options = get_category_names();
     cbCategory = new MComboBox<>(options, colors);
@@ -176,40 +174,23 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     // ========================= Buttons =========================
     this.btnSubmit = new MButton("Submit");
     this.btnSubmit.setFont(nunito_bold_14);
-    this.btnSubmit.setBackground(colors.m_bg_dim);
-    this.btnSubmit.setBorderColor(colors.m_bg_3);
-    this.btnSubmit.setForeground(colors.m_bg_3);
+    this.btnSubmit.setBackground(colors.m_bg_1);
+    this.btnSubmit.setBorderColor(colors.m_bg_1);
+    this.btnSubmit.setForeground(colors.m_bg_5);
     this.btnSubmit.setBorderWidth(2);
-    this.btnSubmit.setEnabled(false);
-    this.btnSubmit.addActionListener(this);
+    this.btnSubmit.setEnabled(true);
 
     this.btnDelete = new MButton("Cancel");
     this.btnDelete.setFont(nunito_bold_14);
     this.btnDelete.setBackground(colors.m_bg_dim);
-    this.btnDelete.setBorderColor(colors.m_red);
-    this.btnDelete.setForeground(colors.m_red);
+    this.btnDelete.setBorderColor(colors.m_bg_3);
+    this.btnDelete.setDefaultForeground(colors.m_grey_0);
     this.btnDelete.setHoverForegroundColor(colors.m_fg_1);
+    this.btnDelete.setHoverBorderColor(colors.m_red);
     this.btnDelete.setHoverBackgroundColor(colors.m_red);
     this.btnDelete.setBorderWidth(2);
-    this.btnDelete.addActionListener(this);
-    this.btnDelete.setVisible(false);
   }
 
-  private void checkFields() {
-    if (!tfTitle.getText().isEmpty() && !tfPrice.getText().isEmpty() && !tfStock.getText().isEmpty() && !taDescription.getText().isEmpty()) {
-      this.btnSubmit.setBackground(colors.m_blue);
-      this.btnSubmit.setBorderColor(colors.m_blue);
-      this.btnSubmit.setForeground(colors.m_fg_1);
-      this.btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
-      this.btnSubmit.setEnabled(true);
-    } else {
-      this.btnSubmit.setEnabled(false);
-      this.btnSubmit.setBackground(colors.m_bg_4);
-      this.btnSubmit.setBorderColor(colors.m_bg_4);
-      this.btnSubmit.setForeground(colors.m_grey_1);
-      this.btnSubmit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-    }
-  }
 
   private String[] get_category_names() {
     ResultSet queryResult = DBQueries.select_all_categories();
@@ -224,21 +205,6 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     }
     String[] namesArray = nameList.toArray(new String[0]);
     return namesArray;
-  }
-
-  private int get_category_id(String category_name) {
-    ResultSet queryResult = DBQueries.select_id_category(category_name);
-    int id_result = 0;
-    try {
-      while (queryResult.next()) {
-        id_result = queryResult.getInt("category_id");
-      }
-      return id_result;
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return id_result;
   }
 
   private class MediaDropPanel extends RoundedPanel implements ActionListener, MTransferListener {
@@ -529,42 +495,6 @@ public class UploadPanel extends JPanel implements ActionListener, DocumentListe
     private JLabel lblTitle = new JLabel("Title");
     private JLabel lblDescription = new JLabel("Description");
     private JLabel lblCategory = new JLabel("Category");
-  }
-
-  @Override
-  public void insertUpdate(DocumentEvent e) {
-    checkFields();
-  }
-
-  @Override
-  public void removeUpdate(DocumentEvent e) {
-    checkFields();
-  }
-
-  @Override
-  public void changedUpdate(DocumentEvent e) {
-    checkFields();
-  }
-
-
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == btnSubmit) {
-      String name = tfTitle.getTextString();
-      double price = Double.parseDouble(tfPrice.getTextString());
-      String description = taDescription.getTextString();
-      int stock_quantity = Integer.parseInt(tfStock.getTextString());
-      int category_id = get_category_id((String) cbCategory.getSelectedItem());
-      System.out.println(category_id);
-      if (category_id == 0) {
-        JOptionPane.showMessageDialog(null, "Not valid category name");
-      }
-      else {
-        JOptionPane.showMessageDialog(null, "Success");
-        DBQueries.insert_product(name, price, description, stock_quantity, category_id);
-      }
-    }
-    return;
   }
 
   // Declare form components

@@ -133,6 +133,7 @@ class FormEditProduct extends JFrame {
     uploadPanel.getDescriptionComponent().setText(pr.m_description);
     uploadPanel.getStockComponent().setText(String.valueOf(pr.m_stock_quantity));
     uploadPanel.getPriceComponent().setText(String.valueOf(pr.m_price));
+    uploadPanel.getDeleteComponent().setText("Delete Product");
     uploadPanel.getLabelComponent().setVisible(false);
     return uploadPanel;
   }
