@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -23,6 +24,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import dev.mimgr.custom.DropContainerPanel;
@@ -42,7 +45,7 @@ import dev.mimgr.utils.ResourceManager;
  *
  * @author dn200
  */
-public class FormMedia extends JPanel implements ActionListener, MTransferListener {
+public class FormMedia extends JPanel implements ActionListener, MTransferListener, TableModelListener {
   public FormMedia(ColorScheme colors) {
     this.colors = colors;
     // =======================================================
@@ -107,12 +110,12 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       contentContainer.setLayout(new GridBagLayout());
       contentContainer.setBackground(colors.m_bg_0);
 
-      String[] items = { 
+      String[] cbBulkAction = { 
         "Bulk actions",
         "Delete Permanently"
       };
 
-      this.bulkAction = new MComboBox<>(items, colors);
+      this.bulkAction = new MComboBox<>(cbBulkAction, colors);
       this.bulkAction.setBackground(colors.m_bg_0);
       this.bulkAction.setForeground(colors.m_grey_0);
 
@@ -210,6 +213,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     this.applyBulkAction.setHoverForegroundColor(colors.m_blue);
     this.applyBulkAction.setHoverBorderColor(colors.m_blue);
     this.applyBulkAction.setBorderRadius(0);
+    this.applyBulkAction.addActionListener(this);;
   }
 
   private void setup_table() {
@@ -234,9 +238,9 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
         return column == 0;
       }
     };
-
+    
     table.setModel(model);
-
+    
     tv.add_column(table, "", TableView.setup_checkbox_column(colors));
     tv.add_column(table, "", TableView.setup_image_column(colors));
     tv.add_column(table, "Image name", TableView.setup_default_column());
@@ -245,10 +249,9 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     tv.add_column(table, "Author", TableView.setup_default_column());
     tv.add_column(table, "Caption", TableView.setup_default_column());
     tv.load_column(table, model);
-
-    for (int i = 0; i < 20; ++i) {
-      model.addRow(new Object[]{Boolean.FALSE, emptyImageIcon, "Smith", "Snowboarding", 3});
-    }
+    
+    model.addTableModelListener(this);
+    get_all_images(model);
   }
 
 
@@ -292,9 +295,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
         if (obj instanceof File file) {
           Path newFilePath = rm.moveStagedFileToUploadDir(file);
           System.out.println(rm.getProjectPath().relativize(newFilePath));
-          DBQueries.insert_image(String.valueOf(
-            rm.getProjectPath().relativize(newFilePath)
-          ), file.getName(), "");
+          DBQueries.insert_image(String.valueOf(rm.getProjectPath().relativize(newFilePath)).replace("\\", "/"), file.getName(), "");
           get_all_images(model);
           dropPanel.setVisible(false);
         }
@@ -303,6 +304,21 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       rm.cleanTempFiles();
       // Clear the data
       this.droppedItemsPanel.clearData();
+    }
+
+    if (e.getSource() == this.applyBulkAction) {
+      System.out.println(((String) this.bulkAction.getSelectedItem()));
+      // if (((String) this.bulkAction.getSelectedItem()).equals("Edit")) {
+
+      //   FormEditProduct frame = new FormEditProduct(selectedImages.values());
+      //   frame.setVisible(true);
+      // }
+      if (((String) this.bulkAction.getSelectedItem()).equals("Delete Permanently")) {
+        if (!selectedImages.isEmpty()) {
+          delete_image(model, selectedImages.values());
+          selectedImages.clear();
+        }
+      }
     }
     return;
   }
@@ -331,6 +347,37 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       droppedItemsPanel.addData(file);
     }
     return;
+  }
+
+  @Override
+  public void tableChanged(TableModelEvent e) {
+    int row = e.getFirstRow();
+    int column = e.getColumn();
+    switch (e.getType()) {
+      case TableModelEvent.UPDATE:
+        Object newValue = model.getValueAt(row, column);
+        if (column == 0) {
+          if (newValue instanceof Boolean) {
+            if ((Boolean) newValue) {
+              selectedImages.put(row, imageList.get(row));
+            } else {
+              selectedImages.remove(row);
+            }
+          }
+        }
+        break;
+    }
+  }
+
+  private void delete_image(DefaultTableModel model, Iterable<ImageRecord> prList) {
+    for (ImageRecord i : prList) {
+      DBQueries.delete_image(i.m_id);
+    }
+    model.setRowCount(0);
+    if (!imageList.isEmpty()) {
+      imageList = new ArrayList<>();
+    }
+    get_all_images(model);
   }
 
   private class MediaDropPanel extends DropPanel {
@@ -386,7 +433,7 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
             Boolean.FALSE,
             this.emptyImageIcon = IconManager.loadIcon(Paths.get(pr.m_url).toAbsolutePath().toFile()),
             pr.m_name,
-            pr.m_url.substring(pr.m_url.lastIndexOf("\\") + 1),
+            pr.m_url.substring(pr.m_url.lastIndexOf("/") + 1),
             pr.m_created_at,
             pr.m_author,
             pr.m_caption
@@ -422,4 +469,5 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   private ResourceManager rm = ResourceManager.getInstance();
   DefaultTableModel model;
   private ArrayList<ImageRecord> imageList = new ArrayList<>();
+  private HashMap<Integer, ImageRecord> selectedImages = new HashMap<>();
 }

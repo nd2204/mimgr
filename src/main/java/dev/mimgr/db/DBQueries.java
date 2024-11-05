@@ -23,6 +23,11 @@ public class DBQueries {
   public static final String SELECT_ALL_CATEGORIES = "SELECT category_id, category_name FROM categories WHERE category_name IS NOT NULL";
   public static final String SELECT_ALL_IMAGES = "SELECT * FROM images";
 
+  public static final String UPDATE_INTRUMENT = "UPDATE products SET name=?, price=?, description=?, stock_quantity=?, category_id=? WHERE product_id=?";
+  
+  public static final String DELETE_IMAGE = "DELETE FROM images WHERE image_id=?";
+  public static final String DELETE_INTRUMENT = "DELETE FROM products WHERE product_id=?";
+
   private static Connection dbcon = DBConnection.get_instance().get_connection();
   /*
    * General db insert function
@@ -125,6 +130,53 @@ public class DBQueries {
     try (FileWriter fileWriter = new FileWriter(filePath, true)) { // Mở tệp ở chế độ ghi nối tiếp (append)
       fileWriter.write(sql + "\n"); // Thêm câu lệnh SQL vào tệp
     } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  
+  public static void update_product(String name, Double price, String description, int stock_quantity, int category_id,
+      int product_id) {
+    try {
+      PreparedStatement preparedStatement = dbcon.prepareStatement(UPDATE_INTRUMENT);
+      preparedStatement.setString(1, name);
+      preparedStatement.setDouble(2, price);
+      preparedStatement.setString(3, description);
+      preparedStatement.setInt(4, stock_quantity);
+      preparedStatement.setInt(5, category_id);
+      preparedStatement.setInt(6, product_id);
+
+      int result = preparedStatement.executeUpdate();
+      System.out.println(result + " row(s) affected");
+      String generatedInsertSQL = String.format(
+          "UPDATE products SET name='%s', price=%.2f, description='%s', stock_quantity=%d, category_id=%d WHERE product_id=%d;",
+          name, price, description, stock_quantity, category_id, product_id);
+
+      // Ghi câu lệnh SQL vào file init.sql
+      writeSQLToFile(sqlPath, generatedInsertSQL);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void delete_product(int product_id) {
+    try {
+      PreparedStatement preparedStatement = dbcon.prepareStatement(DELETE_INTRUMENT);
+      preparedStatement.setInt(1, product_id);
+      int result = preparedStatement.executeUpdate();
+      System.out.println(result + " row(s) affected");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void delete_image(int image_id) {
+    try {
+      PreparedStatement preparedStatement = dbcon.prepareStatement(DELETE_IMAGE);
+      preparedStatement.setInt(1, image_id);
+      int result = preparedStatement.executeUpdate();
+      System.out.println(result + " row(s) affected");
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
