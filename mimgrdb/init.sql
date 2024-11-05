@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 CREATE TABLE IF NOT EXISTS images (
-  id               INT AUTO_INCREMENT PRIMARY KEY,
+  image_id               INT AUTO_INCREMENT PRIMARY KEY,
   image_url        VARCHAR(255) UNIQUE,
   image_name       VARCHAR(255),
   image_caption    TEXT,
@@ -43,12 +43,12 @@ CREATE TABLE IF NOT EXISTS images (
 );
 
 CREATE TABLE IF NOT EXISTS product_images (
-  image_id       INT            AUTO_INCREMENT PRIMARY KEY,
+  image_product_id       INT            AUTO_INCREMENT PRIMARY KEY,
   product_id     INT            NOT NULL,
-  image_id_fk    INT,
+  image_id    INT,
   is_main_image  BOOLEAN        DEFAULT FALSE,
   FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE,
-  FOREIGN KEY(image_id_fk) REFERENCES images(id)  ON DELETE CASCADE
+  FOREIGN KEY(image_id) REFERENCES images(image_id)  ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS orders (
