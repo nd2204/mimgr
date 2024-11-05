@@ -6,21 +6,11 @@ import java.sql.SQLException;
 
 public class UserRecord {
   public UserRecord(ResultSet rs) throws SQLException {
-    m_id       = rs.getInt("id");
-    m_hash     = rs.getString("hash");
-    m_salt     = rs.getString("salt");
-    m_username = rs.getString("username");
+    m_id       = rs.getInt(FIELD_ID);
+    m_hash     = rs.getString(FIELD_HASH);
+    m_salt     = rs.getString(FIELD_SALT);
+    m_username = rs.getString(FIELD_USERNAME);
     m_role     = rs.getString("role");
-  }
-
-  public UserRecord(
-    int id, String name, String hash, String salt, int role
-  ) {
-    m_id       = id;
-    m_username = name;
-    m_hash     = hash;
-    m_salt     = salt;
-    m_role     = roles[role];
   }
 
   public static ResultSet selectUserById(Connection con, int id) {

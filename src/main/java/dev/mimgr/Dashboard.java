@@ -26,7 +26,7 @@ public class Dashboard extends JPanel {
 
     // Header
     HeaderPanel headerPanel = new HeaderPanel(colors);
-    headerPanel.setPreferredSize(new Dimension(this.getWidth(), 60));
+    headerPanel.setPreferredSize(new Dimension(this.getWidth(), 65));
     btnToggleSidebar = headerPanel.getToggleSidebarComponent();
     btnToggleSidebar.addActionListener(new HeaderBarListener());
     this.add(headerPanel, BorderLayout.NORTH);
@@ -43,6 +43,7 @@ public class Dashboard extends JPanel {
       final int padding_horizontal = 15;
       final int padding_vertical = 5;
       final int icon_size = 16;
+      MButton firstButton;
       Icon home_icon      = IconManager.getIcon("home_1.png", icon_size, icon_size, colors.m_fg_0);
       Icon orders_icon    = IconManager.getIcon("shopping_bag.png", icon_size, icon_size, colors.m_fg_0);
       Icon products_icon  = IconManager.getIcon("tag.png", icon_size, icon_size, colors.m_fg_0);
@@ -71,7 +72,7 @@ public class Dashboard extends JPanel {
       c.insets = new Insets(padding_vertical, padding_horizontal, padding_vertical, padding_horizontal);
       sidebarPanel.addComponent(sep, c);
       sidebarPanel.addMenuButton("Orders", orders_icon, new FormOrder(colors), c);
-      sidebarPanel.addMenuButton("Products", products_icon, new FormProduct(colors), c);
+      firstButton = sidebarPanel.addMenuButton("Products", products_icon, new FormProduct(colors), c);
       sidebarPanel.addMenuButton("Analytics", analytics_icon, new FormAnalytic(colors), c);
       sidebarPanel.addMenuButton("Media", media_icon, new FormMedia(colors), c);
 
@@ -93,6 +94,8 @@ public class Dashboard extends JPanel {
 
       SidebarMenuListener sml = new SidebarMenuListener();
       btnLogOut.addActionListener(sml);
+
+      sidebarPanel.setCurrentMenu(firstButton);
     }
   }
 
