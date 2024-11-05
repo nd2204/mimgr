@@ -103,6 +103,7 @@ public class Dashboard extends JPanel {
         Entry.removeDashBoard();
         PanelManager.get_main_panel().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         PanelManager.show("FORM_LOGIN");
+        LoginService.logoutUser();
       }
     }
   }

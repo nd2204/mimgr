@@ -10,6 +10,7 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import dev.mimgr.db.UserRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.ResourceManager;
@@ -31,7 +32,18 @@ class Entry extends JFrame {
     FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
 
     // Register startup panel
-    registerDashBoard(colors);
+    UserRecord ur = SessionManager.loadSession();
+    if (ur == null) {
+      registerLoginSignup(colors);
+    } else {
+      SessionManager.setCurrentUser(ur);
+      registerDashBoard(colors);
+    }
+    
+    if (ur != null) {
+      System.out.println("Logged in as user: " + ur.m_username + " as role: " + ur.m_role);
+    }
+
     for (JPanel panel : PanelManager.getAllPanels()) {
       System.out.println(panel);
     }

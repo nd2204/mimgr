@@ -70,11 +70,11 @@ CREATE TABLE IF NOT EXISTS order_items (
   FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
-CREATE TABLE IF NOT EXISTS sessions (
-  session_id VARCHAR(255) PRIMARY KEY,
-  user_id    INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  expires_at TIMESTAMP,
+CREATE TABLE remember_me_tokens (
+  token_id    VARCHAR(64) PRIMARY KEY,
+  user_id     INT,
+  token_value VARCHAR(64),
+  expiration_time TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
@@ -246,4 +246,3 @@ INSERT INTO products (name, price, stock_quantity, category_id, description) VAL
   'The Kawai K-15 e PE piano with an impeccable finish and a full, voluminous sound. This is largely due to the K-15"s solid soundboard, which is unique in this price range. This is made of spruce wood, which has been carefully selected and tested. By using very hard tuning pins made of maple, nickel-plated tuning pegs and stable detents made of plywood, the models of the K-series are especially tuning stable and allow the pianist decades of playing pleasure. The Kawai K-15 e PE piano also features the extremely precise Millenium action. The hammer heads are pressed from 100% premium wool.'
   )
 ;
-

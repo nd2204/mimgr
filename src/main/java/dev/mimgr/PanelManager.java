@@ -28,9 +28,9 @@ public class PanelManager {
       "Error: No panel found with ID '" + id + "'";
 
     m_main_panel.remove(panel);
-    if (currentPanelId.equals(id)) {
-      currentPanelId = null;
-    }
+//    if (currentPanelId.equals(id)) {
+//      currentPanelId = null;
+//    }
     m_main_panel.revalidate();
     m_main_panel.repaint();
   }

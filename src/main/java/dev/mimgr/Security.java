@@ -3,6 +3,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.UUID;
 
 public class Security {
   public static String hash_string(String input) {
@@ -30,5 +31,16 @@ public class Security {
 
     sr.nextBytes(salt);
     return Base64.getEncoder().encodeToString(salt);
+  }
+
+  public static String generateToken() {
+    SecureRandom secureRandom = new SecureRandom();
+    byte[] randomBytes = new byte[24];
+    secureRandom.nextBytes(randomBytes);
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+  }
+
+  public static String generateSessionId() {
+    return UUID.randomUUID().toString();
   }
 }

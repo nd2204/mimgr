@@ -19,13 +19,11 @@ public class DBQueries {
   public static final String INSERT_IMAGE = "INSERT INTO images (image_url, image_name, image_caption) VALUES (?, ?, ?)";
   public static final String INSERT_SESSION = "INSERT INTO session (image_url, image_name, image_caption) VALUES (?, ?, ?)";
 
-
   public static final String SELECT_ALL_INSTRUMENTS = "SELECT * FROM products";
   public static final String SELECT_ALL_CATEGORIES = "SELECT category_id, category_name FROM categories WHERE category_name IS NOT NULL";
   public static final String SELECT_ALL_IMAGES = "SELECT * FROM images";
 
   private static Connection dbcon = DBConnection.get_instance().get_connection();
-
   /*
    * General db insert function
    * @param con Database connection

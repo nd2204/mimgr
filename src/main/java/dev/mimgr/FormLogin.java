@@ -202,28 +202,8 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
     this.setVisible(false);
   }
 
-  private boolean is_valid_credential(String username, String password) {
-    String salt;
-    ResultSet result = DBQueries.select_user(username);
-    try {
-      while (result.next()) {
-        salt = result.getString("salt");
-        if (Security.hash_string(password + salt).equals(result.getString("hash"))) {
-          return true;
-        }
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
-
   @Override
   public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == remember) {
-      JOptionPane.showMessageDialog(null, "Remembered");
-    }
-
     if (e.getSource() == show_password_button) {
       if (!isShowingPassword) {
         pf_password.setShowingPassword(true);
@@ -250,7 +230,7 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
         return;
       }
 
-      if (is_valid_credential(username, password)) {
+      if (LoginService.loginUser(username, password, remember.isSelected())) {
         Entry.removeLoginSignup();
         Entry.registerDashBoard(m_colors);
       } else {
@@ -280,7 +260,6 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
       this.login_button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
   }
-
 
   @Override
   public void insertUpdate(DocumentEvent e) {
