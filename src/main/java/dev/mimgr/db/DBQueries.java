@@ -9,162 +9,121 @@ import java.sql.SQLException;
 
 public class DBQueries {
   private static String sqlPath = "mimgrdb/init.sql";
-  public static final String INSERT_USER = "INSERT INTO users (username, hash, salt) VALUES (?, ?, ?)";
   public static final String SELECT_USER = "SELECT hash, salt FROM users WHERE username=?";
-  public static final String INSERT_INSTRUMENT = "INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES (?, ?, ?, ?, ?)";
-  public static final String SELECT_ALL_INTRUMENTS = "SELECT * FROM products";
-  public static final String SELECT_INTRUMENTS = "SELECT * FROM products where name LIKE ?";
-  public static final String SELECT_ALL_CATEGORIES = "SELECT category_id, category_name FROM categories WHERE category_name IS NOT NULL";
+  public static final String SELECT_INSTRUMENTS = "SELECT * FROM products where name LIKE ?";
   public static final String SELECT_ID_CATEGORY = "SELECT category_id FROM categories WHERE category_name=?";
-  public static final String SELECT_ALL_IMAGES = "SELECT * FROM images";
+  public static final String SELECT_SESSION = "SELECT * FROM sessions WHERE session_id = ?";
+
+  public static final String INSERT_INSTRUMENT = "INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES (?, ?, ?, ?, ?)";
+  public static final String INSERT_USER = "INSERT INTO users (username, hash, salt) VALUES (?, ?, ?)";
   public static final String INSERT_IMAGE = "INSERT INTO images (image_url, image_name, image_caption) VALUES (?, ?, ?)";
+  public static final String INSERT_SESSION = "INSERT INTO session (image_url, image_name, image_caption) VALUES (?, ?, ?)";
+
+
+  public static final String SELECT_ALL_INSTRUMENTS = "SELECT * FROM products";
+  public static final String SELECT_ALL_CATEGORIES = "SELECT category_id, category_name FROM categories WHERE category_name IS NOT NULL";
+  public static final String SELECT_ALL_IMAGES = "SELECT * FROM images";
 
   private static Connection dbcon = DBConnection.get_instance().get_connection();
 
-  public static void insert_user(String username, String hash, String salt) {
-    try {
-      PreparedStatement preparedStatement = dbcon.prepareStatement(INSERT_USER);
-      preparedStatement.setString(1, username);
-      preparedStatement.setString(2, hash);
-      preparedStatement.setString(3, salt);
-      int result = preparedStatement.executeUpdate();
-      System.out.println(result + " row(s) affected");
-      String generatedInsertSQL = String.format(
-          "INSERT INTO users (username, hash, salt) VALUES ('%s', '%s', '%s');",
-          username, hash, salt);
-
-      // Ghi câu lệnh SQL vào file init.sql
-      writeSQLToFile(sqlPath, generatedInsertSQL);
+  /*
+   * General db insert function
+   * @param con Database connection
+   * @return int
+   */
+  public static int update(Connection con, String stmt, Object... args) {
+    int result = 0;
+    try (PreparedStatement preparedStatement = con.prepareStatement(stmt)) {
+      for (int i = 1; i < args.length + 1; ++i) {
+        preparedStatement.setObject(i, args[i-1]);
+      }
+      result = preparedStatement.executeUpdate();
     } catch (SQLException e) {
       e.printStackTrace();
+    }
+    return result;
+  }
+
+  public static ResultSet select(Connection con, String stmt, Object... args) {
+    ResultSet resultSet = null;
+
+    try {
+      PreparedStatement preparedStatement = con.prepareStatement(stmt);
+      for (int i = 1; i < args.length + 1; ++i) {
+        preparedStatement.setObject(i, args[i-1]);
+      }
+      resultSet = preparedStatement.executeQuery();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return resultSet;
+  }
+
+  public static void insert_user(String username, String hash, String salt) {
+    int result = update(dbcon, INSERT_USER, username, hash, salt);
+    System.out.println(result + " row(s) affected");
+
+    // Ghi câu lệnh SQL vào file init.sql
+    if (result > 0) {
+      writeSQLToFile(sqlPath, String.format(
+        "INSERT INTO users (username, hash, salt) VALUES ('%s', '%s', '%s');",
+        username, hash, salt)
+      );
+    }
+  }
+
+  public static void insert_product(String name, Double price, String description, int stock_quantity, int category_id) {
+    int result = update(dbcon, INSERT_INSTRUMENT, name, price, description, stock_quantity, category_id);
+    System.out.println(result + " row(s) affected");
+
+    // Ghi câu lệnh SQL vào file init.sql
+    if (result > 0) {
+      writeSQLToFile(sqlPath, String.format(
+        "INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES ('%s', %.2f, '%s', %d, %d);",
+        name, price, description, stock_quantity, category_id)
+      );
+    }
+  }
+
+  public static void insert_image(String image_url, String image_name, String image_caption) {
+    image_name = image_name.substring(0, image_name.indexOf("."));
+    int result = update(dbcon, INSERT_IMAGE, image_url, image_name, image_caption);
+
+    // Ghi câu lệnh SQL vào file init.sql
+    if (result > 0) {
+      writeSQLToFile(sqlPath, String.format(
+        "INSERT INTO images (image_url, image_name, image_caption) VALUES ('%s', '%s', '%s');",
+        image_url, image_name, image_caption)
+      );
     }
   }
 
   public static ResultSet select_user(String username) {
-    ResultSet resultSet = null;
-
-    try {
-      PreparedStatement preparedStatement = dbcon.prepareStatement(SELECT_USER);
-      preparedStatement.setString(1, username);
-      resultSet = preparedStatement.executeQuery();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
-    return resultSet;
-  }
-
-  public static void insert_product(String name, Double price, String description, int stock_quantity,
-      int category_id) {
-    try {
-      PreparedStatement preparedStatement = dbcon.prepareStatement(INSERT_INSTRUMENT);
-      preparedStatement.setString(1, name);
-      preparedStatement.setDouble(2, price);
-      preparedStatement.setString(3, description);
-      preparedStatement.setInt(4, stock_quantity);
-      preparedStatement.setInt(5, category_id);
-
-      int result = preparedStatement.executeUpdate();
-      System.out.println(result + " row(s) affected");
-      String generatedInsertSQL = String.format(
-          "INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES ('%s', %.2f, '%s', %d, %d);",
-          name, price, description, stock_quantity, category_id);
-
-      // Ghi câu lệnh SQL vào file init.sql
-      writeSQLToFile(sqlPath, generatedInsertSQL);
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
+    return select(dbcon, SELECT_USER, username);
   }
 
   public static ResultSet select_all_intruments() {
-    ResultSet resultSet = null;
-    try {
-      PreparedStatement preparedStatement = dbcon.prepareStatement(SELECT_ALL_INTRUMENTS);
-      resultSet = preparedStatement.executeQuery();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
-    return resultSet;
+    return select(dbcon, SELECT_ALL_INSTRUMENTS);
   }
 
   public static ResultSet select_intruments(String name) {
-    ResultSet resultSet = null;
-
-    try {
-      PreparedStatement preparedStatement = dbcon.prepareStatement(SELECT_INTRUMENTS);
-      preparedStatement.setString(1, '%' + name + '%');
-      resultSet = preparedStatement.executeQuery();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
-    return resultSet;
+    return select(dbcon, SELECT_INSTRUMENTS, '%' + name + '%');
   }
 
   public static ResultSet select_all_categories() {
-    ResultSet resultSet = null;
-
-    try {
-      PreparedStatement preparedStatement = dbcon.prepareStatement(SELECT_ALL_CATEGORIES);
-      resultSet = preparedStatement.executeQuery();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
-    return resultSet;
+    return select(dbcon, SELECT_ALL_CATEGORIES);
   }
 
   public static ResultSet select_id_category(String category_name) {
-    ResultSet resultSet = null;
-
-    try {
-      PreparedStatement preparedStatement = dbcon.prepareStatement(SELECT_ID_CATEGORY);
-      preparedStatement.setString(1, category_name);
-      resultSet = preparedStatement.executeQuery();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
-    return resultSet;
-  }
-
-  public static void insert_image(String image_url, String image_name, String image_caption) {
-    try {
-      image_name = image_name.substring(0, image_name.indexOf("."));
-      PreparedStatement preparedStatement = dbcon.prepareStatement(INSERT_IMAGE);
-      preparedStatement.setString(1, image_url);
-      preparedStatement.setString(2, image_name);
-      preparedStatement.setString(3, image_caption);
-
-      int result = preparedStatement.executeUpdate();
-      System.out.println(result + " row(s) affected");
-      String generatedInsertSQL = String.format(
-          "INSERT INTO images (image_url, image_name, image_caption) VALUES ('%s', '%s', '%s');",
-          image_url, image_name, image_caption);
-
-      // Ghi câu lệnh SQL vào file init.sql
-      writeSQLToFile(sqlPath, generatedInsertSQL);
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
+    return select(dbcon, SELECT_ID_CATEGORY, category_name);
   }
 
   public static ResultSet select_all_images() {
-    ResultSet resultSet = null;
-
-    try {
-      PreparedStatement preparedStatement = dbcon.prepareStatement(SELECT_ALL_IMAGES);
-      resultSet = preparedStatement.executeQuery();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
-    return resultSet;
+    return select(dbcon, SELECT_ALL_IMAGES);
   }
 
-  public static void writeSQLToFile(String filePath, String sql) {
+  private static void writeSQLToFile(String filePath, String sql) {
     try (FileWriter fileWriter = new FileWriter(filePath, true)) { // Mở tệp ở chế độ ghi nối tiếp (append)
       fileWriter.write(sql + "\n"); // Thêm câu lệnh SQL vào tệp
     } catch (IOException e) {

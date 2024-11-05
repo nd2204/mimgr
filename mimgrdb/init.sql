@@ -70,6 +70,13 @@ CREATE TABLE IF NOT EXISTS order_items (
   FOREIGN KEY (product_id) REFERENCES products(product_id)
 );
 
+CREATE TABLE IF NOT EXISTS sessions (
+  session_id VARCHAR(255) PRIMARY KEY,
+  user_id    INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
 
 -- Add root categories first
 INSERT INTO categories (category_id, category_name) VALUES 
@@ -114,7 +121,8 @@ INSERT INTO categories (category_name, parent_id) VALUES
   ('Accessories for Winds', 6), ('Music Books for Winds', 6),
 
   ('Headphones', 7), ('Cables', 7), ('Plugs & Adapters', 7), ('Stands', 7), ('Tuners', 7), ('Metronomes', 7), ('Switches & Buttons', 7),
-  ('Power Adapters & Supplies', 7), ('Cable Clamps, Gaffa Tape, etc.', 7);
+  ('Power Adapters & Supplies', 7), ('Cable Clamps, Gaffa Tape, etc.', 7)
+;
 
 INSERT INTO products (name, price, stock_quantity, category_id, description) VALUES
   (
@@ -237,3 +245,5 @@ INSERT INTO products (name, price, stock_quantity, category_id, description) VAL
   'MUSIC STORE E-Gitarren Zubehör Paket', 29.00, 10, 74,
   'The Kawai K-15 e PE piano with an impeccable finish and a full, voluminous sound. This is largely due to the K-15"s solid soundboard, which is unique in this price range. This is made of spruce wood, which has been carefully selected and tested. By using very hard tuning pins made of maple, nickel-plated tuning pegs and stable detents made of plywood, the models of the K-series are especially tuning stable and allow the pianist decades of playing pleasure. The Kawai K-15 e PE piano also features the extremely precise Millenium action. The hammer heads are pressed from 100% premium wool.'
   )
+;
+

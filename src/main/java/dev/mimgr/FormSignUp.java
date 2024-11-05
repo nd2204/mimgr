@@ -209,8 +209,7 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
   }
 
   private boolean valid_username(String username) {
-    ResultSet queryResult = DBQueries.select_user(username);
-    try {
+    try (ResultSet queryResult = DBQueries.select_user(username)) {
       if (queryResult.next()) {
         JOptionPane.showMessageDialog(null, "Tên người dùng đã tồn tại");
         return false;
