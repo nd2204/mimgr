@@ -42,6 +42,14 @@ class FormEditProduct extends JFrame {
   private int    m_width;
   private int    m_height;
 
+  public ArrayList<MButton> getEditSubmitButtons() {
+    return editSubmitButtons;
+  }
+
+  public ArrayList<MButton> getEditDeleteButtons() {
+    return editDeleteButtons;
+  }
+
   public FormEditProduct(ProductRecord pr) {
     productRecords = new ArrayList<>();
     productRecords.add(pr);
@@ -65,6 +73,8 @@ class FormEditProduct extends JFrame {
     m_aspect_ratio = 16.0f / 10.0f;
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
+    editSubmitButtons = new ArrayList<>();
+    editDeleteButtons = new ArrayList<>();
     mainPanel = new JPanel(new BorderLayout());
     mainPanel.setBackground(colors.m_bg_dim);
     currentUploadPanel = new JPanel();
@@ -183,9 +193,11 @@ class FormEditProduct extends JFrame {
         } else {
           c.insets = new Insets(padding_vertical, padding_horizontal, padding_vertical, padding_horizontal);
         }
-        new EditButtonListener(button, panel, pr);
+        EditButtonListener ebl = new EditButtonListener(button, panel, pr);
         this.add(button , c);
         c.gridy++;
+        editSubmitButtons.add(ebl.getEditSubmitButton());
+        editDeleteButtons.add(ebl.getEditDeleteButton());
       }
 
       sidebarPanel.setCurrentMenu(firstMenuBtn);
@@ -196,6 +208,14 @@ class FormEditProduct extends JFrame {
   }
 
   private class EditButtonListener implements ActionListener {
+    public MButton getEditSubmitButton() {
+      return this.btnSubmit;
+    }
+
+    public MButton getEditDeleteButton() {
+      return this.btnDelete;
+    }
+    
     public EditButtonListener(MButton sb, UploadPanel panel, ProductRecord pr) {
       this.btnDelete = panel.getDeleteComponent();
       this.btnSubmit = panel.getSubmitComponent();
@@ -209,18 +229,18 @@ class FormEditProduct extends JFrame {
       tfStock = panel.getStockComponent();
       cbCategory = panel.getCategoryComponent();
       product_id = pr.m_id;
-
+      
       TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();
       tfPrice.getDocument().addDocumentListener(textFieldListener);
       tfTitle.getDocument().addDocumentListener(textFieldListener);
       tfStock.getDocument().addDocumentListener(textFieldListener);
       taDescription.getDocument().addDocumentListener(textFieldListener);
-
+      
       tfTitle.setText(pr.m_name);
       tfStock.setText(String.valueOf(pr.m_stock_quantity));
       tfPrice.setText(String.valueOf(pr.m_price));
       taDescription.setText(pr.m_description);
-
+      cbCategory.setSelectedItem(get_category_name(pr.m_category_id));
       panel.getDeleteComponent().setText("Delete Product");
       panel.getLabelComponent().setVisible(false);
       panel.setProductRecord(pr);
@@ -238,8 +258,9 @@ class FormEditProduct extends JFrame {
     @Override
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == btnDelete) {
-        System.out.println("Exiting?");
         sidebarPanel.removeMenuButton(sidebarButton);
+        DBQueries.delete_product(product_id);
+        JOptionPane.showMessageDialog(null, "Success");
         return;
       }
 
@@ -255,8 +276,8 @@ class FormEditProduct extends JFrame {
           JOptionPane.showMessageDialog(null, "Not valid category name");
         }
         else {
-          JOptionPane.showMessageDialog(null, "Success");
           DBQueries.update_product(name, price, description, stock_quantity, category_id, product_id);
+          JOptionPane.showMessageDialog(null, "Success");
         }
         return;
       }
@@ -320,8 +341,24 @@ class FormEditProduct extends JFrame {
     return id_result;
   }
 
+  private String get_category_name(int category_id) {
+    ResultSet queryResult = DBQueries.select_name_category(category_id);
+    String name_result = "";
+    try {
+      while (queryResult.next()) {
+        name_result = queryResult.getString("category_name");
+      }
+      return name_result;
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return name_result;
+  }
+
   private SidebarPanel sidebarPanel;
   private JPanel currentUploadPanel, mainPanel;
   private ArrayList<ProductRecord> productRecords;
-
+  private ArrayList<MButton> editSubmitButtons;
+  private ArrayList<MButton> editDeleteButtons;
 }

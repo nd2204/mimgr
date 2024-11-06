@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
@@ -27,6 +26,10 @@ class FormAddProduct extends JFrame {
   private double m_aspect_ratio;
   private int    m_width;
   private int    m_height;
+
+  public MButton getAddProductSubmitButton() {
+    return this.btnSubmit;
+  }
 
   public FormAddProduct(ColorScheme colors) {
     this.colors = colors;
@@ -61,6 +64,7 @@ class FormAddProduct extends JFrame {
     tfStock = uploadPanel.getStockComponent();
     tfStock.getDocument().addDocumentListener(textFieldListener);
     taDescription = uploadPanel.getDescriptionComponent();
+    cbCategory = uploadPanel.getCategoryComponent();
     this.setLayout(new BorderLayout());
     this.setMinimumSize(new Dimension(854, 600));
     this.setTitle("Add Product");
@@ -94,8 +98,9 @@ class FormAddProduct extends JFrame {
           JOptionPane.showMessageDialog(null, "Not valid category name");
         }
         else {
-          JOptionPane.showMessageDialog(null, "Success");
           DBQueries.insert_product(name, price, description, stock_quantity, category_id);
+          JOptionPane.showMessageDialog(null, "Success");
+          FormAddProduct.this.dispose();
         }
         return;
       }

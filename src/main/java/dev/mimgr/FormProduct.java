@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
@@ -81,10 +81,10 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
       contentContainer.setLayout(new GridBagLayout());
       contentContainer.setBackground(colors.m_bg_0);
 
-      String[] items = { 
-        "Bulk actions",
-        "Delete Permanently",
-        "Edit"
+      String[] items = {
+          "Bulk actions",
+          "Delete Permanently",
+          "Edit"
       };
 
       this.cbBulkAction = new MComboBox<>(items, colors);
@@ -239,11 +239,17 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
             // Retrieve data for the selected row
             FormEditProduct frame = new FormEditProduct(productList.get(row));
             frame.setVisible(true);
-
+            for (MButton btn : frame.getEditSubmitButtons()) {
+              refreshAfterChange(btn);
+            }
+            for (MButton btn : frame.getEditDeleteButtons()) {
+              refreshAfterChange(btn);
+            }
             // // Display the data in a dialog
             // JOptionPane.showMessageDialog(null,
-            //     "Details:\nName: " + pr.m_name + "\nQuantity: " + pr.m_stock_quantity + "\nPrice: " + pr.m_price + "\nDescription: " + pr.m_description,
-            //     "Intrument Details", JOptionPane.INFORMATION_MESSAGE);
+            // "Details:\nName: " + pr.m_name + "\nQuantity: " + pr.m_stock_quantity +
+            // "\nPrice: " + pr.m_price + "\nDescription: " + pr.m_description,
+            // "Intrument Details", JOptionPane.INFORMATION_MESSAGE);
           }
         }
       }
@@ -253,8 +259,9 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == this.btnAddProduct) {
-      JFrame jFrame = new FormAddProduct(colors);
-      jFrame.setVisible(true);
+      FormAddProduct jFrameAddProduct = new FormAddProduct(colors);
+      jFrameAddProduct.setVisible(true);
+      refreshAfterChange(jFrameAddProduct.getAddProductSubmitButton());
     }
 
     if (e.getSource() == this.btnApplyBulkAction) {
@@ -263,17 +270,24 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
 
         FormEditProduct frame = new FormEditProduct(selectedProducts.values());
         frame.setVisible(true);
+        for (MButton btn : frame.getEditSubmitButtons()) {
+          refreshAfterChange(btn);
+        }
+        for (MButton btn : frame.getEditDeleteButtons()) {
+          refreshAfterChange(btn);
+        }
       }
 
       if (((String) this.cbBulkAction.getSelectedItem()).equals("Delete Permanently")) {
         int response = JOptionPane.showConfirmDialog(
-          this,
-          "Delete " + selectedProducts.size() + " items?",
-          "Confirm Delete",
-          JOptionPane.YES_NO_OPTION);
+            this,
+            "Delete " + selectedProducts.size() + " items?",
+            "Confirm Delete",
+            JOptionPane.YES_NO_OPTION);
 
         if (response == JOptionPane.YES_OPTION) {
           // TODO Delete
+          delete_product(model, selectedProducts.values());
         }
       }
     }
@@ -300,17 +314,17 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     int column = e.getColumn();
     switch (e.getType()) {
       case TableModelEvent.UPDATE:
-      Object newValue = model.getValueAt(row, column);
-      if (column == 0) {
-        if (newValue instanceof Boolean) {
-          if ((Boolean) newValue) {
-            selectedProducts.put(row, productList.get(row));
-          } else {
-            selectedProducts.remove(row);
+        Object newValue = model.getValueAt(row, column);
+        if (column == 0) {
+          if (newValue instanceof Boolean) {
+            if ((Boolean) newValue) {
+              selectedProducts.put(row, productList.get(row));
+            } else {
+              selectedProducts.remove(row);
+            }
           }
         }
-      }
-      break;
+        break;
     }
   }
 
@@ -328,11 +342,11 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
         ProductRecord pr = new ProductRecord(queryResult);
         productList.add(pr);
         model.addRow(new Object[] {
-          Boolean.FALSE,
-          pr.m_name,
-          pr.m_price,
-          pr.m_stock_quantity,
-          pr.m_description
+            Boolean.FALSE,
+            pr.m_name,
+            pr.m_price,
+            pr.m_stock_quantity,
+            pr.m_description
         });
       }
     } catch (SQLException e) {
@@ -349,6 +363,27 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     } else {
       get_all_intruments(model);
     }
+  }
+
+  private void delete_product(DefaultTableModel model, Iterable<ProductRecord> prList) {
+    for (ProductRecord pr : prList) {
+      DBQueries.delete_product(pr.m_id);
+    }
+    model.setRowCount(0);
+    if (!productList.isEmpty()) {
+      productList = new ArrayList<>();
+    }
+    get_all_intruments(model);
+  }
+
+  private void refreshAfterChange(MButton btn) {
+    btn.addActionListener((actionEvent) -> {
+      new Thread(() -> {
+        SwingUtilities.invokeLater(() -> {
+          get_all_intruments(model);
+        });
+      }).start();
+    });
   }
 
   private TableView tv = new TableView();
