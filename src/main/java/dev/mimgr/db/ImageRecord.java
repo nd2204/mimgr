@@ -83,6 +83,6 @@ public class ImageRecord {
     } catch (Exception e) {
       // TODO: handle exception
     }
-    return "";
+    return "N/A";
   }
 }

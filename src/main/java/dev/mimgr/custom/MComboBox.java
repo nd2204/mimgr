@@ -1,17 +1,11 @@
 package dev.mimgr.custom;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.awt.color.ColorSpace;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
@@ -19,13 +13,11 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
-import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.ComboBoxUI;
@@ -49,6 +41,7 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
     comboBoxTextField.setBackground(colors.m_bg_dim);
     comboBoxTextField.setForeground(colors.m_grey_2);
     comboBoxTextField.setCaretColor(colors.m_grey_2);
+    comboBoxTextField.setFont(nunito_bold_14);
     comboBoxTextField.setBorder(BorderFactory.createCompoundBorder(
       new LineBorder(colors.m_bg_5, 1),
       new EmptyBorder(0, 10, 0, 10)
@@ -108,7 +101,7 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
     public MComboBoxRenderer() {
       super();
       setOpaque(true);
-      setFont(FontManager.getFont("NunitoBold", 14f));
+      setFont(nunito_bold_14);
     }
 
     @Override
@@ -181,6 +174,10 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
       new EmptyBorder(0, 10, 0, 10)
     ));
   }
+
+  private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
+  private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
+  private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
 
   private ColorScheme colors = ColorTheme.get_currentScheme();
   private ComboBoxUI comboBoxUI = new MComboBoxUI();

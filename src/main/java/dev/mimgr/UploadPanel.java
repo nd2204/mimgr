@@ -163,7 +163,6 @@ public class UploadPanel extends JPanel {
   }
 
   public void setup_form_style() {
-
     // ========================= Fields =========================
     Consumer<MTextField> setup_common_textfield = (tf) -> {
       tf.setInputForeground(colors.m_fg_0);
@@ -196,6 +195,7 @@ public class UploadPanel extends JPanel {
 
     String[] options = get_category_names();
     cbCategory = new MComboBox<>(options, colors);
+    cbCategory.getEditor().getEditorComponent().setFont(nunito_bold_14);
 
     // ========================= Buttons =========================
     this.btnSubmit = new MButton("Submit");
@@ -216,7 +216,6 @@ public class UploadPanel extends JPanel {
     this.btnDelete.setHoverBackgroundColor(colors.m_red);
     this.btnDelete.setBorderWidth(2);
   }
-
 
   private String[] get_category_names() {
     ResultSet queryResult = DBQueries.select_all_categories();
@@ -243,16 +242,29 @@ public class UploadPanel extends JPanel {
       droppedItemsPanel = new DropContainerPanel(colors);
       droppedItemsPanel.addActionListener(this);
 
-      selectFilesButton.setBackground(colors.m_bg_dim);
-      selectFilesButton.setBorderColor(colors.m_bg_3);
-      selectFilesButton.setHoverBorderColor(colors.m_accent);
-      selectFilesButton.setClickBackgroundColor(colors.m_bg_1);
-      selectFilesButton.setForeground(colors.m_accent);
-      selectFilesButton.setHorizontalAlignment(SwingConstants.CENTER);
-      selectFilesButton.addActionListener(this);
+      btnSelectFiles.setFont(nunito_bold_14);
+      btnSelectFiles.setBackground(colors.m_bg_dim);
+      btnSelectFiles.setBorderColor(colors.m_bg_3);
+      btnSelectFiles.setHoverBorderColor(colors.m_accent);
+      btnSelectFiles.setClickBackgroundColor(colors.m_bg_1);
+      btnSelectFiles.setForeground(colors.m_accent);
+      btnSelectFiles.setHorizontalAlignment(SwingConstants.CENTER);
+      btnSelectFiles.addActionListener(this);
+
+      btnSelectFromMedia = new MButton("Select From Media");
+      btnSelectFromMedia.setFont(nunito_bold_14);
+      btnSelectFromMedia.setBackground(colors.m_bg_dim);
+      btnSelectFromMedia.setBorderColor(colors.m_bg_3);
+      btnSelectFromMedia.setHoverBorderColor(colors.m_accent);
+      btnSelectFromMedia.setClickBackgroundColor(colors.m_bg_1);
+      btnSelectFromMedia.setForeground(colors.m_accent);
+      btnSelectFromMedia.setHorizontalAlignment(SwingConstants.CENTER);
+      btnSelectFromMedia.addActionListener(this);
 
       lblMedia.setFont(nunito_bold_16);
       lblMedia.setForeground(colors.m_fg_0);
+      lblMedia.setHorizontalAlignment(SwingConstants.LEFT);
+      lblMedia.setVerticalAlignment(SwingConstants.CENTER);
 
       GridBagConstraints gbc = new GridBagConstraints();
 
@@ -260,10 +272,18 @@ public class UploadPanel extends JPanel {
       gbc.anchor = GridBagConstraints.FIRST_LINE_START;
       gbc.gridx = 0;
       gbc.gridy = 0;
+      gbc.fill = GridBagConstraints.BOTH;
       this.add(lblMedia, gbc);
 
+      gbc.insets = new Insets(20, 5, 5, 20);
+      gbc.anchor = GridBagConstraints.FIRST_LINE_END;
+      gbc.gridx = 1;
+      gbc.gridy = 0;
+      gbc.fill = GridBagConstraints.NONE;
+      this.add(btnSelectFromMedia, gbc);
+
       DropPanel dropArea = new DropPanel(colors);
-    {
+      {
         GridBagConstraints gc = new GridBagConstraints();
         dropArea.setLayout(new GridBagLayout());
         dropArea.addTransferListener(this);
@@ -291,7 +311,7 @@ public class UploadPanel extends JPanel {
         gc.insets = new Insets(0, 0, 0, 0);
         gc.fill = GridBagConstraints.NONE;
         gc.gridy = 2;
-        dropArea.add(selectFilesButton, gc);
+        dropArea.add(btnSelectFiles, gc);
       }
 
       gbc.insets = new Insets(5, 20, 20, 20);
@@ -299,6 +319,7 @@ public class UploadPanel extends JPanel {
       gbc.gridy = 1;
       gbc.weightx = 1.0;
       gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.gridwidth = 2;
       this.add(dropArea, gbc);
 
       gbc.insets = new Insets(0, 20, 20, 20);
@@ -306,7 +327,7 @@ public class UploadPanel extends JPanel {
       gbc.gridy = 2;
       gbc.weightx = 0.0;
       gbc.weighty = 0.0;
-      gbc.gridwidth = GridBagConstraints.REMAINDER;
+      gbc.gridwidth = 2;
       gbc.fill = GridBagConstraints.NONE;
       JScrollPane sp = droppedItemsPanel.getScrollPaneComponent();
       sp.setMaximumSize(new Dimension(660, Integer.MAX_VALUE));
@@ -317,7 +338,7 @@ public class UploadPanel extends JPanel {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (e.getSource() == this.selectFilesButton) {
+      if (e.getSource() == this.btnSelectFiles) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         fileChooser.setDialogTitle("Select Files");
@@ -380,7 +401,8 @@ public class UploadPanel extends JPanel {
     }
 
     private JLabel lblMedia = new JLabel("Media");
-    private MButton selectFilesButton = new MButton("Select Files");
+    private MButton btnSelectFiles = new MButton("Select Files");
+    private MButton btnSelectFromMedia = new MButton("Select Files");
     private DropContainerPanel droppedItemsPanel;
   }
 
