@@ -222,7 +222,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     tv.add_column(table, "Description", TableView.setup_default_column());
     tv.load_column(table, model);
     model.addTableModelListener(this);
-    // get_all_intruments(model);
+    get_all_intruments(model);
 
     scrollPane = new JScrollPane(table);
     table.setup_scrollbar(scrollPane);

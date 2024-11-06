@@ -1,11 +1,14 @@
 package dev.mimgr;
 
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,13 +17,19 @@ import java.util.Arrays;
 import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import dev.mimgr.custom.MButton;
+import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MScrollPane;
+import dev.mimgr.custom.MTextArea;
+import dev.mimgr.custom.MTextField;
 import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.ColorTheme;
@@ -56,7 +65,6 @@ class FormEditProduct extends JFrame {
     m_aspect_ratio = 16.0f / 10.0f;
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
-
     mainPanel = new JPanel(new BorderLayout());
     mainPanel.setBackground(colors.m_bg_dim);
     currentUploadPanel = new JPanel();
@@ -129,12 +137,6 @@ class FormEditProduct extends JFrame {
 
   private UploadPanel createProductEditPanel(ProductRecord pr) {
     UploadPanel uploadPanel = new UploadPanel(colors);
-    uploadPanel.getTitleComponent().setText(pr.m_name);
-    uploadPanel.getDescriptionComponent().setText(pr.m_description);
-    uploadPanel.getStockComponent().setText(String.valueOf(pr.m_stock_quantity));
-    uploadPanel.getPriceComponent().setText(String.valueOf(pr.m_price));
-    uploadPanel.getDeleteComponent().setText("Delete Product");
-    uploadPanel.getLabelComponent().setVisible(false);
     return uploadPanel;
   }
 
@@ -167,7 +169,7 @@ class FormEditProduct extends JFrame {
       c.anchor = GridBagConstraints.FIRST_LINE_START;
       c.fill = GridBagConstraints.HORIZONTAL;
 
-      JPanel panel;
+      UploadPanel panel;
       MButton firstMenuBtn = null;
       for (ProductRecord pr : productRecords) {
         panel = createProductEditPanel(pr);
@@ -181,6 +183,7 @@ class FormEditProduct extends JFrame {
         } else {
           c.insets = new Insets(padding_vertical, padding_horizontal, padding_vertical, padding_horizontal);
         }
+        new EditButtonListener(button, panel, pr);
         this.add(button , c);
         c.gridy++;
       }
@@ -192,7 +195,133 @@ class FormEditProduct extends JFrame {
     }
   }
 
+  private class EditButtonListener implements ActionListener {
+    public EditButtonListener(MButton sb, UploadPanel panel, ProductRecord pr) {
+      this.btnDelete = panel.getDeleteComponent();
+      this.btnSubmit = panel.getSubmitComponent();
+      this.sidebarButton = sb;
+      this.panel = panel;
+
+
+      tfTitle = panel.getTitleComponent();
+      tfPrice = panel.getPriceComponent();
+      taDescription = panel.getDescriptionComponent();
+      tfStock = panel.getStockComponent();
+      cbCategory = panel.getCategoryComponent();
+      product_id = pr.m_id;
+
+      TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();
+      tfPrice.getDocument().addDocumentListener(textFieldListener);
+      tfTitle.getDocument().addDocumentListener(textFieldListener);
+      tfStock.getDocument().addDocumentListener(textFieldListener);
+      taDescription.getDocument().addDocumentListener(textFieldListener);
+
+      tfTitle.setText(pr.m_name);
+      tfStock.setText(String.valueOf(pr.m_stock_quantity));
+      tfPrice.setText(String.valueOf(pr.m_price));
+      taDescription.setText(pr.m_description);
+
+      panel.getDeleteComponent().setText("Delete Product");
+      panel.getLabelComponent().setVisible(false);
+      panel.setProductRecord(pr);
+
+      Init();
+    }
+
+    private void Init() {
+      btnSubmit = panel.getSubmitComponent();
+      btnSubmit.addActionListener(this);
+      btnDelete = panel.getDeleteComponent();
+      btnDelete.addActionListener(this);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      if (e.getSource() == btnDelete) {
+        System.out.println("Exiting?");
+        sidebarPanel.removeMenuButton(sidebarButton);
+        return;
+      }
+
+      if (e.getSource() == btnSubmit) {
+        String name = tfTitle.getTextString();
+        double price = Double.parseDouble(tfPrice.getTextString());
+        String description = taDescription.getTextString();
+        int stock_quantity = Integer.parseInt(tfStock.getTextString());
+        int category_id = get_category_id((String) cbCategory.getSelectedItem());
+        
+        System.out.println(category_id);
+        if (category_id == 0) {
+          JOptionPane.showMessageDialog(null, "Not valid category name");
+        }
+        else {
+          JOptionPane.showMessageDialog(null, "Success");
+          DBQueries.update_product(name, price, description, stock_quantity, category_id, product_id);
+        }
+        return;
+      }
+    }
+
+    private class TextFieldDocumentListener implements DocumentListener {
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+      checkFields();
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+      checkFields();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+      checkFields();
+    }
+
+    private void checkFields() {
+      if (!tfTitle.getText().isEmpty() && !tfPrice.getText().isEmpty() && !tfStock.getText().isEmpty()) {
+        btnSubmit.setBackground(colors.m_blue);
+        btnSubmit.setBorderColor(colors.m_blue);
+        btnSubmit.setForeground(colors.m_fg_1);
+        btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnSubmit.setEnabled(true);
+      } else {
+        btnSubmit.setEnabled(false);
+        btnSubmit.setBackground(colors.m_bg_4);
+        btnSubmit.setBorderColor(colors.m_bg_4);
+        btnSubmit.setForeground(colors.m_grey_1);
+        btnSubmit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+      }
+    }
+  }
+
+    MButton sidebarButton, btnSubmit, btnDelete;
+    private UploadPanel panel;
+    private MTextArea taDescription;
+    private MTextField tfTitle;
+    private MTextField tfPrice;
+    private MTextField tfStock;
+    int product_id;
+    private MComboBox<String> cbCategory;
+  }
+
+  private int get_category_id(String category_name) {
+    ResultSet queryResult = DBQueries.select_id_category(category_name);
+    int id_result = 0;
+    try {
+      while (queryResult.next()) {
+        id_result = queryResult.getInt("category_id");
+      }
+      return id_result;
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return id_result;
+  }
+
   private SidebarPanel sidebarPanel;
   private JPanel currentUploadPanel, mainPanel;
   private ArrayList<ProductRecord> productRecords;
+
 }

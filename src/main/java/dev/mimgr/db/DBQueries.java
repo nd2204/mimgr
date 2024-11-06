@@ -12,16 +12,18 @@ public class DBQueries {
   public static final String SELECT_USER = "SELECT hash, salt FROM users WHERE username=?";
   public static final String SELECT_INSTRUMENTS = "SELECT * FROM products where name LIKE ?";
   public static final String SELECT_ID_CATEGORY = "SELECT category_id FROM categories WHERE category_name=?";
+  public static final String SELECT_NAME_CATEGORY = "SELECT category_name FROM categories WHERE category_id=?";
   public static final String SELECT_SESSION = "SELECT * FROM sessions WHERE session_id = ?";
 
   public static final String INSERT_INSTRUMENT = "INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES (?, ?, ?, ?, ?)";
   public static final String INSERT_USER = "INSERT INTO users (username, hash, salt) VALUES (?, ?, ?)";
-  public static final String INSERT_IMAGE = "INSERT INTO images (image_url, image_name, image_caption) VALUES (?, ?, ?)";
+  public static final String INSERT_IMAGE = "INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES (?, ?, ?, ?)";
   public static final String INSERT_SESSION = "INSERT INTO session (image_url, image_name, image_caption) VALUES (?, ?, ?)";
 
   public static final String SELECT_ALL_INSTRUMENTS = "SELECT * FROM products";
   public static final String SELECT_ALL_CATEGORIES = "SELECT category_id, category_name FROM categories WHERE category_name IS NOT NULL";
   public static final String SELECT_ALL_IMAGES = "SELECT * FROM images";
+  
 
   public static final String UPDATE_INTRUMENT = "UPDATE products SET name=?, price=?, description=?, stock_quantity=?, category_id=? WHERE product_id=?";
   
@@ -89,9 +91,9 @@ public class DBQueries {
     }
   }
 
-  public static void insert_image(String image_url, String image_name, String image_caption) {
+  public static void insert_image(String image_url, String image_name, String image_caption, int author) {
     image_name = image_name.substring(0, image_name.indexOf("."));
-    int result = update(dbcon, INSERT_IMAGE, image_url, image_name, image_caption);
+    int result = update(dbcon, INSERT_IMAGE, image_url, image_name, image_caption, author);
 
     // Ghi câu lệnh SQL vào file init.sql
     if (result > 0) {
@@ -120,6 +122,10 @@ public class DBQueries {
 
   public static ResultSet select_id_category(String category_name) {
     return select(dbcon, SELECT_ID_CATEGORY, category_name);
+  }
+
+  public static ResultSet select_name_category(int category_id) {
+    return select(dbcon, SELECT_NAME_CATEGORY, category_id);
   }
 
   public static ResultSet select_all_images() {

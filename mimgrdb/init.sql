@@ -246,4 +246,6 @@ INSERT INTO products (name, price, stock_quantity, category_id, description) VAL
   'The Kawai K-15 e PE piano with an impeccable finish and a full, voluminous sound. This is largely due to the K-15"s solid soundboard, which is unique in this price range. This is made of spruce wood, which has been carefully selected and tested. By using very hard tuning pins made of maple, nickel-plated tuning pegs and stable detents made of plywood, the models of the K-series are especially tuning stable and allow the pianist decades of playing pleasure. The Kawai K-15 e PE piano also features the extremely precise Millenium action. The hammer heads are pressed from 100% premium wool.'
   )
 ;
+
 INSERT INTO users (username, hash, salt) VALUES ('ikienkinzero', 'bc85bbcceedd99b2b7713b2976046b099fb3649d029633803bdfc71c35603e9a', 'rduAoV20DQsHQtQrD0p3SQ==');
+INSERT INTO users (username, hash, salt) VALUES ('nd2204', '4a6381563f67d178ef73a2ac4f4119978d2835dfd8f1ec8f67f78460618d93ae', '9NOV6F3hYrOS0HeanJMuDA==');

@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 
 import javax.swing.Icon;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import dev.mimgr.custom.MButton;
@@ -127,10 +126,11 @@ public class SidebarPanel extends RoundedPanel implements ActionListener {
     button.setHoverBackgroundColor(colors.m_bg_1);
   }
 
-
   public void removeMenuButton(MButton button) {
     this.contentPanel.remove(buttonToPanel.get(button));
-    this.remove(button);
+    button.setVisible(false);
+    revalidate();
+    repaint();
   }
 
   public MButton[] getAllMenuButtons() {

@@ -35,6 +35,7 @@ import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
+import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
@@ -105,14 +106,14 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     this.add(dropPanel, c);
 
     // Content
-  {
+    {
       GridBagConstraints cc = new GridBagConstraints();
       contentContainer.setLayout(new GridBagLayout());
       contentContainer.setBackground(colors.m_bg_0);
 
-      String[] cbBulkAction = { 
-        "Bulk actions",
-        "Delete Permanently"
+      String[] cbBulkAction = {
+          "Bulk actions",
+          "Delete Permanently"
       };
 
       this.bulkAction = new MComboBox<>(cbBulkAction, colors);
@@ -213,7 +214,8 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     this.applyBulkAction.setHoverForegroundColor(colors.m_blue);
     this.applyBulkAction.setHoverBorderColor(colors.m_blue);
     this.applyBulkAction.setBorderRadius(0);
-    this.applyBulkAction.addActionListener(this);;
+    this.applyBulkAction.addActionListener(this);
+    ;
   }
 
   private void setup_table() {
@@ -238,9 +240,9 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
         return column == 0;
       }
     };
-    
+
     table.setModel(model);
-    
+
     tv.add_column(table, "", TableView.setup_checkbox_column(colors));
     tv.add_column(table, "", TableView.setup_image_column(colors));
     tv.add_column(table, "Image name", TableView.setup_default_column());
@@ -249,11 +251,10 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     tv.add_column(table, "Author", TableView.setup_default_column());
     tv.add_column(table, "Caption", TableView.setup_default_column());
     tv.load_column(table, model);
-    
+
     model.addTableModelListener(this);
     get_all_images(model);
   }
-
 
   @Override
   public void actionPerformed(ActionEvent e) {
@@ -270,7 +271,8 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
       fileChooser.setDialogTitle("Select Files");
       fileChooser.setMultiSelectionEnabled(true);
-      fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "gif"));
+      fileChooser.setFileFilter(
+          new javax.swing.filechooser.FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "gif"));
 
       // Show the file chooser dialog and wait for user action
       int userSelection = fileChooser.showOpenDialog(null);
@@ -295,7 +297,10 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
         if (obj instanceof File file) {
           Path newFilePath = rm.moveStagedFileToUploadDir(file);
           System.out.println(rm.getProjectPath().relativize(newFilePath));
-          DBQueries.insert_image(String.valueOf(rm.getProjectPath().relativize(newFilePath)).replace("\\", "/"), file.getName(), "");
+          DBQueries.insert_image(
+            String.valueOf(rm.getProjectPath().relativize(newFilePath)).replace("\\", "/"),
+            file.getName(), "", SessionManager.getCurrentUser().m_id
+          );
           get_all_images(model);
           dropPanel.setVisible(false);
         }
@@ -310,8 +315,8 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       System.out.println(((String) this.bulkAction.getSelectedItem()));
       // if (((String) this.bulkAction.getSelectedItem()).equals("Edit")) {
 
-      //   FormEditProduct frame = new FormEditProduct(selectedImages.values());
-      //   frame.setVisible(true);
+      // FormEditProduct frame = new FormEditProduct(selectedImages.values());
+      // frame.setVisible(true);
       // }
       if (((String) this.bulkAction.getSelectedItem()).equals("Delete Permanently")) {
         if (!selectedImages.isEmpty()) {
@@ -372,6 +377,8 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
   private void delete_image(DefaultTableModel model, Iterable<ImageRecord> prList) {
     for (ImageRecord i : prList) {
       DBQueries.delete_image(i.m_id);
+      File file = new File(i.m_url);
+      file.delete();
     }
     model.setRowCount(0);
     if (!imageList.isEmpty()) {
@@ -427,16 +434,16 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     }
     try {
       while (queryResult.next()) {
-        ImageRecord pr = new ImageRecord(queryResult);
-        imageList.add(pr);
+        ImageRecord ir = new ImageRecord(queryResult);
+        imageList.add(ir);
         model.addRow(new Object[] {
             Boolean.FALSE,
-            this.emptyImageIcon = IconManager.loadIcon(Paths.get(pr.m_url).toAbsolutePath().toFile()),
-            pr.m_name,
-            pr.m_url.substring(pr.m_url.lastIndexOf("/") + 1),
-            pr.m_created_at,
-            pr.m_author,
-            pr.m_caption
+            this.emptyImageIcon = IconManager.loadIcon(Paths.get(ir.m_url).toAbsolutePath().toFile()),
+            ir.m_name,
+            ir.m_url.substring(ir.m_url.lastIndexOf("/") + 1),
+            ir.m_created_at,
+            ImageRecord.getImageAuthor(DBConnection.get_instance().get_connection(), ir),
+            ir.m_caption
         });
       }
     } catch (SQLException e) {
@@ -445,12 +452,12 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     }
   }
 
+
   private TableView tv = new TableView();
   private Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
   private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
-
 
   private ColorScheme colors;
   private RoundedPanel contentContainer = new RoundedPanel();

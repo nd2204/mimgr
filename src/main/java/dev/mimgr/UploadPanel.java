@@ -1,7 +1,5 @@
 package dev.mimgr;
 
-import java.awt.BorderLayout;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -34,6 +32,7 @@ import dev.mimgr.custom.MTextArea;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.DBQueries;
+import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.MTransferListener;
 import dev.mimgr.utils.ResourceManager;
@@ -70,6 +69,33 @@ public class UploadPanel extends JPanel {
 
   public MButton getDeleteComponent() {
     return this.btnDelete;
+  }
+
+  public String getCategoryName(int category_id) {
+    return get_category_name(category_id);
+  }
+
+  public void setProductRecord(ProductRecord pr) {
+    this.product = pr;
+  }
+
+  public ProductRecord getProductRecord() {
+    return this.product;
+  }
+
+  private String get_category_name(int category_id) {
+    ResultSet queryResult = DBQueries.select_name_category(category_id);
+    String name_result = "";
+    try {
+      while (queryResult.next()) {
+        name_result = queryResult.getString("category_name");
+      }
+      return name_result;
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return name_result;
   }
 
   UploadPanel(ColorScheme colors) {
@@ -510,4 +536,5 @@ public class UploadPanel extends JPanel {
   private MTextArea taDescription;
   private MButton btnSubmit, btnDelete;
   private ColorScheme colors;
+  private ProductRecord product;
 }

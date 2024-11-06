@@ -73,4 +73,16 @@ public class ImageRecord {
     ir.m_name = ir.m_name.substring(0, ir.m_name.indexOf("."));
     return DBQueries.update(con, QUERY_INSERT, ir.m_url, ir.m_name, ir.m_caption, ir.m_author);
   }
+
+  public static String getImageAuthor(Connection con, ImageRecord ir) {
+    try (ResultSet rs = UserRecord.selectUserById(con, ir.m_author)) {
+      if (rs.next()) {
+        UserRecord ur = new UserRecord(rs);
+        return ur.m_username;
+      }
+    } catch (Exception e) {
+      // TODO: handle exception
+    }
+    return "";
+  }
 }
