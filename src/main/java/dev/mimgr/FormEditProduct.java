@@ -30,13 +30,13 @@ import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTextArea;
 import dev.mimgr.custom.MTextField;
-import dev.mimgr.db.DBQueries;
+import dev.mimgr.db.CategoryRecord;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 class FormEditProduct extends JFrame {
-  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_EVERFOREST);
+  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST);
 
   private double m_aspect_ratio;
   private int    m_width;
@@ -137,7 +137,7 @@ class FormEditProduct extends JFrame {
 
   public static void main(String arg[]) {
     try {
-      ResultSet rs = DBQueries.select_all_intruments();
+      ResultSet rs = ProductRecord.selectAll();
       if (!rs.next()) return;
       ProductRecord pr = new ProductRecord(rs);
       new FormEditProduct(pr);
@@ -259,7 +259,7 @@ class FormEditProduct extends JFrame {
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == btnDelete) {
         sidebarPanel.removeMenuButton(sidebarButton);
-        DBQueries.delete_product(product_id);
+        ProductRecord.delete(product_id);
         JOptionPane.showMessageDialog(null, "Success");
         return;
       }
@@ -276,7 +276,7 @@ class FormEditProduct extends JFrame {
           JOptionPane.showMessageDialog(null, "Not valid category name");
         }
         else {
-          DBQueries.update_product(name, price, description, stock_quantity, category_id, product_id);
+          ProductRecord.update(name, price, description, stock_quantity, category_id, product_id);
           JOptionPane.showMessageDialog(null, "Success");
         }
         return;
@@ -327,7 +327,7 @@ class FormEditProduct extends JFrame {
   }
 
   private int get_category_id(String category_name) {
-    ResultSet queryResult = DBQueries.select_id_category(category_name);
+    ResultSet queryResult = CategoryRecord.selectByName(category_name);
     int id_result = 0;
     try {
       while (queryResult.next()) {
@@ -342,7 +342,7 @@ class FormEditProduct extends JFrame {
   }
 
   private String get_category_name(int category_id) {
-    ResultSet queryResult = DBQueries.select_name_category(category_id);
+    ResultSet queryResult = CategoryRecord.selectByKey(category_id);
     String name_result = "";
     try {
       while (queryResult.next()) {

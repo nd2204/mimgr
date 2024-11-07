@@ -3,7 +3,6 @@ package dev.mimgr.custom;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -14,14 +13,11 @@ import java.awt.event.FocusEvent;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import dev.mimgr.IconManager;
-import dev.mimgr.theme.ColorTheme;
-import dev.mimgr.theme.ColorTheme.theme;
-import dev.mimgr.theme.builtin.ColorScheme;
+
 
 public class MTextField extends JTextField implements FocusListener { 
   // Constructor with default settings

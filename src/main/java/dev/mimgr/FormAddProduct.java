@@ -18,7 +18,8 @@ import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTextArea;
 import dev.mimgr.custom.MTextField;
-import dev.mimgr.db.DBQueries;
+import dev.mimgr.db.CategoryRecord;
+import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -98,7 +99,7 @@ class FormAddProduct extends JFrame {
           JOptionPane.showMessageDialog(null, "Not valid category name");
         }
         else {
-          DBQueries.insert_product(name, price, description, stock_quantity, category_id);
+          ProductRecord.insert(name, price, description, stock_quantity, category_id);
           JOptionPane.showMessageDialog(null, "Success");
           FormAddProduct.this.dispose();
         }
@@ -141,7 +142,7 @@ class FormAddProduct extends JFrame {
   }
 
   private int get_category_id(String category_name) {
-    ResultSet queryResult = DBQueries.select_id_category(category_name);
+    ResultSet queryResult = CategoryRecord.selectByName(category_name);
     int id_result = 0;
     try {
       while (queryResult.next()) {
@@ -157,7 +158,7 @@ class FormAddProduct extends JFrame {
 
 
   public static void main(String arg[]) {
-    ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_EVERFOREST);
+    ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST);
     new FormAddProduct(colors);
   }
 

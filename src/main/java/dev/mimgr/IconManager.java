@@ -89,7 +89,7 @@ public class IconManager {
       var image = ImageIO.read(file);
       return new ImageIcon(image);
     } catch (IOException e) {
-      System.err.println("Error loading icon: " + e.getMessage());
+      e.printStackTrace();
       return null; // Return null if the image couldn't be loaded
     }
   }

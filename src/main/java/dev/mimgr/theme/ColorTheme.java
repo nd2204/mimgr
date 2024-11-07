@@ -5,20 +5,17 @@ import dev.mimgr.theme.builtin.*;
 public class ColorTheme {
   private static ColorScheme currentScheme = null;
 
-  public static enum theme {
-    THEME_DARK_GRUVBOX,
-    THEME_DARK_CATPUCCIN,
-    THEME_DARK_EVERFOREST,
-    THEME_DARK_DEFAULT,
-    THEME_LIGHT_GRUVBOX,
-    THEME_LIGHT_CATPUCCIN,
-    THEME_LIGHT_EVERFOREST,
-    THEME_LIGHT_DEFAULT,
-    THEME_CUSTOM,
-  };
+  public static final int THEME_DARK_GRUVBOX     = 0;
+  public static final int THEME_DARK_CATPUCCIN   = 1;
+  public static final int THEME_DARK_EVERFOREST  = 2;
+  public static final int THEME_DARK_DEFAULT     = 3;
+  public static final int THEME_LIGHT_GRUVBOX    = 4;
+  public static final int THEME_LIGHT_CATPUCCIN  = 5;
+  public static final int THEME_LIGHT_EVERFOREST = 6;
+  public static final int THEME_LIGHT_DEFAULT    = 7;
 
-  public static ColorScheme get_colorscheme(theme t) {
-    switch(t) {
+  public static ColorScheme get_colorscheme(int theme) {
+    switch(theme) {
       case THEME_DARK_DEFAULT:
         currentScheme = new DefaultDark();
         break;

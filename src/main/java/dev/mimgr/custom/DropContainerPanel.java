@@ -3,12 +3,10 @@ package dev.mimgr.custom;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,9 +35,6 @@ public class DropContainerPanel extends JPanel implements ActionListener {
       JScrollPane.VERTICAL_SCROLLBAR_NEVER,
       JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
     );
-
-    // MScrollBar vsb = new MScrollBar(colors);
-    // sp.setVerticalScrollBar(vsb);
 
     MScrollBar hsb = new MScrollBar(colors);
     hsb.setOrientation(MScrollBarUI.HORIZONTAL);
@@ -77,19 +72,17 @@ public class DropContainerPanel extends JPanel implements ActionListener {
 
     MButton button = null;
     if (data instanceof File file) {
-      button = new MButton();
-      setup_button_icon(button, IconManager.loadIcon(file));
+      button = createButton(IconManager.loadIcon(file));
     }
     else if (data instanceof String s) {
-      button = new MButton(s);
+      button = createButton(null);
+      button.setText(s);
     }
     else if (data instanceof ImageIcon icon) {
-      button = new MButton();
-      setup_button_icon(button, icon);
+      button = createButton(icon);
     }
     else if (data instanceof Path path) {
-      button = new MButton();
-      setup_button_icon(button, IconManager.loadIcon(path.toFile()));
+      button = createButton(IconManager.loadIcon(path.toFile()));
     }
 
     if (button != null) {
@@ -117,7 +110,7 @@ public class DropContainerPanel extends JPanel implements ActionListener {
     return stagedData.isEmpty();
   }
 
-  public JButton getConfirmButton() {
+  public MButton getConfirmButton() {
     return confirmButton;
   }
 
@@ -155,26 +148,29 @@ public class DropContainerPanel extends JPanel implements ActionListener {
     repaint();
   }
 
-  private void setup_button_icon(MButton button, Icon icon) {
-    int size = 100 - button.getBorderWidth() * 4;
-    button.setIcon(
-      IconManager.resizeByAspectRatio(icon, size, size)
-    );
-  }
-
-
-  private void setup_button(MButton button) {
-    button.setBackground(colors.m_bg_dim);
-    button.setForeground(colors.m_fg_0);
+  public static MButton createButton(Icon icon) {
+    MButton button = new MButton();
+    if (icon != null) {
+      int size = 100 - button.getBorderWidth() * 4;
+      button.setIcon(
+        IconManager.resizeByAspectRatio(icon, size, size)
+      );
+    }
     button.setBorderWidth(2);
     button.setBorderRadius(0);
     button.setFont(FontManager.getFont("NunitoBold", 14f));
     button.setPreferredSize(new Dimension(100, 100));
     button.setMaximumSize(new Dimension(100, 100));
     button.setMaximumSize(new Dimension(100, 100));
+    return button;
+  }
+
+  private void setup_button(MButton button) {
+    button.addActionListener(this);
+    button.setBackground(colors.m_bg_dim);
+    button.setForeground(colors.m_fg_0);
     button.setHoverBorderColor(colors.m_red);
     button.setBorderColor(colors.m_bg_5);
-    button.addActionListener(this);
   }
 
   private JScrollPane scrollPane;

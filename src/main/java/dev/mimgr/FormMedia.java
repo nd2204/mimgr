@@ -1,5 +1,6 @@
 package dev.mimgr;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -10,32 +11,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
-import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableModel;
 
+import dev.mimgr.component.MediaViewSwitcher;
+import dev.mimgr.component.IMediaView;
 import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.DropPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
-import dev.mimgr.custom.MTable;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
-import dev.mimgr.db.DBConnection;
+
 import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
@@ -46,18 +42,19 @@ import dev.mimgr.utils.ResourceManager;
  *
  * @author dn200
  */
-public class FormMedia extends JPanel implements ActionListener, MTransferListener, TableModelListener {
+public class FormMedia extends JPanel {
   public FormMedia(ColorScheme colors) {
     this.colors = colors;
+    InitializeComponent();
     // =======================================================
     // Setup Layout
     // =======================================================
-
     this.setLayout(new GridBagLayout());
 
     int padding = 25;
 
     // Top
+    GridBagConstraints c = new GridBagConstraints();
     c.insets = new Insets(25, padding, 25, padding);
     c.gridx = 0;
     c.gridy = 0;
@@ -74,11 +71,10 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     dropPanel.setOpaque(false);
     dropPanel.setVisible(false);
     dropPanel.setLayout(new GridBagLayout());
-    droppedItemsPanel = new DropContainerPanel(this.colors);
-    droppedItemsPanel.addActionListener(this);
+
     {
       MediaDropPanel dropArea = new MediaDropPanel();
-      dropArea.addTransferListener(this);
+      dropArea.addTransferListener(new MediaTransferListener());
       GridBagConstraints gc = new GridBagConstraints();
       gc.gridx = 0;
       gc.gridy = 0;
@@ -112,8 +108,9 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
       contentContainer.setBackground(colors.m_bg_0);
 
       String[] cbBulkAction = {
-          "Bulk actions",
-          "Delete Permanently"
+        "Bulk actions",
+        "Edit",
+        "Delete Permanently"
       };
 
       this.bulkAction = new MComboBox<>(cbBulkAction, colors);
@@ -122,37 +119,52 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
 
       cc.gridx = 0;
       cc.gridy = 0;
-      cc.weightx = 0.0;
       cc.ipadx = 50;
+      cc.weightx = 0.0;
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
-      cc.fill = GridBagConstraints.BOTH;
+      cc.fill = GridBagConstraints.VERTICAL;
       cc.insets = new Insets(15, 15, 0, 5);
-      contentContainer.add(bulkAction, cc);
+      contentContainer.add(layoutSelectorComponent, cc);
 
+      cc.ipadx = 0;
       cc.gridx = 1;
       cc.gridy = 0;
-      cc.weightx = 0.0;
+      cc.weightx = 1.0;
       cc.insets = new Insets(15, 0, 0, 15);
-      cc.fill = GridBagConstraints.VERTICAL;
-      contentContainer.add(applyBulkAction, cc);
+      cc.fill = GridBagConstraints.BOTH;
+      contentContainer.add(filterTextField, cc);
 
       cc.gridx = 2;
       cc.gridy = 0;
       cc.weightx = 1.0;
+      cc.fill = GridBagConstraints.BOTH;
+      contentContainer.add(Box.createHorizontalGlue(), cc);
+
+      cc.gridx = 3;
+      cc.gridy = 0;
+      cc.weightx = 0.0;
+      cc.ipadx = 55;
+      cc.insets = new Insets(15, 0, 0, 5);
       cc.fill = GridBagConstraints.VERTICAL;
-      cc.anchor = GridBagConstraints.FIRST_LINE_END;
-      contentContainer.add(filterTextField, cc);
+      contentContainer.add(bulkAction, cc);
+
+      cc.gridx = 4;
+      cc.gridy = 0;
+      cc.weightx = 0.0;
+      cc.ipadx = 20;
+      cc.insets = new Insets(15, 0, 0, 15);
+      cc.fill = GridBagConstraints.VERTICAL;
+      contentContainer.add(applyBulkAction, cc);
 
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
       cc.gridx = 0;
       cc.gridy = 1;
       cc.weightx = 1.0;
       cc.weighty = 1.0;
-      cc.gridwidth = 4;
+      cc.gridwidth = GridBagConstraints.REMAINDER;
       cc.insets = new Insets(15, 0, 15, 0);
       cc.fill = GridBagConstraints.BOTH;
-      setup_table();
-      contentContainer.add(tableScrollPane, cc);
+      contentContainer.add(mediaViewSwitcher.getPanel(), cc);
     }
 
     c.insets = new Insets(0, padding, 20, padding);
@@ -161,230 +173,135 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     c.gridy = 2;
     c.weightx = 1.0;
     c.weighty = 1.0;
-    c.gridwidth = 4;
+    c.gridwidth = GridBagConstraints.REMAINDER;
     this.add(contentContainer, c);
-
-    // Post Content
-
-    // =======================================================
-    // Setup Appearance
-    // =======================================================
-    this.setBackground(colors.m_bg_dim);
-
-    this.topLabel.setFont(nunito_bold_20);
-    this.topLabel.setForeground(colors.m_fg_0);
-
-    this.addMediaButton.setBackground(colors.m_bg_0);
-    this.addMediaButton.setBorderColor(colors.m_bg_4);
-    this.addMediaButton.setHoverBackgroundColor(colors.m_bg_2);
-    this.addMediaButton.setHoverBorderColor(colors.m_bg_3);
-    this.addMediaButton.setClickBackgroundColor(colors.m_bg_1);
-    this.addMediaButton.setFont(nunito_extrabold_14);
-    this.addMediaButton.setIcon(IconManager.getIcon("upload.png", 16, 16, colors.m_grey_0));
-    this.addMediaButton.setForeground(colors.m_grey_0);
-    this.addMediaButton.setText(" " + this.addMediaButton.getText());
-    this.addMediaButton.addActionListener(this);
-
-    this.filterTextField.setIcon(IconManager.getIcon("search.png", 20, 20, colors.m_grey_0), MTextField.ICON_PREFIX);
-    this.filterTextField.setBackground(colors.m_bg_dim);
-    this.filterTextField.setForeground(colors.m_fg_0);
-    this.filterTextField.setPlaceholder("Filter Images");
-    this.filterTextField.setPlaceholderForeground(colors.m_grey_0);
-    this.filterTextField.setBorderWidth(1);
-    this.filterTextField.setBorderColor(colors.m_bg_5);
-    this.filterTextField.setInputForeground(colors.m_fg_0);
-    this.filterTextField.setFont(nunito_bold_14);
-
-    this.tableScrollPane.setBackground(colors.m_bg_0);
-    this.tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
-
-    this.selectFilesButton.setBackground(colors.m_bg_dim);
-    this.selectFilesButton.setBorderColor(colors.m_bg_3);
-    this.selectFilesButton.setHoverBorderColor(colors.m_accent);
-    this.selectFilesButton.setClickBackgroundColor(colors.m_bg_1);
-    this.selectFilesButton.setForeground(colors.m_accent);
-    this.selectFilesButton.setHorizontalAlignment(SwingConstants.CENTER);
-    this.selectFilesButton.addActionListener(this);
-
-    this.applyBulkAction.setForeground(colors.m_grey_2);
-    this.applyBulkAction.setBackground(colors.m_bg_0);
-    this.applyBulkAction.setBorderColor(colors.m_bg_5);
-    this.applyBulkAction.setHoverBackgroundColor(colors.m_bg_1);
-    this.applyBulkAction.setClickBackgroundColor(colors.m_bg_dim);
-    this.applyBulkAction.setHoverForegroundColor(colors.m_blue);
-    this.applyBulkAction.setHoverBorderColor(colors.m_blue);
-    this.applyBulkAction.setBorderRadius(0);
-    this.applyBulkAction.addActionListener(this);
-    ;
   }
 
-  private void setup_table() {
-    this.emptyImageIcon = IconManager.getIcon("image.png", colors.m_grey_0);
-    table = new MTable(colors);
-    table.setFillsViewportHeight(true);
-    table.setRowHeight(emptyImageIcon.getIconHeight() + 40);
-    table.setAutoscrolls(true);
-    // table.setAutoResizeMode(MTable.AUTO_RESIZE_OFF);
-
-    tableScrollPane = new JScrollPane(table);
-    table.setup_scrollbar(tableScrollPane);
-
-    model = new DefaultTableModel() {
-      @Override
-      public Class<?> getColumnClass(int columnIndex) {
-        return columnIndex == 0 ? Boolean.class : String.class;
+  private class MediaButtonActionListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      if (e.getSource() == FormMedia.this.addMediaButton) {
+        if (dropPanel.isVisible()) {
+          dropPanel.setVisible(false);
+        } else {
+          dropPanel.setVisible(true);
+        }
       }
 
-      @Override
-      public boolean isCellEditable(int row, int column) {
-        return column == 0;
-      }
-    };
-
-    table.setModel(model);
-
-    tv.add_column(table, "", TableView.setup_checkbox_column(colors));
-    tv.add_column(table, "", TableView.setup_image_column(colors));
-    tv.add_column(table, "Image name", TableView.setup_default_column());
-    tv.add_column(table, "Filename", TableView.setup_default_column());
-    tv.add_column(table, "Date", TableView.setup_default_column());
-    tv.add_column(table, "Author", TableView.setup_default_column());
-    tv.add_column(table, "Caption", TableView.setup_default_column());
-    tv.load_column(table, model);
-
-    model.addTableModelListener(this);
-    get_all_images(model);
-  }
-
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    if (e.getSource() == this.addMediaButton) {
-      if (dropPanel.isVisible()) {
-        dropPanel.setVisible(false);
-      } else {
-        dropPanel.setVisible(true);
-      }
-    }
-
-    if (e.getSource() == this.selectFilesButton) {
-      JFileChooser fileChooser = new JFileChooser();
-      fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-      fileChooser.setDialogTitle("Select Files");
-      fileChooser.setMultiSelectionEnabled(true);
-      fileChooser.setFileFilter(
+      if (e.getSource() == FormMedia.this.selectFilesButton) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setDialogTitle("Select Files");
+        fileChooser.setMultiSelectionEnabled(true);
+        fileChooser.setFileFilter(
           new javax.swing.filechooser.FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "gif"));
 
-      // Show the file chooser dialog and wait for user action
-      int userSelection = fileChooser.showOpenDialog(null);
+        // Show the file chooser dialog and wait for user action
+        int userSelection = fileChooser.showOpenDialog(null);
 
-      // Handle the user selection
-      if (userSelection == JFileChooser.APPROVE_OPTION) {
-        // Get the selected file
-        File[] selectedFile = fileChooser.getSelectedFiles();
-        for (File file : selectedFile) {
-          if (rm.isValidImageFile(file)) {
-            droppedItemsPanel.addData(file);
-          }
-        }
-      } else {
-        System.out.println("No file selected.");
-      }
-    }
-
-    if (e.getSource() == this.droppedItemsPanel.getConfirmButton()) {
-      // Do something with the data
-      for (Object obj : this.droppedItemsPanel.getAllData()) {
-        if (obj instanceof File file) {
-          Path newFilePath = rm.moveStagedFileToUploadDir(file);
-          System.out.println(rm.getProjectPath().relativize(newFilePath));
-          DBQueries.insert_image(
-            String.valueOf(rm.getProjectPath().relativize(newFilePath)).replace("\\", "/"),
-            file.getName(), "", SessionManager.getCurrentUser().m_id
-          );
-          get_all_images(model);
-          dropPanel.setVisible(false);
-        }
-      }
-      // Clean temp file from download
-      rm.cleanTempFiles();
-      // Clear the data
-      this.droppedItemsPanel.clearData();
-    }
-
-    if (e.getSource() == this.applyBulkAction) {
-      System.out.println(((String) this.bulkAction.getSelectedItem()));
-      // if (((String) this.bulkAction.getSelectedItem()).equals("Edit")) {
-
-      // FormEditProduct frame = new FormEditProduct(selectedImages.values());
-      // frame.setVisible(true);
-      // }
-      if (((String) this.bulkAction.getSelectedItem()).equals("Delete Permanently")) {
-        if (!selectedImages.isEmpty()) {
-          delete_image(model, selectedImages.values());
-          selectedImages.clear();
-        }
-      }
-    }
-    return;
-  }
-
-  @Override
-  public void onStringImported(String string) {
-    if (ResourceManager.isImageUrl(string)) {
-      Path fp = rm.downloadTempFile(string);
-      droppedItemsPanel.addData(fp.toFile());
-    }
-    return;
-  }
-
-  @Override
-  public void onImageImported(Image image) {
-    System.out.println("Dropped Image data");
-    System.out.println(image);
-    return;
-  }
-
-  @Override
-  public void onFileListImported(List<File> files) {
-    System.out.println("Dropped File list data");
-    for (File file : files) {
-      System.out.println("valid: " + rm.isValidImageFile(file) + " " + file);
-      droppedItemsPanel.addData(file);
-    }
-    return;
-  }
-
-  @Override
-  public void tableChanged(TableModelEvent e) {
-    int row = e.getFirstRow();
-    int column = e.getColumn();
-    switch (e.getType()) {
-      case TableModelEvent.UPDATE:
-        Object newValue = model.getValueAt(row, column);
-        if (column == 0) {
-          if (newValue instanceof Boolean) {
-            if ((Boolean) newValue) {
-              selectedImages.put(row, imageList.get(row));
-            } else {
-              selectedImages.remove(row);
+        // Handle the user selection
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+          // Get the selected file
+          File[] selectedFile = fileChooser.getSelectedFiles();
+          for (File file : selectedFile) {
+            if (rm.isValidImageFile(file)) {
+              droppedItemsPanel.addData(file);
             }
           }
+        } else {
+          System.out.println("No file selected.");
         }
-        break;
+      }
+
+      if (e.getSource() == btnTableView) {
+        mediaViewSwitcher.setCurrentView(MediaViewSwitcher.VIEW_TABLE);
+        btnGridView.setIcon(FormMedia.this.gridIcon);
+        btnTableView.setIcon(IconManager.changeIconColor(FormMedia.this.tableIcon, colors.m_grey_2));
+      }
+
+      if (e.getSource() == btnGridView) {
+        mediaViewSwitcher.setCurrentView(MediaViewSwitcher.VIEW_GRID);
+        btnGridView.setIcon(IconManager.changeIconColor(FormMedia.this.gridIcon, colors.m_grey_2));
+        btnTableView.setIcon(FormMedia.this.tableIcon);
+      }
+
+      if (e.getSource() == FormMedia.this.droppedItemsPanel.getConfirmButton()) {
+        // Do something with the data
+        IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+        for (Object obj : FormMedia.this.droppedItemsPanel.getAllData()) {
+          if (obj instanceof File file) {
+            Path newFilePath = rm.moveStagedFileToUploadDir(file);
+            System.out.println(rm.getProjectPath().relativize(newFilePath));
+            ImageRecord.insert(
+              String.valueOf(rm.getProjectPath().relativize(newFilePath)).replace("\\", "/"),
+              file.getName(),
+              "",
+              SessionManager.getCurrentUser().m_id
+            );
+            currentView.refresh();
+            dropPanel.setVisible(false);
+          }
+        }
+        // Clean temp file from download
+        rm.cleanTempFiles();
+        // Clear the data
+        FormMedia.this.droppedItemsPanel.clearData();
+      }
+
+      if (e.getSource() == FormMedia.this.applyBulkAction) {
+        System.out.println(((String) FormMedia.this.bulkAction.getSelectedItem()));
+        if (((String) FormMedia.this.bulkAction.getSelectedItem()).equals("Edit")) {
+          // TODO FormEditMedia
+        }
+        if (((String) FormMedia.this.bulkAction.getSelectedItem()).equals("Delete Permanently")) {
+          IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+          List<ImageRecord> selectedImage = currentView.getSelectedImages();
+          if (!selectedImage.isEmpty()) {
+            int response = JOptionPane.showConfirmDialog(
+              FormMedia.this,
+              "Delete " + selectedImage.size() + " items?",
+              "Confirm Delete",
+              JOptionPane.YES_NO_OPTION
+            );
+
+            if (response == JOptionPane.YES_OPTION) {
+              currentView.deleteSelectedImages();
+            }
+          } else {
+            JOptionPane.showMessageDialog(null, "Nothing to delete");
+          }
+        }
+      }
+      return;
     }
   }
 
-  private void delete_image(DefaultTableModel model, Iterable<ImageRecord> prList) {
-    for (ImageRecord i : prList) {
-      DBQueries.delete_image(i.m_id);
-      File file = new File(i.m_url);
-      file.delete();
+  private class MediaTransferListener implements MTransferListener {
+    @Override
+    public void onStringImported(String string) {
+      if (ResourceManager.isImageUrl(string)) {
+        Path fp = rm.downloadTempFile(string);
+        droppedItemsPanel.addData(fp.toFile());
+      }
+      return;
     }
-    model.setRowCount(0);
-    if (!imageList.isEmpty()) {
-      imageList = new ArrayList<>();
+
+    @Override
+    public void onImageImported(Image image) {
+      System.out.println("Dropped Image data");
+      System.out.println(image);
+      return;
     }
-    get_all_images(model);
+
+    @Override
+    public void onFileListImported(List<File> files) {
+      System.out.println("Dropped File list data");
+      for (File file : files) {
+        System.out.println("valid: " + rm.isValidImageFile(file) + " " + file);
+        droppedItemsPanel.addData(file);
+      }
+      return;
+    }
   }
 
   private class MediaDropPanel extends DropPanel {
@@ -423,58 +340,156 @@ public class FormMedia extends JPanel implements ActionListener, MTransferListen
     }
   }
 
-  private void get_all_images(DefaultTableModel model) {
-    updateTable(DBQueries.select_all_images(), model);
+  private void InitializeComponent() {
+    // Post Content
+
+    // =======================================================
+    // Setup Appearance
+    // =======================================================
+    this.setBackground(colors.m_bg_dim);
+    this.topLabel = new JLabel("Media Library");
+    this.topLabel.setFont(nunito_bold_20);
+    this.topLabel.setForeground(colors.m_fg_0);
+
+
+    this.rm = ResourceManager.getInstance();
+
+    this.mediaViewSwitcher = new MediaViewSwitcher(colors);
+
+    this.droppedItemsPanel = new DropContainerPanel(this.colors);
+    this.droppedItemsPanel.addActionListener(mediaButtonActionListener);
+
+    this.addMediaButton = new MButton("Add New Media File");
+    this.addMediaButton.setBackground(colors.m_bg_0);
+    this.addMediaButton.setBorderColor(colors.m_bg_4);
+    this.addMediaButton.setHoverBackgroundColor(colors.m_bg_2);
+    this.addMediaButton.setHoverBorderColor(colors.m_bg_3);
+    this.addMediaButton.setClickBackgroundColor(colors.m_bg_1);
+    this.addMediaButton.setFont(nunito_extrabold_14);
+    this.addMediaButton.setIcon(IconManager.getIcon("upload.png", 16, 16, colors.m_grey_0));
+    this.addMediaButton.setForeground(colors.m_grey_0);
+    this.addMediaButton.setText(" " + this.addMediaButton.getText());
+    this.addMediaButton.addActionListener(mediaButtonActionListener);
+
+    this.filterTextField = new MTextField(30);
+    this.filterTextField.setIcon(IconManager.getIcon("search.png", 20, 20, colors.m_grey_0), MTextField.ICON_PREFIX);
+    this.filterTextField.setBackground(colors.m_bg_dim);
+    this.filterTextField.setForeground(colors.m_fg_0);
+    this.filterTextField.setPlaceholder("Filter Images");
+    this.filterTextField.setPlaceholderForeground(colors.m_grey_0);
+    this.filterTextField.setBorderWidth(1);
+    this.filterTextField.setBorderColor(colors.m_bg_5);
+    this.filterTextField.setInputForeground(colors.m_fg_0);
+    this.filterTextField.setFont(nunito_bold_14);
+
+    this.selectFilesButton = new MButton("Select Files");
+    this.selectFilesButton.setBackground(colors.m_bg_dim);
+    this.selectFilesButton.setBorderColor(colors.m_bg_3);
+    this.selectFilesButton.setHoverBorderColor(colors.m_accent);
+    this.selectFilesButton.setClickBackgroundColor(colors.m_bg_1);
+    this.selectFilesButton.setForeground(colors.m_accent);
+    this.selectFilesButton.setHorizontalAlignment(SwingConstants.CENTER);
+    this.selectFilesButton.addActionListener(mediaButtonActionListener);
+
+    this.applyBulkAction = new MButton("Apply");
+    this.applyBulkAction.setForeground(colors.m_grey_2);
+    this.applyBulkAction.setBackground(colors.m_bg_0);
+    this.applyBulkAction.setBorderColor(colors.m_bg_5);
+    this.applyBulkAction.setHoverBackgroundColor(colors.m_bg_1);
+    this.applyBulkAction.setClickBackgroundColor(colors.m_bg_dim);
+    this.applyBulkAction.setHoverForegroundColor(colors.m_blue);
+    this.applyBulkAction.setHoverBorderColor(colors.m_blue);
+    this.applyBulkAction.setBorderRadius(0);
+    this.applyBulkAction.addActionListener(mediaButtonActionListener);
+
+    this.layoutSelectorComponent = new LayoutSelectorComponent();
   }
 
-  private void updateTable(ResultSet queryResult, DefaultTableModel model) {
-    model.setRowCount(0);
-    if (!imageList.isEmpty()) {
-      imageList = new ArrayList<>();
-    }
-    try {
-      while (queryResult.next()) {
-        ImageRecord ir = new ImageRecord(queryResult);
-        imageList.add(ir);
-        model.addRow(new Object[] {
-            Boolean.FALSE,
-            this.emptyImageIcon = IconManager.loadIcon(Paths.get(ir.m_url).toAbsolutePath().toFile()),
-            ir.m_name,
-            ir.m_url.substring(ir.m_url.lastIndexOf("/") + 1),
-            ir.m_created_at,
-            ImageRecord.getImageAuthor(DBConnection.get_instance().get_connection(), ir),
-            ir.m_caption
-        });
-      }
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+  private class LayoutSelectorComponent extends RoundedPanel {
+    public LayoutSelectorComponent() {
+      super(colors); 
+      this.setBackground(colors.m_bg_dim);
+      this.setBorderColor(colors.m_bg_5);
+      this.setPreferredSize(new Dimension(50, this.getPreferredSize().height));
+      this.setMaximumSize(new Dimension(50, this.getPreferredSize().height));
+      this.setMinimumSize(new Dimension(50, this.getPreferredSize().height));
+
+      Consumer<MButton> setupButton = btn -> {
+        btn.setBackground(colors.m_bg_dim);
+        btn.setBackground(null);
+        btn.setBorderWidth(0);
+        btn.setBorderColor(null);
+        btn.setOpaque(false);
+        btn.setBorderPainted(false);
+        btn.setPreferredSize(new Dimension(20, 20));
+        btn.addActionListener(mediaButtonActionListener);
+      };
+
+      FormMedia.this.gridIcon = IconManager.getIcon("grid.png", 16, 16, colors.m_bg_5);
+      FormMedia.this.btnGridView = new MButton(gridIcon);
+      setupButton.accept(FormMedia.this.btnGridView);
+
+      FormMedia.this.tableIcon = IconManager.getIcon("table.png", 16, 16, colors.m_bg_5);
+      FormMedia.this.btnTableView = new MButton(IconManager.changeIconColor(FormMedia.this.tableIcon, colors.m_grey_2));
+      setupButton.accept(FormMedia.this.btnTableView);
+
+      this.setLayout(new GridBagLayout());
+
+      GridBagConstraints c = new GridBagConstraints();
+      c.gridx = 0; c.gridy = 0;
+      c.fill = GridBagConstraints.BOTH;
+      c.weightx = 1.0;
+      c.weighty = 1.0;
+      c.insets = new Insets(1, 1, 1, 0);
+
+      this.add(btnTableView, c);
+
+      JSeparator sep = new JSeparator(JSeparator.VERTICAL);
+      sep.setForeground(colors.m_bg_5);
+      sep.setBackground(null);
+      c.gridx = 1;
+      c.fill = GridBagConstraints.VERTICAL;
+      c.insets = new Insets(1, 0, 1, 0);
+      c.weightx = 0.0;
+      c.weighty = 1.0;
+      c.anchor = GridBagConstraints.CENTER;
+      this.add(sep, c);
+
+      c.insets = new Insets(1, 0, 1, 1);
+      c.gridx = 2;
+      c.fill = GridBagConstraints.BOTH;
+      c.weightx = 1.0;
+      c.weighty = 1.0;
+      this.add(btnGridView, c);
     }
   }
 
+  private Icon gridIcon;
+  private Icon tableIcon;
 
-  private TableView tv = new TableView();
+  private ColorScheme colors;
+  private ResourceManager rm;
   private Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
   private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
 
-  private ColorScheme colors;
-  private RoundedPanel contentContainer = new RoundedPanel();
-  private GridBagConstraints c = new GridBagConstraints();
-  private MTextField filterTextField = new MTextField(30);
-  private MTable table;
-  private JScrollPane tableScrollPane;
-  private JLabel topLabel = new JLabel("Media Library");
-  private MButton addMediaButton = new MButton("Add New Media File");
-  private MButton selectFilesButton = new MButton("Select Files");
-  private JPanel dropPanel = null;
-  private Icon emptyImageIcon;
+  // Controller Component
+  private MTextField filterTextField;
   private MComboBox<String> bulkAction;
-  private MButton applyBulkAction = new MButton("Apply");
+  private MButton addMediaButton;
+  private MButton selectFilesButton;
+  private MButton applyBulkAction;
+  private MButton btnGridView;
+  private MButton btnTableView;
+  private MediaViewSwitcher mediaViewSwitcher;
+  private MediaButtonActionListener mediaButtonActionListener = new MediaButtonActionListener();
+
+  // View Component
+  // private MediaTableView mediaTableView;
+  private JLabel topLabel;
+  private JPanel dropPanel = null;
+  private RoundedPanel contentContainer = new RoundedPanel();
   private DropContainerPanel droppedItemsPanel;
-  private ResourceManager rm = ResourceManager.getInstance();
-  DefaultTableModel model;
-  private ArrayList<ImageRecord> imageList = new ArrayList<>();
-  private HashMap<Integer, ImageRecord> selectedImages = new HashMap<>();
+  private LayoutSelectorComponent layoutSelectorComponent;
 }

@@ -5,7 +5,6 @@ import javax.swing.JButton;
 import javax.swing.border.EmptyBorder;
 
 import dev.mimgr.theme.ColorTheme;
-import dev.mimgr.theme.ColorTheme.theme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 import java.awt.BasicStroke;
@@ -237,7 +236,7 @@ public class MButton extends JButton implements MouseListener {
     repaint();
   }
 
-  private ColorScheme colors         = ColorTheme.get_colorscheme(theme.THEME_LIGHT_DEFAULT);
+  private ColorScheme colors         = ColorTheme.get_colorscheme(ColorTheme.THEME_LIGHT_DEFAULT);
 
   private Color borderColor          = colors.m_bg_5;
   private Color clickBorderColor     = null;

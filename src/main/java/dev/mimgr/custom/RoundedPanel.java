@@ -2,7 +2,6 @@ package dev.mimgr.custom;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -10,7 +9,6 @@ import java.awt.RenderingHints;
 import javax.swing.JPanel;
 
 import dev.mimgr.theme.ColorTheme;
-import dev.mimgr.theme.ColorTheme.theme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class RoundedPanel extends JPanel {
@@ -22,7 +20,7 @@ public class RoundedPanel extends JPanel {
 
   public RoundedPanel() {
     super();
-    colors = ColorTheme.get_colorscheme(theme.THEME_DARK_EVERFOREST);
+    colors = ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST);
     Init();
   }
 

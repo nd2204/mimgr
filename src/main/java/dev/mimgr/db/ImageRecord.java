@@ -1,6 +1,5 @@
 package dev.mimgr.db;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -52,30 +51,32 @@ public class ImageRecord {
     m_author         = author;
   }
 
-  public static ResultSet selectAll(Connection con) {
-    return DBQueries.select(con, QUERY_SELECT_ALL);
+  public static ResultSet selectAll() {
+    return DBQueries.select(QUERY_SELECT_ALL);
   }
 
-  public static int delete(Connection con, ImageRecord ir) {
-    return DBQueries.update(con, QUERY_DELETE_BY_KEY, ir.m_id);
+  public static int delete(ImageRecord ir) {
+    return DBQueries.update(QUERY_DELETE_BY_KEY, ir.m_id);
   }
 
-  public static int delete(Connection con, int id) {
-    return DBQueries.update(con, QUERY_DELETE_BY_KEY, id);
+  public static int delete(int id) {
+    return DBQueries.update(QUERY_DELETE_BY_KEY, id);
   }
 
-  public static int insert(Connection con, String image_url, String image_name, String image_caption, String image_author) {
+  public static int insert(String image_url, String image_name, String image_caption, int image_author) {
     image_name = image_name.substring(0, image_name.indexOf("."));
-    return DBQueries.update(con, QUERY_INSERT, image_url, image_name, image_caption, image_author);
+    int result = DBQueries.update(QUERY_INSERT, image_name, image_url, image_caption, image_author);
+    return result;
   }
 
-  public static int insert(Connection con, ImageRecord ir) {
+  public static int insert(ImageRecord ir) {
     ir.m_name = ir.m_name.substring(0, ir.m_name.indexOf("."));
-    return DBQueries.update(con, QUERY_INSERT, ir.m_url, ir.m_name, ir.m_caption, ir.m_author);
+    int result = DBQueries.update(QUERY_INSERT, ir.m_name, ir.m_url, ir.m_caption, ir.m_author);
+    return result;
   }
 
-  public static String getImageAuthor(Connection con, ImageRecord ir) {
-    try (ResultSet rs = UserRecord.selectUserById(con, ir.m_author)) {
+  public static String getImageAuthor(ImageRecord ir) {
+    try (ResultSet rs = UserRecord.selectUserById(ir.m_author)) {
       if (rs.next()) {
         UserRecord ur = new UserRecord(rs);
         return ur.m_username;

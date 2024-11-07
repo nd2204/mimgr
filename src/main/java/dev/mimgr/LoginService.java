@@ -1,13 +1,10 @@
 package dev.mimgr;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.UserRecord;
 
 public class LoginService {
@@ -21,12 +18,12 @@ public class LoginService {
     } else {
       SessionManager.clearSession();
     }
+    SessionManager.setCurrentUser(userRecord);
     return true;
   }
 
   private static UserRecord authenticate(String username, String password) {
-    Connection con = DBConnection.get_instance().get_connection();
-    ResultSet result = UserRecord.selectUserByName(con, username);
+    ResultSet result = UserRecord.selectUserByName(username);
     try {
       while (result.next()) {
         UserRecord userRecord = new UserRecord(result);

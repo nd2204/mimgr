@@ -16,10 +16,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 
-import dev.mimgr.theme.ColorTheme;
-import dev.mimgr.theme.ColorTheme.theme;
-import dev.mimgr.theme.builtin.ColorScheme;
-
 public class MPasswordField extends JPasswordField implements FocusListener { 
   // Constructor with default settings
   public MPasswordField(int columns) {

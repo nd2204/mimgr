@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 CREATE TABLE IF NOT EXISTS images (
-  image_id               INT AUTO_INCREMENT PRIMARY KEY,
-  image_url        VARCHAR(255) UNIQUE,
+  image_id         INT AUTO_INCREMENT PRIMARY KEY,
   image_name       VARCHAR(255),
+  image_url        VARCHAR(255) UNIQUE,
   image_caption    TEXT,
   image_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   image_author     INT,
@@ -249,3 +249,21 @@ INSERT INTO products (name, price, stock_quantity, category_id, description) VAL
 
 INSERT INTO users (username, hash, salt) VALUES ('ikienkinzero', 'bc85bbcceedd99b2b7713b2976046b099fb3649d029633803bdfc71c35603e9a', 'rduAoV20DQsHQtQrD0p3SQ==');
 INSERT INTO users (username, hash, salt) VALUES ('nd2204', '4a6381563f67d178ef73a2ac4f4119978d2835dfd8f1ec8f67f78460618d93ae', '9NOV6F3hYrOS0HeanJMuDA==');
+INSERT INTO users (username, hash, salt) VALUES ('buidinhhuy', 'e2b903a3eee033d9b05d525ccfd904a78365736c5b6f2da3a25e77e4cfbb12fe', 'kh9/vS/RNlKttgRU1uWDaw==');
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture6.png', 'Picture6', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture8.png', 'Picture8', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture11.png', 'Picture11', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture14.png', 'Picture14', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture5.png', 'Picture5', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture15.png', 'Picture15', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture1.png', 'Picture1', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture3.png', 'Picture3', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture13.png', 'Picture13', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture7.png', 'Picture7', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture4.png', 'Picture4', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture9.png', 'Picture9', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture2.png', 'Picture2', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture10.png', 'Picture10', '', 2);
+INSERT INTO images (image_url, image_name, image_caption, image_author) VALUES ('uploads/Picture12.png', 'Picture12', '', 2);
+INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES ('afsdfasdf', 412412.00, 'vai ca lon', 1213, 56);
+INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES ('fasdfa', 124124.00, 'dfasdf', 44124, 56);

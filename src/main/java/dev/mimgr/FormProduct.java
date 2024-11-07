@@ -31,7 +31,6 @@ import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
-import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -329,7 +328,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   }
 
   private void get_all_intruments(DefaultTableModel model) {
-    updateTable(DBQueries.select_all_intruments(), model);
+    updateTable(ProductRecord.selectAll(), model);
   }
 
   private void updateTable(ResultSet queryResult, DefaultTableModel model) {
@@ -359,7 +358,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
       return;
     }
     if (!name.isBlank()) {
-      updateTable(DBQueries.select_intruments(name), model);
+      updateTable(ProductRecord.selectLikeName(name), model);
     } else {
       get_all_intruments(model);
     }
@@ -367,7 +366,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
 
   private void delete_product(DefaultTableModel model, Iterable<ProductRecord> prList) {
     for (ProductRecord pr : prList) {
-      DBQueries.delete_product(pr.m_id);
+      ProductRecord.delete(pr.m_id);
     }
     model.setRowCount(0);
     if (!productList.isEmpty()) {

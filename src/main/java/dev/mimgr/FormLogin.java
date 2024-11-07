@@ -206,12 +206,10 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == show_password_button) {
       if (!isShowingPassword) {
-        pf_password.setShowingPassword(true);
         pf_password.setEchoChar('\0');
         show_password_button.setIcon(IconManager.getIcon("eye_opened.png", 20, 16, m_colors.m_blue));
         show_password_button.setHoverBorderColor(m_colors.m_blue);
       } else {
-        pf_password.setShowingPassword(false);
         if (!pf_password.getTextString().isEmpty()) {
           pf_password.setEchoChar('*');
         }
@@ -219,9 +217,19 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
         show_password_button.setHoverBorderColor(m_colors.m_grey_0);
       }
       isShowingPassword = !isShowingPassword;
+      pf_password.setShowingPassword(isShowingPassword);
     }
 
     if (e.getSource() == login_button) {
+      tryLogin();
+    }
+    if (e.getSource() == signup_button) {
+      PanelManager.show("FORM_SIGNUP");
+      return;
+    }
+  }
+
+  private void tryLogin() {
       String username = tf_username.getTextString();
       String password = pf_password.getTextString();
 
@@ -238,11 +246,6 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
       }
 
       return;
-    }
-    if (e.getSource() == signup_button) {
-      PanelManager.show("FORM_SIGNUP");
-      return;
-    }
   }
 
   private void checkFields() {

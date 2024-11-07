@@ -9,6 +9,7 @@ import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import dev.mimgr.db.UserRecord;
 import dev.mimgr.theme.ColorTheme;
@@ -20,7 +21,6 @@ class Entry extends JFrame {
     m_aspect_ratio = 16.0f / 10.0f;
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
-
 
     FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
     FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
@@ -39,7 +39,7 @@ class Entry extends JFrame {
       SessionManager.setCurrentUser(ur);
       registerDashBoard(colors);
     }
-    
+
     if (ur != null) {
       System.out.println("Logged in as user: " + ur.m_username + " as role: " + ur.m_role);
     }
@@ -88,10 +88,12 @@ class Entry extends JFrame {
   }
 
   public static void main(String arg[]) {
-    new Entry();
+    SwingUtilities.invokeLater(() -> {
+      new Entry();
+    });
   }
 
-  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.theme.THEME_DARK_EVERFOREST);
+  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST);
   ResourceManager resman = ResourceManager.getInstance();
 
   private double m_aspect_ratio;

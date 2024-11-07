@@ -1,30 +1,31 @@
 package dev.mimgr;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.Border;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.ResultSet;
+
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JSeparator;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-// import java.nio.file.Paths;
-// import java.io.*;
-// import java.awt.event.ActionEvent;
-// import java.awt.event.ActionListener;
-
-// import dev.mimgr.db.MySQLCon;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
-import dev.mimgr.theme.builtin.ColorScheme;
-import dev.mimgr.custom.RoundedPanel;
-import dev.mimgr.db.DBConnection;
-import dev.mimgr.db.DBQueries;
-import dev.mimgr.custom.MPasswordField;
-import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.GradientPanel;
 import dev.mimgr.custom.MButton;
+import dev.mimgr.custom.MPasswordField;
+import dev.mimgr.custom.MTextField;
+import dev.mimgr.custom.RoundedPanel;
+import dev.mimgr.db.DBConnection;
+import dev.mimgr.db.UserRecord;
+import dev.mimgr.theme.builtin.ColorScheme;
 
 public class FormSignUp extends GradientPanel implements ActionListener, DocumentListener {
   FormSignUp(ColorScheme colors) {
@@ -209,7 +210,7 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
   }
 
   private boolean valid_username(String username) {
-    try (ResultSet queryResult = DBQueries.select_user(username)) {
+    try (ResultSet queryResult = UserRecord.selectUserByName(username)) {
       if (queryResult.next()) {
         JOptionPane.showMessageDialog(null, "Tên người dùng đã tồn tại");
         return false;
@@ -305,7 +306,7 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
       String password = pf_password.getTextString();
       String salt = Security.generate_salt(16);
       if (valid_username(username) && valid_password(password)) {
-        DBQueries.insert_user(username, Security.hash_string(password + salt), salt);
+        UserRecord.insertUser(username, Security.hash_string(password + salt), salt, "");
         Entry.removeLoginSignup();
         Entry.registerDashBoard(m_colors);
       }

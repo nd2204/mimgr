@@ -31,7 +31,7 @@ import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTextArea;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
-import dev.mimgr.db.DBQueries;
+import dev.mimgr.db.CategoryRecord;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.MTransferListener;
@@ -84,7 +84,7 @@ public class UploadPanel extends JPanel {
   }
 
   private String get_category_name(int category_id) {
-    ResultSet queryResult = DBQueries.select_name_category(category_id);
+    ResultSet queryResult = ProductRecord.selectByKey(category_id);
     String name_result = "";
     try {
       while (queryResult.next()) {
@@ -218,7 +218,7 @@ public class UploadPanel extends JPanel {
   }
 
   private String[] get_category_names() {
-    ResultSet queryResult = DBQueries.select_all_categories();
+    ResultSet queryResult = CategoryRecord.selectAll();
     List<String> nameList = new ArrayList<>();
     try {
       while (queryResult.next()) {
@@ -241,6 +241,11 @@ public class UploadPanel extends JPanel {
 
       droppedItemsPanel = new DropContainerPanel(colors);
       droppedItemsPanel.addActionListener(this);
+
+      btnClearImages = droppedItemsPanel.getConfirmButton();
+      btnClearImages.setHoverBorderColor(colors.m_red);
+      btnClearImages.setText("Clear");
+      btnClearImages.setHoverBackgroundColor(colors.m_red);
 
       btnSelectFiles.setFont(nunito_bold_14);
       btnSelectFiles.setBackground(colors.m_bg_dim);
@@ -556,7 +561,7 @@ public class UploadPanel extends JPanel {
   private MTextField tfTitle, tfPrice, tfStock;
   private MComboBox<String> cbCategory;
   private MTextArea taDescription;
-  private MButton btnSubmit, btnDelete;
+  private MButton btnSubmit, btnDelete, btnClearImages;
   private ColorScheme colors;
   private ProductRecord product;
 }

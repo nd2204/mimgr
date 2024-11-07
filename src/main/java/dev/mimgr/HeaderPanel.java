@@ -18,7 +18,7 @@ import java.awt.RenderingHints;
 
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MTextField;
-import dev.mimgr.custom.RoundedPanel;
+import dev.mimgr.db.UserRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class HeaderPanel extends JPanel {
@@ -80,7 +80,68 @@ public class HeaderPanel extends JPanel {
     c.ipadx = 25;
     c.ipady = 25;
     c.insets = new Insets(10, 10, 10, 25);
-    this.add(new AvatarPanel("TG", colors.m_aqua, colors.m_fg_1), c);
+    this.add(new UserInfoPanel(), c);
+  }
+
+  private String getShortenedName(String name) {
+    String[] strs = name.split(" ", 3);
+    String result = "";
+    if (strs.length < 2) {
+      for (int i = 0; i < 2; ++i) {
+        result += strs[0].charAt(i);
+      }
+    } else {
+      for (String s : strs) {
+        result += s.charAt(0);
+      }
+    }
+    return result.toUpperCase().trim();
+  }
+
+  private class UserInfoPanel extends JPanel {
+    public UserInfoPanel() {
+      UserRecord ur = SessionManager.getCurrentUser();
+      this.setLayout(new GridBagLayout());
+      this.setBackground(null);
+      this.setOpaque(false);
+
+      JLabel name = new JLabel(ur.m_username);
+      name.setForeground(colors.m_grey_2);
+      name.setHorizontalAlignment(SwingConstants.RIGHT);
+      name.setVerticalAlignment(SwingConstants.CENTER);
+      name.setFont(FontManager.getFont("NunitoBold", 14f));
+      JLabel role = new JLabel(ur.m_role);
+      role.setForeground(colors.m_bg_5);
+      role.setHorizontalAlignment(SwingConstants.RIGHT);
+      role.setVerticalAlignment(SwingConstants.CENTER);
+      role.setFont(FontManager.getFont("NunitoBold", 13f));
+
+      GridBagConstraints c = new GridBagConstraints();
+
+      c.gridheight = 1;
+      c.gridx = 0;
+      c.gridy = 0;
+      c.weightx = 1.0;
+      c.fill = GridBagConstraints.HORIZONTAL;
+      c.anchor = GridBagConstraints.FIRST_LINE_END;
+      c.insets = new Insets(5, 0, 0, 15);
+      this.add(name, c);
+
+      c.insets = new Insets(0, 0, 5, 15);
+      c.gridx = 0;
+      c.gridy = 1;
+      this.add(role, c);
+
+      c = new GridBagConstraints();
+      c.insets = new Insets(0, 0, 0, 0);
+      c.gridx = 1;
+      c.gridy = 0;
+      c.ipadx = 30;
+      c.ipady = 30;
+      c.weighty = 1.0;
+      c.gridheight = 2;
+      this.add(new AvatarPanel(getShortenedName(ur.m_username), colors.m_aqua, colors.m_fg_1), c);
+    }
   }
 
   private class AvatarPanel extends JPanel {
@@ -122,7 +183,7 @@ public class HeaderPanel extends JPanel {
 
       // Calculate position to center the text
       FontMetrics metrics = g2d.getFontMetrics(font);
-      int textX = getWidth() / 2 - metrics.stringWidth(text) / 2;
+      int textX = getWidth() / 2 - metrics.stringWidth(text) / 2 + 1;
       int textY = getHeight() / 2 + metrics.getAscent() / 2 - metrics.getDescent() / 2 - 1;
 
       // Draw the text in the center

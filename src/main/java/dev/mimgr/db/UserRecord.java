@@ -1,6 +1,5 @@
 package dev.mimgr.db;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -10,30 +9,41 @@ public class UserRecord {
     m_hash     = rs.getString(FIELD_HASH);
     m_salt     = rs.getString(FIELD_SALT);
     m_username = rs.getString(FIELD_USERNAME);
-    m_role     = rs.getString("role");
+    m_role     = rs.getString(FIELD_ROLE);
   }
 
-  public static ResultSet selectUserById(Connection con, int id) {
-    return DBQueries.select(con, QUERY_SELECT_BY_ID, id);
+  public static ResultSet selectUserById(int id) {
+    return DBQueries.select(QUERY_SELECT_BY_ID, id);
   }
 
-  public static ResultSet selectUserByName(Connection con, String username) {
-    return DBQueries.select(con, QUERY_SELECT_BY_NAME, username);
+  public static ResultSet selectUserByName(String username) {
+    return DBQueries.select(QUERY_SELECT_BY_NAME, username);
   }
 
-  public static ResultSet selectUserByRole(Connection con, int role) {
-    return DBQueries.select(con, QUERY_SELECT_BY_ROLE, roles[role]);
+  public static ResultSet selectUserByRole(int role) {
+    return DBQueries.select(QUERY_SELECT_BY_ROLE, roles[role]);
   }
 
   public static int insertUser(
-    Connection con, String username,
+    String username,
     String hash, String salt, String role
   ) {
-    return DBQueries.update(con, QUERY_INSERT, username, hash, salt, role);
+    if (role.isBlank()) {
+      role = roles[ROLE_USER];
+    }
+    int result = DBQueries.update(QUERY_INSERT, username, hash, salt, role);
+    // Ghi câu lệnh SQL vào file init.sql
+    if (result > 0) {
+      DBQueries.writeSQLToFile(DBQueries.sqlPath, String.format(
+        "INSERT INTO users (username, hash, salt) VALUES ('%s', '%s', '%s');",
+        username, hash, salt)
+      );
+    }
+    return result;
   }
 
-  public static int updateUser(Connection con, int id, String hash, String salt, int role) {
-    return DBQueries.update(con, QUERY_UPDATE, hash, salt, role, roles[role]);
+  public static int updateUser(int id, String hash, String salt, int role) {
+    return DBQueries.update(QUERY_UPDATE, hash, salt, role, roles[role]);
   }
 
   public int m_id;

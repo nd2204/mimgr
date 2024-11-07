@@ -1,12 +1,15 @@
 package dev.mimgr;
 
-import java.time.Instant;
-import java.util.Properties;
-import java.io.*;
-import java.nio.file.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.util.Properties;
 
 import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.DBQueries;
@@ -15,9 +18,7 @@ import dev.mimgr.utils.ResourceManager;
 
 public class SessionManager {
   public static void addRememberMeToken(String token, Instant expirationTime, int userId) {
-    Connection con = DBConnection.get_instance().get_connection();
     DBQueries.update(
-      con,
       "INSERT INTO remember_me_tokens (token_id, user_id, token_value, expiration_time) VALUES (?, ?, ?, ?)",
       Security.generateToken(), userId, token, expirationTime 
     );
@@ -33,7 +34,7 @@ public class SessionManager {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    
+ 
     System.out.println("SAVED TOKEN TO: " + TOKEN_FILE.toString());
   }
 
@@ -46,13 +47,12 @@ public class SessionManager {
       return null;
     }
 
-    Connection con = DBConnection.get_instance().get_connection();
-    try (ResultSet resultSet = DBQueries.select(con, SELECT_SESSION_QUERY, token)) {
+    try (ResultSet resultSet = DBQueries.select(SELECT_SESSION_QUERY, token)) {
       if (resultSet.next()) {
           Instant expirationTime = resultSet.getTimestamp("expiration_time").toInstant();
         if (Instant.now().isBefore(expirationTime)) {
           int id = resultSet.getInt("user_id");
-          ResultSet rs = UserRecord.selectUserById(con, id);
+          ResultSet rs = UserRecord.selectUserById(id);
           if (rs.next()) {
             return new UserRecord(rs);
           } else {
@@ -84,9 +84,8 @@ public class SessionManager {
   }
 
   public static void clearSession() {
-    Connection con = DBConnection.get_instance().get_connection();
     try {
-      int row = DBQueries.update(con, DELETE_SESSION_QUERY, getToken());
+      int row = DBQueries.update(DELETE_SESSION_QUERY, getToken());
       Files.deleteIfExists(TOKEN_FILE.toPath());
     } catch (IOException e) {
       e.printStackTrace();
