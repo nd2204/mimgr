@@ -10,6 +10,7 @@ public class ProductRecord {
   public String m_description;
   public int m_stock_quantity;
   public int m_category_id;
+  public int m_image_id;
 
   public static final String TABLE                 = "products";
   public static final String FIELD_ID              = "product_id";
@@ -18,14 +19,16 @@ public class ProductRecord {
   public static final String FIELD_DESCRIPTION     = "description";
   public static final String FIELD_STOCK_QUANTITY  = "stock_quantity";
   public static final String FIELD_CATEGORY_ID     = "category_id";
+  public static final String FIELD_IMAGE_ID        = "image_id";
 
   public static final String QUERY_SELECT_ALL = String.format("SELECT * FROM %s", TABLE);
   public static final String QUERY_SELECT_BY_KEY = String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_ID);
   public static final String QUERY_SELECT_BY_NAME = String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_NAME);
   public static final String QUERY_SELECT_LIKE_NAME = String.format("SELECT * FROM %s WHERE %s LIKE ?", TABLE, FIELD_NAME);
+
   public static final String QUERY_INSERT = String.format(
-    "INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?)",
-    TABLE, FIELD_NAME, FIELD_PRICE, FIELD_DESCRIPTION, FIELD_STOCK_QUANTITY, FIELD_CATEGORY_ID
+    "INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)",
+    TABLE, FIELD_NAME, FIELD_PRICE, FIELD_DESCRIPTION, FIELD_STOCK_QUANTITY, FIELD_CATEGORY_ID, FIELD_IMAGE_ID
   );
   public static final String QUERY_DELETE_BY_KEY = String.format(
     "DELETE FROM %s WHERE %s = ?",
@@ -82,27 +85,21 @@ public class ProductRecord {
     return DBQueries.update(QUERY_DELETE_BY_KEY, id);
   }
 
-  public static int insert(String name, Double price, String description, int stock_quantity, int category_id) {
-    int result = DBQueries.update(QUERY_INSERT, name, price, description, stock_quantity, category_id);
-    // Ghi câu lệnh SQL vào file init.sql
-    if (result > 0) {
-      DBQueries.writeSQLToFile(DBQueries.sqlPath, String.format(
-        "INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES ('%s', %.2f, '%s', %d, %d);",
-        name, price, description, stock_quantity, category_id)
-      );
-    }
+  public static int insert(String name, Double price, String description, int stock_quantity, int category_id, int image_id) {
+    int result = DBQueries.update(
+      QUERY_INSERT, name, price, description,
+      stock_quantity, category_id,
+      (image_id < 0) ? null : image_id
+    );
     return result;
   }
 
   public static int insert(ProductRecord pr) {
-    int result = DBQueries.update(QUERY_INSERT, pr.m_name, pr.m_price, pr.m_description, pr.m_stock_quantity, pr.m_category_id);
-    // Ghi câu lệnh SQL vào file init.sql
-    if (result > 0) {
-      DBQueries.writeSQLToFile(DBQueries.sqlPath, String.format(
-        "INSERT INTO products (name, price, description, stock_quantity, category_id) VALUES ('%s', %.2f, '%s', %d, %d);",
-        pr.m_name, pr.m_price, pr.m_description, pr.m_stock_quantity, pr.m_category_id)
-      );
-    }
+    int result = DBQueries.update(
+      QUERY_INSERT, pr.m_name, pr.m_price, pr.m_description,
+      pr.m_stock_quantity, pr.m_category_id,
+      (pr.m_image_id < 0) ? null : pr.m_image_id
+    );
     return result;
   }
 

@@ -10,27 +10,37 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import dev.mimgr.FormAddProduct;
+import dev.mimgr.FormEditProduct;
+
 import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import dev.mimgr.IconManager;
 import dev.mimgr.TableView;
+import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.ImageRecord;
+import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 
-public class ProductTableView extends JPanel implements TableModelListener, IMediaView {
+public class ProductTableView extends JPanel implements TableModelListener {
   public ProductTableView(ColorScheme colors) {
     this.colors = colors;
 
@@ -61,43 +71,69 @@ public class ProductTableView extends JPanel implements TableModelListener, IMed
     this.tableScrollPane.setOpaque(true);
     this.tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-    this.tv.add_column(table, "", TableView.setup_checkbox_column(colors));
-    this.tv.add_column(table, "", TableView.setup_image_column(colors));
-    this.tv.add_column(table, "Image name", TableView.setup_default_column());
-    this.tv.add_column(table, "Filename", TableView.setup_default_column());
-    this.tv.add_column(table, "Date", TableView.setup_default_column());
-    this.tv.add_column(table, "Author", TableView.setup_default_column());
-    this.tv.add_column(table, "Caption", TableView.setup_default_column());
-    this.tv.load_column(table, model);
+    tv.add_column(table, "", TableView.setup_checkbox_column(colors));
+    tv.add_column(table, "", TableView.setup_image_column(colors));
+    tv.add_column(table, "Name", TableView.setup_default_column());
+    tv.add_column(table, "Price", TableView.setup_default_column());
+    tv.add_column(table, "Stock", TableView.setup_default_column());
+    tv.add_column(table, "Description", TableView.setup_default_column());
+    tv.load_column(table, model);
 
     model.addTableModelListener(this);
-    refresh();
+    updateView(() -> ProductRecord.selectAll());
 
     this.setLayout(new BorderLayout());
     this.add(tableScrollPane);
     tableScrollPane.setViewportView(table);
     this.setVisible(true);
+
+    table.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        // Check if it's a double-click
+        if (e.getClickCount() == 2) {
+          int row = table.getSelectedRow();
+          if (row != -1) {
+            FormEditProduct frame = new FormEditProduct(productList.get(row));
+            frame.setVisible(true);
+            for (MButton btn : frame.getEditSubmitButtons()) {
+              setButtonRefreshOnClick(btn);
+            }
+            for (MButton btn : frame.getEditDeleteButtons()) {
+              setButtonRefreshOnClick(btn);
+            }
+          }
+        }
+      }
+    });
   }
 
-  public void updateTable(ResultSet queryResult, DefaultTableModel model) {
+  public void updateView(Supplier<ResultSet> queryInvoker) {
     model.setRowCount(0);
-    imageList = new ArrayList<>();
+    selectedProducts.clear();
+    productList = new ArrayList<>();
+    ResultSet queryResult = queryInvoker.get();
+    currentQueryInvoker = queryInvoker;
     try {
       while (queryResult.next()) {
-        ImageRecord ir = new ImageRecord(queryResult);
-        imageList.add(ir);
-        Icon icon = IconManager.loadIcon(Paths.get(ir.m_url).toAbsolutePath().toFile());
-        if (icon == null) {
-          icon = IconManager.getIcon("image.png", colors.m_grey_0);
+        ProductRecord pr = new ProductRecord(queryResult);
+        ImageRecord ir = ImageRecord.selectById(pr.m_image_id);
+
+        Icon icon = IconManager.getIcon("image.png", colors.m_grey_0);
+        if (ir != null) {
+          Icon testIcon = IconManager.loadIcon(Paths.get(ir.m_url).toAbsolutePath().toFile());
+          if (testIcon != null) {
+            icon = testIcon;
+          }
         }
+        productList.add(pr);
         model.addRow(new Object[] {
             Boolean.FALSE,
             icon,
-            ir.m_name,
-            ir.m_url.substring(ir.m_url.lastIndexOf("/") + 1),
-            ir.m_created_at,
-            ImageRecord.getImageAuthor(ir),
-            ir.m_caption
+            pr.m_name,
+            pr.m_price,
+            pr.m_stock_quantity,
+            pr.m_description
         });
       }
     } catch (SQLException e) {
@@ -105,34 +141,28 @@ public class ProductTableView extends JPanel implements TableModelListener, IMed
     }
   }
 
-  @Override
-  public void deleteSelectedImages() {
-    for (ImageRecord ir : selectedImages.values()) {
-      deleteImage(ir);
+  public void deleteSelectedProducts() {
+    for (ProductRecord pr : selectedProducts.values()) {
+      deleteProduct(pr);
     }
-    selectedImages.clear();
+    selectedProducts.clear();
     refresh();
   }
 
-  @Override
-  public List<ImageRecord> getSelectedImages() {
-    return new ArrayList<>(this.selectedImages.values());
+  public List<ProductRecord> getSelectedProducts() {
+    return new ArrayList<>(this.selectedProducts.values());
   }
 
-  @Override
   public void refresh() {
-    updateTable(ImageRecord.selectAll(), model);
+    updateView(currentQueryInvoker);
   }
 
-  public Set<Integer> getSelectedImagesId() {
-    return this.selectedImages.keySet();
+  public void reset() {
+    updateView(() -> ProductRecord.selectAll());
   }
 
-  private void deleteImage(ImageRecord ir) {
-    ImageRecord.delete(ir);
-    try {
-      Files.deleteIfExists(Path.of(ir.m_url));
-    } catch (IOException e) {}
+  private void deleteProduct(ProductRecord pr) {
+    ProductRecord.delete(pr);
   }
 
   @Override
@@ -145,9 +175,9 @@ public class ProductTableView extends JPanel implements TableModelListener, IMed
         if (column == 0) {
           if (newValue instanceof Boolean) {
             if ((Boolean) newValue) {
-              selectedImages.put(row, imageList.get(row));
+              selectedProducts.put(row, productList.get(row));
             } else {
-              selectedImages.remove(row);
+              selectedProducts.remove(row);
             }
           }
         }
@@ -155,8 +185,19 @@ public class ProductTableView extends JPanel implements TableModelListener, IMed
     }
   }
 
-  private HashMap<Integer, ImageRecord> selectedImages = new HashMap<>();
-  private ArrayList<ImageRecord> imageList = new ArrayList<>();
+  public void setButtonRefreshOnClick(MButton btn) {
+    btn.addActionListener((actionEvent) -> {
+      new Thread(() -> {
+        SwingUtilities.invokeLater(() -> {
+          refresh();
+        });
+      }).start();
+    });
+  }
+
+  private Supplier<ResultSet> currentQueryInvoker;
+  private HashMap<Integer, ProductRecord> selectedProducts = new HashMap<>();
+  private ArrayList<ProductRecord> productList = new ArrayList<>();
   private JScrollPane       tableScrollPane;
   private MTable            table;
   private DefaultTableModel model;

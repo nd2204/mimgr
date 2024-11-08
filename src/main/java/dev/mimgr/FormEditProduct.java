@@ -35,7 +35,7 @@ import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
-class FormEditProduct extends JFrame {
+public class FormEditProduct extends JFrame {
   ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST);
 
   private double m_aspect_ratio;

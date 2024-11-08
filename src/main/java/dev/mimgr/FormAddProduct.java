@@ -23,7 +23,7 @@ import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
-class FormAddProduct extends JFrame {
+public class FormAddProduct extends JFrame {
   private double m_aspect_ratio;
   private int    m_width;
   private int    m_height;
@@ -99,7 +99,7 @@ class FormAddProduct extends JFrame {
           JOptionPane.showMessageDialog(null, "Not valid category name");
         }
         else {
-          ProductRecord.insert(name, price, description, stock_quantity, category_id);
+          ProductRecord.insert(name, price, description, stock_quantity, category_id, -1);
           JOptionPane.showMessageDialog(null, "Success");
           FormAddProduct.this.dispose();
         }

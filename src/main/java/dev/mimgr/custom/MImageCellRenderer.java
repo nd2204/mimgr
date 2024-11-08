@@ -25,7 +25,7 @@ public class MImageCellRenderer extends JLabel implements TableCellRenderer {
     if (value instanceof ImageIcon) {
       Icon icon = (Icon) value;
       if (icon.getIconHeight() > imageMaxSize) {
-        icon =  IconManager.changeIconSize((ImageIcon) value, imageMaxSize, imageMaxSize);
+        icon =  IconManager.resizeByAspectRatio((ImageIcon) value, imageMaxSize, imageMaxSize);
       }
       this.setIcon(icon);
     } else {

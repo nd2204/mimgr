@@ -20,12 +20,12 @@ public class ImageRecord {
   public static final String FIELD_AUTHOR     = "image_author";
 
   public static final String QUERY_SELECT_ALL = String.format("SELECT * FROM %s", TABLE);
-  public static final String QUERY_SELECT_BY_KEY = String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_ID);
+  public static final String QUERY_SELECT_BY_ID = String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_ID);
   public static final String QUERY_INSERT = String.format(
     "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)",
     TABLE, FIELD_NAME, FIELD_URL, FIELD_CAPTION, FIELD_AUTHOR
   );
-  public static final String QUERY_DELETE_BY_KEY = String.format(
+  public static final String QUERY_DELETE_BY_ID = String.format(
     "DELETE FROM %s WHERE %s = ?",
     TABLE, FIELD_ID
   );
@@ -55,12 +55,21 @@ public class ImageRecord {
     return DBQueries.select(QUERY_SELECT_ALL);
   }
 
+  public static ImageRecord selectById(int id) {
+    try (ResultSet rs = DBQueries.select(QUERY_SELECT_BY_ID, id)) {
+      if (rs == null || !rs.next()) return null;
+      return new ImageRecord(rs);
+    } catch (SQLException ex) {
+      return null;
+    }
+  }
+
   public static int delete(ImageRecord ir) {
-    return DBQueries.update(QUERY_DELETE_BY_KEY, ir.m_id);
+    return DBQueries.update(QUERY_DELETE_BY_ID, ir.m_id);
   }
 
   public static int delete(int id) {
-    return DBQueries.update(QUERY_DELETE_BY_KEY, id);
+    return DBQueries.update(QUERY_DELETE_BY_ID, id);
   }
 
   public static int insert(String image_url, String image_name, String image_caption, int image_author) {

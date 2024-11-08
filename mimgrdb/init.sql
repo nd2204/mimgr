@@ -29,26 +29,18 @@ CREATE TABLE IF NOT EXISTS products (
   category_id    INT,
   created_at     TIMESTAMP      DEFAULT CURRENT_TIMESTAMP,
   updated_at     TIMESTAMP      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  image_id       INT,
   FOREIGN KEY(category_id) REFERENCES categories(category_id)
 );
 
 CREATE TABLE IF NOT EXISTS images (
-  image_id         INT AUTO_INCREMENT PRIMARY KEY,
-  image_name       VARCHAR(255),
+  image_id         INT          AUTO_INCREMENT PRIMARY KEY,
   image_url        VARCHAR(255) UNIQUE,
+  image_name       VARCHAR(255),
   image_caption    TEXT,
-  image_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   image_author     INT,
+  image_created_at TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (image_author) REFERENCES users(id)
-);
-
-CREATE TABLE IF NOT EXISTS product_images (
-  image_product_id       INT            AUTO_INCREMENT PRIMARY KEY,
-  product_id     INT            NOT NULL,
-  image_id    INT,
-  is_main_image  BOOLEAN        DEFAULT FALSE,
-  FOREIGN KEY(product_id) REFERENCES products(product_id) ON DELETE CASCADE,
-  FOREIGN KEY(image_id) REFERENCES images(image_id)  ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS orders (
