@@ -18,7 +18,6 @@ public class PanelManager {
 
   public static void register_panel(JPanel panel, String id) {
     m_main_panel.add(panel, id);
-    System.out.println("Registered panel with id: " + id);
     panelMap.put(id, panel);
   }
 
@@ -37,7 +36,7 @@ public class PanelManager {
 
   public static void show(String id) {
     assert panelMap.containsKey(id) :
-    "Error: No panel registered with ID '" + id + "'";
+      "Error: No panel registered with ID '" + id + "'";
     m_panel_switcher.show(m_main_panel, id);
     currentPanelId = id;
   }

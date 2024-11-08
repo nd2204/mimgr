@@ -31,7 +31,7 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
   FormSignUp(ColorScheme colors) {
     super(colors.m_green, new Color(0x357b01));
     m_colors = colors;
-    m_connection = DBConnection.get_instance().get_connection();
+    m_connection = DBConnection.getInstance().getConection();
 
     this.setup_form_style();
 
@@ -302,16 +302,26 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
     }
 
     if (e.getSource() == signup_button) {
+      trySignUp();
+    }
+  }
+
+  private void trySignUp() {
       String username = tf_username.getTextString();
       String password = pf_password.getTextString();
       String salt = Security.generate_salt(16);
+
+      if (DBConnection.getInstance().getConection() == null) {
+        JOptionPane.showMessageDialog(null, "FATAL: Cannot connect to database");
+        return;
+      }
+
       if (valid_username(username) && valid_password(password)) {
         UserRecord.insertUser(username, Security.hash_string(password + salt), salt, "");
         Entry.removeLoginSignup();
         Entry.registerDashBoard(m_colors);
       }
       return;
-    }
   }
 
   @Override

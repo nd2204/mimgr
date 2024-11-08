@@ -11,6 +11,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.UserRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
@@ -36,17 +37,12 @@ class Entry extends JFrame {
     if (ur == null) {
       registerLoginSignup(colors);
     } else {
-      SessionManager.setCurrentUser(ur);
       registerDashBoard(colors);
     }
 
-    if (ur != null) {
-      System.out.println("Logged in as user: " + ur.m_username + " as role: " + ur.m_role);
-    }
-
-    for (JPanel panel : PanelManager.getAllPanels()) {
-      System.out.println(panel);
-    }
+//     for (JPanel panel : PanelManager.getAllPanels()) {
+//       System.out.println(panel);
+//     }
 
     // Main window
     this.setLayout(new BorderLayout());
@@ -63,6 +59,7 @@ class Entry extends JFrame {
   static final WindowListener on_close_handler() {
     return new WindowAdapter() {
       public void windowClosing(WindowEvent e) {
+        DBConnection.getInstance().closeConnection();
         System.exit(0);
       }
     };

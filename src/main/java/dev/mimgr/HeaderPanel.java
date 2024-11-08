@@ -183,7 +183,7 @@ public class HeaderPanel extends JPanel {
 
       // Calculate position to center the text
       FontMetrics metrics = g2d.getFontMetrics(font);
-      int textX = getWidth() / 2 - metrics.stringWidth(text) / 2 + 1;
+      int textX = getWidth() / 2 - metrics.stringWidth(text) / 2;
       int textY = getHeight() / 2 + metrics.getAscent() / 2 - metrics.getDescent() / 2 - 1;
 
       // Draw the text in the center

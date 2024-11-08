@@ -13,21 +13,15 @@ import java.util.Properties;
 
 import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.DBQueries;
+import dev.mimgr.db.SessionRecord;
 import dev.mimgr.db.UserRecord;
 import dev.mimgr.utils.ResourceManager;
 
 public class SessionManager {
-  public static void addRememberMeToken(String token, Instant expirationTime, int userId) {
-    DBQueries.update(
-      "INSERT INTO remember_me_tokens (token_id, user_id, token_value, expiration_time) VALUES (?, ?, ?, ?)",
-      Security.generateToken(), userId, token, expirationTime 
-    );
-  }
-
   public static void saveSession(String token, Instant expirationTime, int userId) {
     Properties properties = new Properties();
     properties.setProperty(TOKEN_KEY, token);
-    addRememberMeToken(token, expirationTime, userId);
+    SessionRecord.insert(Security.generateToken(), token, userId, expirationTime);
 
     try (FileOutputStream outputStream = new FileOutputStream(TOKEN_FILE)) {
       properties.store(outputStream, "User session data");
@@ -47,21 +41,20 @@ public class SessionManager {
       return null;
     }
 
-    try (ResultSet resultSet = DBQueries.select(SELECT_SESSION_QUERY, token)) {
-      if (resultSet.next()) {
-          Instant expirationTime = resultSet.getTimestamp("expiration_time").toInstant();
-        if (Instant.now().isBefore(expirationTime)) {
-          int id = resultSet.getInt("user_id");
-          ResultSet rs = UserRecord.selectUserById(id);
-          if (rs.next()) {
-            return new UserRecord(rs);
-          } else {
-            return null;
-          }
-        } else {
-          System.err.println("NO TOKEN FOUND WITH THIS DEVICE TOKEN");
-          clearSession();
-        }
+    try (ResultSet resultSet = SessionRecord.selectByToken(token)) {
+      if (resultSet == null) return null;
+      if (!resultSet.next()) return null;
+
+      SessionRecord sr = new SessionRecord(resultSet);
+      if (Instant.now().isBefore(sr.m_expiration_time)) {
+        ResultSet rs = UserRecord.selectUserById(sr.m_user_id);
+        if (!rs.next()) return null;
+        UserRecord ur = new UserRecord(rs);
+        setCurrentUser(ur);
+        return ur;
+      } else {
+        System.err.println("NO TOKEN FOUND WITH THIS DEVICE TOKEN");
+        clearSession();
       }
     } catch (SQLException e) {
       e.printStackTrace();
@@ -85,7 +78,7 @@ public class SessionManager {
 
   public static void clearSession() {
     try {
-      int row = DBQueries.update(DELETE_SESSION_QUERY, getToken());
+      SessionRecord.deleteByToken(getToken());
       Files.deleteIfExists(TOKEN_FILE.toPath());
     } catch (IOException e) {
       e.printStackTrace();
@@ -98,12 +91,8 @@ public class SessionManager {
 
   public static void setCurrentUser(UserRecord ur) {
     currentUser = ur;
+    System.out.println("Logged in as user: " + ur.m_username + " as role: " + ur.m_role);
   }
-
-  private static final String SELECT_SESSION_QUERY = 
-    "SELECT user_id, expiration_time FROM remember_me_tokens WHERE token_value = ?";
-  private static final String DELETE_SESSION_QUERY = 
-    "DELETE FROM remember_me_tokens WHERE token_value = ?";
 
   private static ResourceManager rm = ResourceManager.getInstance();
   private static UserRecord currentUser = null;

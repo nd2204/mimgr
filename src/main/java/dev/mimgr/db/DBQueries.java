@@ -8,8 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DBQueries {
-  public static String sqlPath = "mimgrdb/init.sql";
-  private static Connection dbcon = DBConnection.get_instance().get_connection();
+  public static final String sqlPath = "mimgrdb/init.sql";
+  private static Connection dbcon = DBConnection.getInstance().getConection();
 
   /*
    * General db insert function
@@ -18,7 +18,8 @@ public class DBQueries {
    */
   public static int update(String stmt, Object... args) {
     int result = 0;
-    dbcon = DBConnection.get_instance().get_connection();
+    dbcon = DBConnection.getInstance().getConection();
+    if (dbcon == null) return 0;
     try (PreparedStatement preparedStatement = dbcon.prepareStatement(stmt)) {
       for (int i = 1; i < args.length + 1; ++i) {
         preparedStatement.setObject(i, args[i-1]);
@@ -32,7 +33,8 @@ public class DBQueries {
 
   public static ResultSet select(String stmt, Object... args) {
     ResultSet resultSet = null;
-    dbcon = DBConnection.get_instance().get_connection();
+    dbcon = DBConnection.getInstance().getConection();
+    if (dbcon == null) return null;
     try {
       PreparedStatement preparedStatement = dbcon.prepareStatement(stmt);
       for (int i = 1; i < args.length + 1; ++i) {
@@ -42,7 +44,6 @@ public class DBQueries {
     } catch (SQLException e) {
       e.printStackTrace();
     }
-
     return resultSet;
   }
 

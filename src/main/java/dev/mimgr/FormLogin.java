@@ -12,12 +12,8 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.DBConnection;
-import dev.mimgr.db.DBQueries;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.GradientPanel;
@@ -233,7 +229,7 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
       String username = tf_username.getTextString();
       String password = pf_password.getTextString();
 
-      if (DBConnection.get_instance().get_connection() == null) {
+      if (DBConnection.getInstance().getConection() == null) {
         JOptionPane.showMessageDialog(null, "FATAL: Cannot connect to database");
         return;
       }
