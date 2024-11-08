@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -39,7 +40,7 @@ import dev.mimgr.utils.ResourceManager;
 
 public class UploadPanel extends JPanel {
 
-  public MComboBox<String> getCategoryComponent() {
+  public MComboBox<CategoryRecord> getCategoryComponent() {
     return this.cbCategory;
   }
 
@@ -108,6 +109,7 @@ public class UploadPanel extends JPanel {
     this.setMaximumSize(new Dimension(1000, Integer.MAX_VALUE));
 
     MScrollPane scrollPane = new MScrollPane(colors);
+    scrollPane.getVerticalScrollBar().setUnitIncrement(100);
     this.add(scrollPane);
 
     scrollPane.add(thisPanel);
@@ -193,8 +195,9 @@ public class UploadPanel extends JPanel {
     taDescription.setFont(nunito_bold_14);
     taDescription.setLineWrap(true);
 
-    String[] options = get_category_names();
-    cbCategory = new MComboBox<>(options, colors);
+
+    cbCategory = new MComboBox<>(colors);
+    CategoryTree.populateComboBox(cbCategory);
     cbCategory.getEditor().getEditorComponent().setFont(nunito_bold_14);
 
     // ========================= Buttons =========================
@@ -202,7 +205,7 @@ public class UploadPanel extends JPanel {
     this.btnSubmit.setFont(nunito_bold_14);
     this.btnSubmit.setBackground(colors.m_bg_1);
     this.btnSubmit.setBorderColor(colors.m_bg_1);
-    this.btnSubmit.setForeground(colors.m_bg_5);
+    this.btnSubmit.setDefaultForeground(colors.m_bg_2);
     this.btnSubmit.setBorderWidth(2);
     this.btnSubmit.setEnabled(true);
 
@@ -559,9 +562,49 @@ public class UploadPanel extends JPanel {
   private JPanel thisPanel = new JPanel();
   private JLabel lblAddProduct = new JLabel("Add Product");
   private MTextField tfTitle, tfPrice, tfStock;
-  private MComboBox<String> cbCategory;
+  private MComboBox<CategoryRecord> cbCategory;
   private MTextArea taDescription;
   private MButton btnSubmit, btnDelete, btnClearImages;
   private ColorScheme colors;
   private ProductRecord product;
+}
+
+
+class CategoryTree {
+  public static List<CategoryRecord> buildCategoryTree() {
+    HashMap<Integer, CategoryRecord> categoryDict = new HashMap<>();
+    try (ResultSet rs = CategoryRecord.selectAll()) {
+      while (rs.next()) {
+        CategoryRecord cr = new CategoryRecord(rs);
+        categoryDict.put(cr.m_id, cr);
+      }
+    } catch (SQLException ex) {
+      ex.printStackTrace();
+    }
+
+    List<CategoryRecord> rootCategory = new ArrayList<>();
+    int currentParentId;
+    for (CategoryRecord cat : categoryDict.values()) {
+      currentParentId = cat.m_parent_id;
+      if (categoryDict.containsKey(currentParentId)) {
+        categoryDict.get(currentParentId).addChild(cat);
+      } else {
+        rootCategory.add(cat);
+      }
+    }
+    return rootCategory;
+  }
+
+  private static void addCategoryToComboBox(MComboBox<CategoryRecord> comboBox, List<CategoryRecord> categories, int level) {
+    for (CategoryRecord cat :categories) {
+      cat.m_name = "    ".repeat(level) + cat.m_name;
+      comboBox.addItem(cat);
+      addCategoryToComboBox(comboBox, cat.childs, level + 1);
+    }
+  }
+
+  public static void populateComboBox(MComboBox<CategoryRecord> comboBox) {
+    List<CategoryRecord> categories = buildCategoryTree();
+    addCategoryToComboBox(comboBox, categories, 0);
+  }
 }

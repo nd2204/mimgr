@@ -13,6 +13,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.JFrame;
@@ -20,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
@@ -203,48 +208,63 @@ public class FormEditProduct extends JFrame {
 
   private class EditButtonListener implements ActionListener {
     public EditButtonListener(MButton sb, UploadPanel panel, ProductRecord pr) {
-      this.btnDelete = panel.getDeleteComponent();
-      this.btnSubmit = panel.getSubmitComponent();
       this.sidebarButton = sb;
       this.panel = panel;
+      this.panel.getDeleteComponent().setText("Delete Product");
+      this.panel.getLabelComponent().setVisible(false);
+      this.panel.setProductRecord(pr);
 
-      tfTitle = panel.getTitleComponent();
-      tfPrice = panel.getPriceComponent();
-      taDescription = panel.getDescriptionComponent();
-      tfStock = panel.getStockComponent();
-      cbCategory = panel.getCategoryComponent();
-      product_id = pr.m_id;
-
-      TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();
-      tfPrice.getDocument().addDocumentListener(textFieldListener);
-      tfTitle.getDocument().addDocumentListener(textFieldListener);
-      tfStock.getDocument().addDocumentListener(textFieldListener);
-      taDescription.getDocument().addDocumentListener(textFieldListener);
-
-      tfTitle.setText(pr.m_name);
-      tfStock.setText(String.valueOf(pr.m_stock_quantity));
-      tfPrice.setText(String.valueOf(pr.m_price));
-      taDescription.setText(pr.m_description);
-      cbCategory.setSelectedItem(get_category_name(pr.m_category_id));
-      panel.getDeleteComponent().setText("Delete Product");
-      panel.getLabelComponent().setVisible(false);
-      panel.setProductRecord(pr);
-
-      Init();
+      InitializeComponent();
     }
 
-    private void Init() {
-      btnSubmit = panel.getSubmitComponent();
-      btnSubmit.addActionListener(this);
-      btnDelete = panel.getDeleteComponent();
-      btnDelete.addActionListener(this);
+    private void InitializeComponent() {
+      this.btnDelete = panel.getDeleteComponent();
+      this.btnDelete.addActionListener(this);
+
+      this.btnSubmit = panel.getSubmitComponent();
+      this.btnSubmit.addActionListener(this);
+      this.btnSubmit.setEnabled(false);
+      this.btnSubmit.setBackground(colors.m_bg_1);
+      this.btnSubmit.setBorderColor(colors.m_bg_1);
+      this.btnSubmit.setForeground(colors.m_bg_3);
+      this.btnSubmit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+
+      ProductRecord pr = this.panel.getProductRecord();
+
+      this.tfTitle = panel.getTitleComponent();
+      this.tfTitle.setText(pr.m_name);
+      this.tfTitle.setCaretPosition(0);
+
+      this.tfPrice = panel.getPriceComponent();
+      this.tfPrice.setText(String.valueOf(pr.m_price));
+
+      this.taDescription = panel.getDescriptionComponent();
+      this.taDescription.setText(pr.m_description);
+
+      this.tfStock = panel.getStockComponent();
+      this.tfStock.setText(String.valueOf(pr.m_stock_quantity));
+
+      this.cbCategory = panel.getCategoryComponent();
+      this.cbCategory.setSelectedItem(CategoryRecord.selectByKey(pr.m_category_id));
+
+      TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();
+
+      this.tfTitle.getDocument().addDocumentListener(textFieldListener);
+      this.tfPrice.getDocument().addDocumentListener(textFieldListener);
+      this.tfStock.getDocument().addDocumentListener(textFieldListener);
+      this.taDescription.getDocument().addDocumentListener(textFieldListener);
+      JTextField tf = (JTextField) this.cbCategory.getEditor().getEditorComponent();
+      tf.getDocument().addDocumentListener(textFieldListener);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == btnDelete) {
         sidebarPanel.removeMenuButton(sidebarButton);
-        ProductRecord.delete(product_id);
+        ProductRecord.delete(panel.getProductRecord().m_id);
+        if (sidebarPanel.getMenuButtonCount() < 1) {
+          FormEditProduct.this.dispose();
+        }
         JOptionPane.showMessageDialog(null, "Success");
         return;
       }
@@ -261,7 +281,7 @@ public class FormEditProduct extends JFrame {
           JOptionPane.showMessageDialog(null, "Not valid category name");
         }
         else {
-          ProductRecord.update(name, price, description, stock_quantity, category_id, product_id);
+          ProductRecord.update(name, price, description, stock_quantity, category_id, panel.getProductRecord().m_id);
           JOptionPane.showMessageDialog(null, "Success");
         }
         return;
@@ -269,37 +289,47 @@ public class FormEditProduct extends JFrame {
     }
 
     private class TextFieldDocumentListener implements DocumentListener {
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-      checkFields();
-    }
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        checkFields();
+      }
 
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-      checkFields();
-    }
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        checkFields();
+      }
 
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-      checkFields();
-    }
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        checkFields();
+      }
 
-    private void checkFields() {
-      if (!tfTitle.getText().isEmpty() && !tfPrice.getText().isEmpty() && !tfStock.getText().isEmpty()) {
-        btnSubmit.setBackground(colors.m_blue);
-        btnSubmit.setBorderColor(colors.m_blue);
-        btnSubmit.setForeground(colors.m_fg_1);
-        btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSubmit.setEnabled(true);
-      } else {
-        btnSubmit.setEnabled(false);
-        btnSubmit.setBackground(colors.m_bg_4);
-        btnSubmit.setBorderColor(colors.m_bg_4);
-        btnSubmit.setForeground(colors.m_grey_1);
+      private void checkFields() {
+        ProductRecord pr = panel.getProductRecord();
+        CategoryRecord cr = new CategoryRecord(pr.m_category_id, "", 0);
+        cr.m_id = pr.m_category_id;
+        if (!tfTitle.getText().isEmpty() && !tfPrice.getText().isEmpty() && !tfStock.getText().isEmpty()) {
+          if ( !tfTitle.getText().equals(pr.m_name)
+            || !tfPrice.getText().equals(String.valueOf(pr.m_price))
+            || !tfStock.getText().equals(String.valueOf(pr.m_stock_quantity))
+            || !taDescription.getText().equals(String.valueOf(pr.m_description))
+            || !cbCategory.getSelectedItem().equals(cr))
+          {
+            btnSubmit.setBackground(colors.m_blue);
+            btnSubmit.setBorderColor(colors.m_blue);
+            btnSubmit.setDefaultForeground(colors.m_fg_1);
+            btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            btnSubmit.setEnabled(true);
+          }
+          return;
+        }
+        btnSubmit.setBackground(colors.m_bg_1);
+        btnSubmit.setBorderColor(colors.m_bg_1);
+        btnSubmit.setDefaultForeground(colors.m_bg_3);
         btnSubmit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        btnSubmit.setEnabled(false);
       }
     }
-  }
 
     MButton sidebarButton, btnSubmit, btnDelete;
     private UploadPanel panel;
@@ -307,38 +337,17 @@ public class FormEditProduct extends JFrame {
     private MTextField tfTitle;
     private MTextField tfPrice;
     private MTextField tfStock;
-    int product_id;
-    private MComboBox<String> cbCategory;
+    private MComboBox<CategoryRecord> cbCategory;
   }
 
   private int get_category_id(String category_name) {
-    ResultSet queryResult = CategoryRecord.selectByName(category_name);
-    int id_result = 0;
-    try {
-      while (queryResult.next()) {
-        id_result = queryResult.getInt("category_id");
-      }
-      return id_result;
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return id_result;
+    CategoryRecord cr = CategoryRecord.selectByName(category_name);
+    return (cr == null) ? 0 : cr.m_id;
   }
 
   private String get_category_name(int category_id) {
-    ResultSet queryResult = CategoryRecord.selectByKey(category_id);
-    String name_result = "";
-    try {
-      while (queryResult.next()) {
-        name_result = queryResult.getString("category_name");
-      }
-      return name_result;
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return name_result;
+    CategoryRecord cr = CategoryRecord.selectByKey(category_id);
+    return (cr == null) ? "" : cr.m_name;
   }
 
   private SidebarPanel sidebarPanel;

@@ -3,6 +3,8 @@ package dev.mimgr.db;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import dev.mimgr.SessionManager;
+
 public class ImageRecord {
   public int m_id;
   public String m_name;
@@ -80,7 +82,13 @@ public class ImageRecord {
 
   public static int insert(ImageRecord ir) {
     ir.m_name = ir.m_name.substring(0, ir.m_name.indexOf("."));
-    int result = DBQueries.update(QUERY_INSERT, ir.m_name, ir.m_url, ir.m_caption, ir.m_author);
+    int result = DBQueries.update(
+      QUERY_INSERT,
+      ir.m_name,
+      ir.m_url,
+      ir.m_caption,
+      SessionManager.getCurrentUser().m_id
+    );
     return result;
   }
 

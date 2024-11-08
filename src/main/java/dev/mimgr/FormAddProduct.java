@@ -142,20 +142,9 @@ public class FormAddProduct extends JFrame {
   }
 
   private int get_category_id(String category_name) {
-    ResultSet queryResult = CategoryRecord.selectByName(category_name);
-    int id_result = 0;
-    try {
-      while (queryResult.next()) {
-        id_result = queryResult.getInt("category_id");
-      }
-      return id_result;
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return id_result;
+    CategoryRecord cr = CategoryRecord.selectByName(category_name);
+    return (cr == null) ? 0 : cr.m_id;
   }
-
 
   public static void main(String arg[]) {
     ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST);
@@ -167,7 +156,7 @@ public class FormAddProduct extends JFrame {
   private MTextField tfTitle;
   private MTextField tfPrice;
   private MTextField tfStock;
-  private MComboBox<String> cbCategory;
+  private MComboBox<CategoryRecord> cbCategory;
   private MButton btnDelete;
   private MButton btnSubmit;
   private ColorScheme colors;

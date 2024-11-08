@@ -2,11 +2,13 @@ package dev.mimgr.db;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class CategoryRecord {
   public int m_id;
   public String m_name;
   public int m_parent_id;
+  public ArrayList<CategoryRecord> childs;
 
   public static final String TABLE            = "categories";
   public static final String FIELD_ID         = "category_id";
@@ -21,31 +23,58 @@ public class CategoryRecord {
     m_id = id;
     m_name = name;
     m_parent_id = parent_id;
+    childs = new ArrayList<>();
+  }
+
+  public void addChild(CategoryRecord cr) {
+    this.childs.add(cr);
+  }
+
+  @Override
+  public String toString() {
+    return m_name;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof CategoryRecord) {
+      CategoryRecord other = (CategoryRecord) obj;
+      return this.m_id == other.m_id;  // Match by ID
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return Integer.hashCode(m_id);  // Make sure the hash code is based on ID
   }
 
   public CategoryRecord(ResultSet rs) throws SQLException {
-    m_id = rs.getInt("id");
-    m_name = rs.getString("category_name");
-    m_parent_id = rs.getInt("parent_id");
+    m_id = rs.getInt(FIELD_ID);
+    m_name = rs.getString(FIELD_NAME);
+    m_parent_id = rs.getInt(FIELD_PARENT_ID);
+    childs = new ArrayList<>();
   }
 
   public static ResultSet selectAll() {
     return DBQueries.select(QUERY_SELECT_ALL);
   }
-  
-  public static ResultSet selectByKey(int id) {
-    return DBQueries.select(QUERY_SELECT_BY_KEY, id);
+
+  public static CategoryRecord selectByKey(int id) {
+    try (ResultSet rs = DBQueries.select(QUERY_SELECT_BY_KEY, id)) {
+      if (!rs.next()) return null;
+      return new CategoryRecord(rs);
+    } catch (SQLException ex) {
+      return null;
+    }
   }
 
-  public static ResultSet selectByKey(ProductRecord pr) {
-    return DBQueries.select(QUERY_SELECT_BY_KEY, pr.m_id);
-  }
-  
-  public static ResultSet selectByName(String name) {
-    return DBQueries.select(QUERY_SELECT_BY_NAME, name);
-  }
-
-  public static ResultSet selectByName(ProductRecord pr) {
-    return DBQueries.select(QUERY_SELECT_BY_NAME, pr.m_name);
+  public static CategoryRecord selectByName(String name) {
+    try (ResultSet rs = DBQueries.select(QUERY_SELECT_BY_NAME, name)) {
+      if (!rs.next()) return null;
+      return new CategoryRecord(rs);
+    } catch (SQLException ex) {
+      return null;
+    }
   }
 }

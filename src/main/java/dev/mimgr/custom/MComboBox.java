@@ -21,11 +21,13 @@ import javax.swing.ListCellRenderer;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.plaf.ComboBoxUI;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 import javax.swing.plaf.basic.BasicComboPopup;
 import javax.swing.plaf.basic.ComboPopup;
 
 import dev.mimgr.FontManager;
+import dev.mimgr.db.CategoryRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -34,9 +36,19 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
   public MComboBox(T[] items, ColorScheme colors) {
     super(items);
     this.colors = colors;
+    Init();
+  }
+  public MComboBox(ColorScheme colors) {
+    super();
+    this.colors = colors;
+    Init();
+  }
+
+  private void Init() {
     setRenderer(new MComboBoxRenderer());
     setUI(this.comboBoxUI);
     setEditable(true);
+    this.setEditor(new MComboBoxEditor());
     this.comboBoxTextField = (JTextField) this.getEditor().getEditorComponent();
     comboBoxTextField.setBackground(colors.m_bg_dim);
     comboBoxTextField.setForeground(colors.m_grey_2);
@@ -94,6 +106,19 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
       pop.setBackground(colors.m_bg_dim);
       pop.setOpaque(true);
       return pop;
+    }
+  }
+
+  class MComboBoxEditor extends BasicComboBoxEditor {
+    @Override
+    public void setItem(Object item) {
+      if (item instanceof CategoryRecord) {
+        // Trim leading/trailing whitespace from the category name for the text field
+        String trimmedName = ((CategoryRecord) item).m_name.trim();
+        super.setItem(trimmedName);
+      } else {
+        super.setItem(item);
+      }
     }
   }
 

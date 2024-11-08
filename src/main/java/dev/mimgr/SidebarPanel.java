@@ -31,7 +31,7 @@ public class SidebarPanel extends RoundedPanel implements ActionListener {
     this.contentPanel = contentPanel;
     this.contentPanelSwitcher = new CardLayout();
     this.contentPanel.setLayout(contentPanelSwitcher);
-    this.thisPanel = new JPanel();
+    // this.thisPanel = new JPanel();
     this.setupButtonStyle = (button) -> this.setDefaultButtonStyle(button);
     this.setupSelectedButtonStyle = (button) -> this.setDefaultSelectedButtonStyle(button);
 
@@ -128,6 +128,8 @@ public class SidebarPanel extends RoundedPanel implements ActionListener {
 
   public void removeMenuButton(MButton button) {
     this.contentPanel.remove(buttonToPanel.get(button));
+    this.buttonToPanel.remove(button);
+    setCurrentMenu(buttonToPanel.keySet().iterator().next());
     button.setVisible(false);
     revalidate();
     repaint();
@@ -139,13 +141,15 @@ public class SidebarPanel extends RoundedPanel implements ActionListener {
       .toArray(new MButton[this.buttonToPanel.keySet().size()]);
   }
 
+  public int getMenuButtonCount() {
+    return this.buttonToPanel.size();
+  }
+
   public Consumer<MButton> setupButtonStyle = null;
   public Consumer<MButton> setupSelectedButtonStyle = null;
 
-  private JPanel thisPanel;
   private CardLayout contentPanelSwitcher;
   private JPanel contentPanel;
-  private MScrollPane scrollPane;
   private ColorScheme colors;
   private MButton pButton = null;
   private Map<MButton, JPanel> buttonToPanel = new HashMap<>();
