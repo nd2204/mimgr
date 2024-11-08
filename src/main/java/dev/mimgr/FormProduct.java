@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -200,11 +201,10 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
 
         FormEditProduct frame = new FormEditProduct(productTableView.getSelectedProducts());
         frame.setVisible(true);
-        for (MButton btn : frame.getEditSubmitButtons()) {
-          productTableView.setButtonRefreshOnClick(btn);
-        }
-        for (MButton btn : frame.getEditDeleteButtons()) {
-          productTableView.setButtonRefreshOnClick(btn);
+        List<UploadPanel> uploadPanel = frame.getUploadPanels();
+        for (UploadPanel panel : uploadPanel) {
+          productTableView.setButtonRefreshOnClick(panel.getDeleteComponent());
+          productTableView.setButtonRefreshOnClick(panel.getSubmitComponent());
         }
       }
 

@@ -30,6 +30,19 @@ public class DropContainerPanel extends JPanel implements ActionListener {
     thisPanel.setSize(0, 140);
     thisPanel.setBorder(new EmptyBorder(5, 0, 5, 0));
 
+    confirmButton.setFont(FontManager.getFont("NunitoBold", 14f));
+    confirmButton.setBackground(colors.m_bg_dim);
+    confirmButton.setForeground(colors.m_bg_3);
+    confirmButton.setBorderColor(colors.m_bg_3);
+    confirmButton.setBorderWidth(2);
+    confirmButton.setHoverBorderColor(colors.m_green);
+    confirmButton.setHoverBackgroundColor(colors.m_green);
+    confirmButton.setHoverForegroundColor(colors.m_fg_1);
+    confirmButton.setPreferredSize(new Dimension(100, 100));
+    confirmButton.setMaximumSize(new Dimension(100, 100));
+    confirmButton.setMaximumSize(new Dimension(100, 100));
+    confirmButton.addActionListener(this);
+
     scrollPane = new JScrollPane(
       thisPanel,
       JScrollPane.VERTICAL_SCROLLBAR_NEVER,
@@ -55,18 +68,6 @@ public class DropContainerPanel extends JPanel implements ActionListener {
       this.setVisible(true);
     }
     if (isEmpty()) {
-      confirmButton.setFont(FontManager.getFont("NunitoBold", 14f));
-      confirmButton.setBackground(colors.m_bg_dim);
-      confirmButton.setForeground(colors.m_bg_3);
-      confirmButton.setBorderColor(colors.m_bg_3);
-      confirmButton.setBorderWidth(2);
-      confirmButton.setHoverBorderColor(colors.m_green);
-      confirmButton.setHoverBackgroundColor(colors.m_green);
-      confirmButton.setHoverForegroundColor(colors.m_fg_1);
-      confirmButton.setPreferredSize(new Dimension(100, 100));
-      confirmButton.setMaximumSize(new Dimension(100, 100));
-      confirmButton.setMaximumSize(new Dimension(100, 100));
-      confirmButton.addActionListener(this);
       thisPanel.add(confirmButton);
     }
 

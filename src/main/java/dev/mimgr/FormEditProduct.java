@@ -42,12 +42,8 @@ public class FormEditProduct extends JFrame {
   private int    m_width;
   private int    m_height;
 
-  public ArrayList<MButton> getEditSubmitButtons() {
-    return editSubmitButtons;
-  }
-
-  public ArrayList<MButton> getEditDeleteButtons() {
-    return editDeleteButtons;
+  public ArrayList<UploadPanel> getUploadPanels() {
+    return this.uploadPanels;
   }
 
   public FormEditProduct(ProductRecord pr) {
@@ -73,8 +69,7 @@ public class FormEditProduct extends JFrame {
     m_aspect_ratio = 16.0f / 10.0f;
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
-    editSubmitButtons = new ArrayList<>();
-    editDeleteButtons = new ArrayList<>();
+    uploadPanels = new ArrayList<>();
     mainPanel = new JPanel(new BorderLayout());
     mainPanel.setBackground(colors.m_bg_dim);
     currentUploadPanel = new JPanel();
@@ -193,11 +188,10 @@ public class FormEditProduct extends JFrame {
         } else {
           c.insets = new Insets(padding_vertical, padding_horizontal, padding_vertical, padding_horizontal);
         }
-        EditButtonListener ebl = new EditButtonListener(button, panel, pr);
+        uploadPanels.add(panel);
+        new EditButtonListener(button, panel, pr);
         this.add(button , c);
         c.gridy++;
-        editSubmitButtons.add(ebl.getEditSubmitButton());
-        editDeleteButtons.add(ebl.getEditDeleteButton());
       }
 
       sidebarPanel.setCurrentMenu(firstMenuBtn);
@@ -208,20 +202,11 @@ public class FormEditProduct extends JFrame {
   }
 
   private class EditButtonListener implements ActionListener {
-    public MButton getEditSubmitButton() {
-      return this.btnSubmit;
-    }
-
-    public MButton getEditDeleteButton() {
-      return this.btnDelete;
-    }
-    
     public EditButtonListener(MButton sb, UploadPanel panel, ProductRecord pr) {
       this.btnDelete = panel.getDeleteComponent();
       this.btnSubmit = panel.getSubmitComponent();
       this.sidebarButton = sb;
       this.panel = panel;
-
 
       tfTitle = panel.getTitleComponent();
       tfPrice = panel.getPriceComponent();
@@ -229,13 +214,13 @@ public class FormEditProduct extends JFrame {
       tfStock = panel.getStockComponent();
       cbCategory = panel.getCategoryComponent();
       product_id = pr.m_id;
-      
+
       TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();
       tfPrice.getDocument().addDocumentListener(textFieldListener);
       tfTitle.getDocument().addDocumentListener(textFieldListener);
       tfStock.getDocument().addDocumentListener(textFieldListener);
       taDescription.getDocument().addDocumentListener(textFieldListener);
-      
+
       tfTitle.setText(pr.m_name);
       tfStock.setText(String.valueOf(pr.m_stock_quantity));
       tfPrice.setText(String.valueOf(pr.m_price));
@@ -270,7 +255,7 @@ public class FormEditProduct extends JFrame {
         String description = taDescription.getTextString();
         int stock_quantity = Integer.parseInt(tfStock.getTextString());
         int category_id = get_category_id((String) cbCategory.getSelectedItem());
-        
+
         System.out.println(category_id);
         if (category_id == 0) {
           JOptionPane.showMessageDialog(null, "Not valid category name");
@@ -359,6 +344,5 @@ public class FormEditProduct extends JFrame {
   private SidebarPanel sidebarPanel;
   private JPanel currentUploadPanel, mainPanel;
   private ArrayList<ProductRecord> productRecords;
-  private ArrayList<MButton> editSubmitButtons;
-  private ArrayList<MButton> editDeleteButtons;
+  private ArrayList<UploadPanel> uploadPanels;
 }

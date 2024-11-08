@@ -31,6 +31,7 @@ import java.awt.event.MouseEvent;
 
 import dev.mimgr.IconManager;
 import dev.mimgr.TableView;
+import dev.mimgr.UploadPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTable;
@@ -95,12 +96,11 @@ public class ProductTableView extends JPanel implements TableModelListener {
           int row = table.getSelectedRow();
           if (row != -1) {
             FormEditProduct frame = new FormEditProduct(productList.get(row));
+            List<UploadPanel> uploadPanels = frame.getUploadPanels();
             frame.setVisible(true);
-            for (MButton btn : frame.getEditSubmitButtons()) {
-              setButtonRefreshOnClick(btn);
-            }
-            for (MButton btn : frame.getEditDeleteButtons()) {
-              setButtonRefreshOnClick(btn);
+            for (UploadPanel panel : uploadPanels) {
+              setButtonRefreshOnClick(panel.getDeleteComponent());
+              setButtonRefreshOnClick(panel.getSubmitComponent());
             }
           }
         }
