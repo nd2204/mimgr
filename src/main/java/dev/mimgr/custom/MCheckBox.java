@@ -75,6 +75,11 @@ public class MCheckBox extends JCheckBox {
     repaint();
   }
 
+  public void setBoxSelectedColor(Color color) {
+    this.boxSelectedColor = color;
+    repaint();
+  }
+
   public Color getCheckColor() {
     return this.checkColor;
   }
@@ -134,11 +139,14 @@ public class MCheckBox extends JCheckBox {
     }
     g2d.fillRoundRect(boxX + borderWidth, boxY + borderWidth, boxSize - borderWidth, boxSize - borderWidth, this.boxRadius, this.boxRadius);
 
-    // Draw the checkbox box
     g2d.setColor(boxColor);
+    if (isSelected()) {
+      g2d.setColor(boxSelectedColor);
+    }
     if (getModel().isRollover()) {
       g2d.setColor(boxHoverColor);
     }
+    // Draw the checkbox box
     g2d.setStroke(new BasicStroke(borderWidth));
     g2d.drawRoundRect(boxX + borderWidth, boxY + borderWidth, boxSize - borderWidth, boxSize - borderWidth, this.boxRadius, this.boxRadius);
 
@@ -166,6 +174,7 @@ public class MCheckBox extends JCheckBox {
   private int borderWidth = 2;
   private int boxRadius = 8;
   private Color checkColor = Color.GREEN;
+  private Color boxSelectedColor = Color.GREEN;
   private Color boxColor = Color.LIGHT_GRAY;
   private Color boxHoverColor = Color.DARK_GRAY;
   private Color boxBackground = null;

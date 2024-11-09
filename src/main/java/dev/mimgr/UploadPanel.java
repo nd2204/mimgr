@@ -84,6 +84,10 @@ public class UploadPanel extends JPanel {
     return this.product;
   }
 
+  public DropContainerPanel getDropContainerPanel() {
+    return this.dropContainerPanel;
+  }
+
   private String get_category_name(int category_id) {
     ResultSet queryResult = ProductRecord.selectByKey(category_id);
     String name_result = "";
@@ -205,7 +209,7 @@ public class UploadPanel extends JPanel {
     this.btnSubmit.setFont(nunito_bold_14);
     this.btnSubmit.setBackground(colors.m_bg_1);
     this.btnSubmit.setBorderColor(colors.m_bg_1);
-    this.btnSubmit.setDefaultForeground(colors.m_bg_2);
+    this.btnSubmit.setDefaultForeground(colors.m_bg_4);
     this.btnSubmit.setBorderWidth(2);
     this.btnSubmit.setEnabled(true);
 
@@ -220,21 +224,6 @@ public class UploadPanel extends JPanel {
     this.btnDelete.setBorderWidth(2);
   }
 
-  private String[] get_category_names() {
-    ResultSet queryResult = CategoryRecord.selectAll();
-    List<String> nameList = new ArrayList<>();
-    try {
-      while (queryResult.next()) {
-        nameList.add(queryResult.getString("category_name"));
-      }
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    String[] namesArray = nameList.toArray(new String[0]);
-    return namesArray;
-  }
-
   private class MediaDropPanel extends RoundedPanel implements ActionListener, MTransferListener {
     public MediaDropPanel() {
       this.setBorderColor(colors.m_bg_2);
@@ -242,10 +231,10 @@ public class UploadPanel extends JPanel {
       this.setBackground(colors.m_bg_0);
       this.setBorderRadius(15);
 
-      droppedItemsPanel = new DropContainerPanel(colors);
-      droppedItemsPanel.addActionListener(this);
+      dropContainerPanel = new DropContainerPanel(colors);
+      dropContainerPanel.addActionListener(this);
 
-      btnClearImages = droppedItemsPanel.getConfirmButton();
+      btnClearImages = dropContainerPanel.getConfirmButton();
       btnClearImages.setHoverBorderColor(colors.m_red);
       btnClearImages.setText("Clear");
       btnClearImages.setHoverBackgroundColor(colors.m_red);
@@ -337,11 +326,11 @@ public class UploadPanel extends JPanel {
       gbc.weighty = 0.0;
       gbc.gridwidth = 2;
       gbc.fill = GridBagConstraints.NONE;
-      JScrollPane sp = droppedItemsPanel.getScrollPaneComponent();
+      JScrollPane sp = dropContainerPanel.getScrollPaneComponent();
       sp.setMaximumSize(new Dimension(660, Integer.MAX_VALUE));
       sp.setMinimumSize(new Dimension(660, sp.getPreferredSize().height));
       sp.setPreferredSize(new Dimension(660, 140));
-      this.add(droppedItemsPanel, gbc);
+      this.add(dropContainerPanel, gbc);
     }
 
     @Override
@@ -350,7 +339,7 @@ public class UploadPanel extends JPanel {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         fileChooser.setDialogTitle("Select Files");
-        fileChooser.setMultiSelectionEnabled(true);
+        fileChooser.setMultiSelectionEnabled(false);
         fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "gif"));
 
         // Show the file chooser dialog and wait for user action
@@ -359,20 +348,19 @@ public class UploadPanel extends JPanel {
         // Handle the user selection
         if (userSelection == JFileChooser.APPROVE_OPTION) {
           // Get the selected file
-          File[] selectedFile = fileChooser.getSelectedFiles();
-          for (File file : selectedFile) {
-            if (rm.isValidImageFile(file)) {
-              droppedItemsPanel.addData(file);
-            }
+          File selectedFile = fileChooser.getSelectedFile();
+          if (rm.isValidImageFile(selectedFile)) {
+            dropContainerPanel.clearData();
+            dropContainerPanel.addData(selectedFile);
           }
         } else {
           System.out.println("No file selected.");
         }
       }
 
-      if (e.getSource() == this.droppedItemsPanel.getConfirmButton()) {
+      if (e.getSource() == UploadPanel.this.dropContainerPanel.getConfirmButton()) {
         // Do something with the data
-        for (Object obj : this.droppedItemsPanel.getAllData()) {
+        for (Object obj : UploadPanel.this.dropContainerPanel.getAllData()) {
           if (obj instanceof File file) {
             Path newFilePath = rm.moveStagedFileToUploadDir(file);
             System.out.println(rm.getProjectPath().relativize(newFilePath));
@@ -381,7 +369,7 @@ public class UploadPanel extends JPanel {
         // Clean temp file from download
         rm.cleanTempFiles();
         // Clear the data
-        this.droppedItemsPanel.clearData();
+        UploadPanel.this.dropContainerPanel.clearData();
       }
     }
 
@@ -389,8 +377,9 @@ public class UploadPanel extends JPanel {
     public void onStringImported(String string) {
       if (ResourceManager.isImageUrl(string)) {
         // System.out.println(rm.getUploadPath());
-        Path fp = rm.downloadTempFile(string);
-        droppedItemsPanel.addData(fp.toFile());
+        Path fp = ResourceManager.downloadFileToPath(string, ResourceManager.getInstance().getUploadPath());
+        dropContainerPanel.clearData();
+        dropContainerPanel.addData(fp);
       }
       return;
     }
@@ -402,16 +391,14 @@ public class UploadPanel extends JPanel {
 
     @Override
     public void onFileListImported(List<File> files) {
-      for (File file : files) {
-        droppedItemsPanel.addData(file);
-      }
+      dropContainerPanel.clearData();
+      dropContainerPanel.addData(files.getFirst());
       return;
     }
 
     private JLabel lblMedia = new JLabel("Media");
     private MButton btnSelectFiles = new MButton("Select Files");
     private MButton btnSelectFromMedia = new MButton("Select Files");
-    private DropContainerPanel droppedItemsPanel;
   }
 
   private class PricingPanel extends RoundedPanel {
@@ -567,8 +554,8 @@ public class UploadPanel extends JPanel {
   private MButton btnSubmit, btnDelete, btnClearImages;
   private ColorScheme colors;
   private ProductRecord product;
+  private DropContainerPanel dropContainerPanel;
 }
-
 
 class CategoryTree {
   public static List<CategoryRecord> buildCategoryTree() {
@@ -594,6 +581,7 @@ class CategoryTree {
     }
     return rootCategory;
   }
+
 
   private static void addCategoryToComboBox(MComboBox<CategoryRecord> comboBox, List<CategoryRecord> categories, int level) {
     for (CategoryRecord cat :categories) {

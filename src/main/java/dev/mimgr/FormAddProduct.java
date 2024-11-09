@@ -6,22 +6,28 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTextArea;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.db.CategoryRecord;
+import dev.mimgr.db.ImageRecord;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.ResourceManager;
 
 public class FormAddProduct extends JFrame {
   private double m_aspect_ratio;
@@ -53,9 +59,11 @@ public class FormAddProduct extends JFrame {
     TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();
     // Main window
     uploadPanel = new UploadPanel(colors);
+    dropContainerPanel = uploadPanel.getDropContainerPanel();
     btnSubmit = uploadPanel.getSubmitComponent();
     btnSubmit.addActionListener(uploadButtonListener);
     btnSubmit.setText("Add Product");
+    btnSubmit.setEnabled(false);
     btnDelete = uploadPanel.getDeleteComponent();
     btnDelete.addActionListener(uploadButtonListener);
     tfPrice = uploadPanel.getPriceComponent();
@@ -66,6 +74,7 @@ public class FormAddProduct extends JFrame {
     tfStock.getDocument().addDocumentListener(textFieldListener);
     taDescription = uploadPanel.getDescriptionComponent();
     cbCategory = uploadPanel.getCategoryComponent();
+
     this.setLayout(new BorderLayout());
     this.setMinimumSize(new Dimension(854, 600));
     this.setTitle("Add Product");
@@ -79,11 +88,40 @@ public class FormAddProduct extends JFrame {
     this.requestFocus();
   }
 
+  private int processDropData() {
+    List<Object> objs = this.dropContainerPanel.getAllData();
+    // Process the first image in the drop panel
+    int image_id = 0;
+    for (Object o : objs) {
+      if (o instanceof File file) {
+        if (!file.toPath().equals(rm.getUploadPath().resolve(file.getName()))) {
+          Path newFilePath = rm.moveStagedFileToUploadDir(file);
+          ImageRecord.insert(
+            String.valueOf(rm.getProjectPath().relativize(newFilePath)).replace("\\", "/"),
+            file.getName(),
+            "",
+            SessionManager.getCurrentUser().m_id
+          );
+        }
+        image_id = getImageIdByFileName(file.getName());
+        break;
+      }
+    }
+    // Clean temp file from download
+    rm.cleanTempFiles();
+    return image_id;
+  }
+
+  private int getImageIdByFileName(String filename) {
+    ImageRecord ir = ImageRecord.selectByName(filename);
+    return (ir == null) ? 0 : ir.m_id;
+  }
+
+
   private class UploadButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == btnDelete) {
-        System.out.println("Exiting?");
         FormAddProduct.this.dispose();
         return;
       }
@@ -93,13 +131,13 @@ public class FormAddProduct extends JFrame {
         double price = Double.parseDouble(tfPrice.getTextString());
         String description = taDescription.getTextString();
         int stock_quantity = Integer.parseInt(tfStock.getTextString());
-        int category_id = get_category_id((String) cbCategory.getSelectedItem());
-        System.out.println(category_id);
+        CategoryRecord cr = (CategoryRecord) cbCategory.getSelectedItem();
+        int category_id = cr.m_id;
         if (category_id == 0) {
           JOptionPane.showMessageDialog(null, "Not valid category name");
         }
         else {
-          ProductRecord.insert(name, price, description, stock_quantity, category_id, -1);
+          ProductRecord.insert(name, price, description, stock_quantity, category_id, processDropData());
           JOptionPane.showMessageDialog(null, "Success");
           FormAddProduct.this.dispose();
         }
@@ -133,17 +171,12 @@ public class FormAddProduct extends JFrame {
         btnSubmit.setEnabled(true);
       } else {
         btnSubmit.setEnabled(false);
-        btnSubmit.setBackground(colors.m_bg_4);
-        btnSubmit.setBorderColor(colors.m_bg_4);
+        btnSubmit.setBackground(colors.m_bg_1);
+        btnSubmit.setBorderColor(colors.m_bg_1);
         btnSubmit.setForeground(colors.m_grey_1);
         btnSubmit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
       }
     }
-  }
-
-  private int get_category_id(String category_name) {
-    CategoryRecord cr = CategoryRecord.selectByName(category_name);
-    return (cr == null) ? 0 : cr.m_id;
   }
 
   public static void main(String arg[]) {
@@ -151,6 +184,8 @@ public class FormAddProduct extends JFrame {
     new FormAddProduct(colors);
   }
 
+  private DropContainerPanel dropContainerPanel;
+  private ResourceManager rm = ResourceManager.getInstance();
   private UploadPanel uploadPanel;
   private MTextArea taDescription;
   private MTextField tfTitle;

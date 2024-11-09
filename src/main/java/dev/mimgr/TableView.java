@@ -20,9 +20,11 @@ public class TableView {
       MCheckBoxHeader checkBoxHeader = new MCheckBoxHeader(colors, table, colIndex);
       checkBoxHeader.getCheckBoxComponent().setCheckColor(colors.m_green);
       checkBoxHeader.getCheckBoxComponent().setBoxColor(colors.m_bg_3);
+      checkBoxHeader.getCheckBoxComponent().setBoxSelectedColor(colors.m_green);
       checkBoxHeader.getCheckBoxComponent().setBackground(colors.m_bg_dim);
       MCheckBoxCellRenderer checkBoxRenderer = new MCheckBoxCellRenderer(colors);
       checkBoxRenderer.setCheckColor(colors.m_green);
+      checkBoxRenderer.setBoxSelectedColor(colors.m_green);
       checkBoxRenderer.setBoxColor(colors.m_bg_3);
       checkBoxRenderer.setBackground(colors.m_bg_0);
 

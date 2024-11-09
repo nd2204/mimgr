@@ -181,11 +181,7 @@ public class FormMedia extends JPanel {
     @Override
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == FormMedia.this.addMediaButton) {
-        if (dropPanel.isVisible()) {
-          dropPanel.setVisible(false);
-        } else {
-          dropPanel.setVisible(true);
-        }
+        dropPanel.setVisible(!dropPanel.isVisible());
       }
 
       if (e.getSource() == FormMedia.this.selectFilesButton) {
@@ -228,7 +224,8 @@ public class FormMedia extends JPanel {
       if (e.getSource() == FormMedia.this.droppedItemsPanel.getConfirmButton()) {
         // Do something with the data
         IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
-        for (Object obj : FormMedia.this.droppedItemsPanel.getAllData()) {
+        List<Object> objs = FormMedia.this.droppedItemsPanel.getAllData();
+        for (Object obj : objs) {
           if (obj instanceof File file) {
             Path newFilePath = rm.moveStagedFileToUploadDir(file);
             System.out.println(rm.getProjectPath().relativize(newFilePath));

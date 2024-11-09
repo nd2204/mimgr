@@ -129,7 +129,9 @@ public class SidebarPanel extends RoundedPanel implements ActionListener {
   public void removeMenuButton(MButton button) {
     this.contentPanel.remove(buttonToPanel.get(button));
     this.buttonToPanel.remove(button);
-    setCurrentMenu(buttonToPanel.keySet().iterator().next());
+    if (!buttonToPanel.isEmpty()) {
+      setCurrentMenu(buttonToPanel.keySet().iterator().next());
+    }
     button.setVisible(false);
     revalidate();
     repaint();

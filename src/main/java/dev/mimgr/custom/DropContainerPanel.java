@@ -64,9 +64,7 @@ public class DropContainerPanel extends JPanel implements ActionListener {
   }
 
   public void addData(Object data) {
-    if (!isVisible()) {
-      this.setVisible(true);
-    }
+    this.setVisible(true);
     if (isEmpty()) {
       thisPanel.add(confirmButton);
     }

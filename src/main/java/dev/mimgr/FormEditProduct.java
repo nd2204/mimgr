@@ -9,6 +9,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,15 +33,18 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTextArea;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.db.CategoryRecord;
+import dev.mimgr.db.ImageRecord;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.ResourceManager;
 
 public class FormEditProduct extends JFrame {
   ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST);
@@ -78,6 +84,7 @@ public class FormEditProduct extends JFrame {
     mainPanel = new JPanel(new BorderLayout());
     mainPanel.setBackground(colors.m_bg_dim);
     currentUploadPanel = new JPanel();
+    currentUploadPanel.setBackground(colors.m_bg_0);
     sidebarPanel = new SidebarPanel(currentUploadPanel, colors);
     sidebarPanel.setBackground(colors.m_bg_0);
     sidebarPanel.setPreferredSize(new Dimension(300, this.getHeight()));
@@ -110,6 +117,9 @@ public class FormEditProduct extends JFrame {
     sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
     sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     sidebarPanel.addComponent(sp, gc);
+    if (productRecords.size() < 2) {
+      sidebarPanel.setVisible(false);
+    }
 
     FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
     FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
@@ -133,16 +143,6 @@ public class FormEditProduct extends JFrame {
 
     this.setVisible(true);
     this.requestFocus();
-  }
-
-  public static void main(String arg[]) {
-    try {
-      ResultSet rs = ProductRecord.selectAll();
-      if (!rs.next()) return;
-      ProductRecord pr = new ProductRecord(rs);
-      new FormEditProduct(pr);
-    } catch (SQLException e) {
-    }
   }
 
   private UploadPanel createProductEditPanel(ProductRecord pr) {
@@ -222,12 +222,13 @@ public class FormEditProduct extends JFrame {
       this.btnDelete.addActionListener(this);
 
       this.btnSubmit = panel.getSubmitComponent();
+      this.btnSubmit.setText("Update");
       this.btnSubmit.addActionListener(this);
-      this.btnSubmit.setEnabled(false);
-      this.btnSubmit.setBackground(colors.m_bg_1);
-      this.btnSubmit.setBorderColor(colors.m_bg_1);
-      this.btnSubmit.setForeground(colors.m_bg_3);
-      this.btnSubmit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+      this.btnSubmit.setBackground(colors.m_green);
+      this.btnSubmit.setBorderColor(colors.m_green);
+      this.btnSubmit.setDefaultForeground(colors.m_fg_1);
+      this.btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+      this.btnSubmit.setEnabled(true);
 
       ProductRecord pr = this.panel.getProductRecord();
 
@@ -247,6 +248,12 @@ public class FormEditProduct extends JFrame {
       this.cbCategory = panel.getCategoryComponent();
       this.cbCategory.setSelectedItem(CategoryRecord.selectByKey(pr.m_category_id));
 
+      this.dropContainerPanel = panel.getDropContainerPanel();
+      ImageRecord ir = ImageRecord.selectById(pr.m_image_id);
+      if (ir != null) {
+        this.dropContainerPanel.addData(Paths.get(ir.m_url).toAbsolutePath().toFile());
+      }
+
       TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();
 
       this.tfTitle.getDocument().addDocumentListener(textFieldListener);
@@ -257,34 +264,64 @@ public class FormEditProduct extends JFrame {
       tf.getDocument().addDocumentListener(textFieldListener);
     }
 
+    private int processDropData() {
+      List<Object> objs = this.dropContainerPanel.getAllData();
+      // Process the first image in the drop panel
+      int image_id = 0;
+      for (Object o : objs) {
+        if (o instanceof File file) {
+          if (!rm.getUploadPath().resolve(file.getName()).toFile().exists()) {
+            Path newFilePath = rm.moveStagedFileToUploadDir(file);
+            ImageRecord.insert(
+              String.valueOf(rm.getProjectPath().relativize(newFilePath)).replace("\\", "/"),
+              file.getName(),
+              "",
+              SessionManager.getCurrentUser().m_id
+            );
+          }
+          image_id = getImageIdByFileName(file.getName());
+          break;
+        }
+      }
+      // Clean temp file from download
+      rm.cleanTempFiles();
+      return image_id;
+    }
+
+    private int getImageIdByFileName(String filename) {
+      ImageRecord ir = ImageRecord.selectByName(filename);
+      return (ir == null) ? 0 : ir.m_id;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == btnDelete) {
         sidebarPanel.removeMenuButton(sidebarButton);
-        ProductRecord.delete(panel.getProductRecord().m_id);
-        if (sidebarPanel.getMenuButtonCount() < 1) {
-          FormEditProduct.this.dispose();
-        }
-        JOptionPane.showMessageDialog(null, "Success");
-        return;
+        int row = ProductRecord.delete(panel.getProductRecord().m_id);
+        JOptionPane.showMessageDialog(null, row + " row(s) affected");
       }
 
-      if (e.getSource() == btnSubmit) {
+      else if (e.getSource() == btnSubmit) {
         String name = tfTitle.getTextString();
         double price = Double.parseDouble(tfPrice.getTextString());
         String description = taDescription.getTextString();
         int stock_quantity = Integer.parseInt(tfStock.getTextString());
-        int category_id = get_category_id((String) cbCategory.getSelectedItem());
+        CategoryRecord categoryRecord = (CategoryRecord) cbCategory.getSelectedItem();
+        int image_id = processDropData();
 
-        System.out.println(category_id);
-        if (category_id == 0) {
+        System.out.println(categoryRecord);
+        if (categoryRecord.m_id == 0) {
           JOptionPane.showMessageDialog(null, "Not valid category name");
         }
         else {
-          ProductRecord.update(name, price, description, stock_quantity, category_id, panel.getProductRecord().m_id);
-          JOptionPane.showMessageDialog(null, "Success");
+          int row = ProductRecord.update(name, price, description, stock_quantity, categoryRecord.m_id, image_id, panel.getProductRecord().m_id);
+          sidebarPanel.removeMenuButton(sidebarButton);
+          JOptionPane.showMessageDialog(null, row + " row(s) affected");
         }
-        return;
+      }
+
+      if (sidebarPanel.getMenuButtonCount() < 1) {
+        FormEditProduct.this.dispose();
       }
     }
 
@@ -305,33 +342,24 @@ public class FormEditProduct extends JFrame {
       }
 
       private void checkFields() {
-        ProductRecord pr = panel.getProductRecord();
-        CategoryRecord cr = new CategoryRecord(pr.m_category_id, "", 0);
-        cr.m_id = pr.m_category_id;
         if (!tfTitle.getText().isEmpty() && !tfPrice.getText().isEmpty() && !tfStock.getText().isEmpty()) {
-          if ( !tfTitle.getText().equals(pr.m_name)
-            || !tfPrice.getText().equals(String.valueOf(pr.m_price))
-            || !tfStock.getText().equals(String.valueOf(pr.m_stock_quantity))
-            || !taDescription.getText().equals(String.valueOf(pr.m_description))
-            || !cbCategory.getSelectedItem().equals(cr))
-          {
-            btnSubmit.setBackground(colors.m_blue);
-            btnSubmit.setBorderColor(colors.m_blue);
-            btnSubmit.setDefaultForeground(colors.m_fg_1);
-            btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            btnSubmit.setEnabled(true);
-          }
-          return;
+          btnSubmit.setBackground(colors.m_green);
+          btnSubmit.setBorderColor(colors.m_green);
+          btnSubmit.setDefaultForeground(colors.m_fg_1);
+          btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
+          btnSubmit.setEnabled(true);
+        } else {
+          btnSubmit.setBackground(colors.m_bg_1);
+          btnSubmit.setBorderColor(colors.m_bg_1);
+          btnSubmit.setDefaultForeground(colors.m_bg_3);
+          btnSubmit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+          btnSubmit.setEnabled(false);
         }
-        btnSubmit.setBackground(colors.m_bg_1);
-        btnSubmit.setBorderColor(colors.m_bg_1);
-        btnSubmit.setDefaultForeground(colors.m_bg_3);
-        btnSubmit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        btnSubmit.setEnabled(false);
       }
     }
 
     MButton sidebarButton, btnSubmit, btnDelete;
+    private DropContainerPanel dropContainerPanel;
     private UploadPanel panel;
     private MTextArea taDescription;
     private MTextField tfTitle;
@@ -340,16 +368,7 @@ public class FormEditProduct extends JFrame {
     private MComboBox<CategoryRecord> cbCategory;
   }
 
-  private int get_category_id(String category_name) {
-    CategoryRecord cr = CategoryRecord.selectByName(category_name);
-    return (cr == null) ? 0 : cr.m_id;
-  }
-
-  private String get_category_name(int category_id) {
-    CategoryRecord cr = CategoryRecord.selectByKey(category_id);
-    return (cr == null) ? "" : cr.m_name;
-  }
-
+  private ResourceManager rm = ResourceManager.getInstance();
   private SidebarPanel sidebarPanel;
   private JPanel currentUploadPanel, mainPanel;
   private ArrayList<ProductRecord> productRecords;

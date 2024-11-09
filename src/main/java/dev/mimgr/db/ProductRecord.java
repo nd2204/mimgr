@@ -35,8 +35,9 @@ public class ProductRecord {
     TABLE, FIELD_ID
   );
   public static final String QUERY_UPDATE_BY_KEY = String.format(
-    "UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
-    TABLE, FIELD_NAME, FIELD_PRICE, FIELD_DESCRIPTION, FIELD_STOCK_QUANTITY, FIELD_CATEGORY_ID, FIELD_ID
+    "UPDATE %s SET %s=?, %s=?, %s=?, %s=?, %s=?, %s=? WHERE %s=?",
+    TABLE, FIELD_NAME, FIELD_PRICE, FIELD_DESCRIPTION, 
+    FIELD_STOCK_QUANTITY, FIELD_CATEGORY_ID, FIELD_IMAGE_ID, FIELD_ID
   );
 
 
@@ -47,6 +48,7 @@ public class ProductRecord {
     m_price          = rs.getDouble(FIELD_PRICE);
     m_stock_quantity = rs.getInt(FIELD_STOCK_QUANTITY);
     m_category_id    = rs.getInt(FIELD_CATEGORY_ID);
+    m_image_id       = rs.getInt(FIELD_IMAGE_ID);
   }
 
   public static ResultSet selectAll() {
@@ -103,8 +105,8 @@ public class ProductRecord {
     return result;
   }
 
-  public static int update(String name, Double price, String description, int stock_quantity, int category_id, int product_id) {
-    return DBQueries.update(QUERY_UPDATE_BY_KEY, name, price, description, stock_quantity, category_id, product_id);
+  public static int update(String name, Double price, String description, int stock_quantity, int category_id, int image_id, int product_id) {
+    return DBQueries.update(QUERY_UPDATE_BY_KEY, name, price, description, stock_quantity, category_id, image_id, product_id);
   }
 
   public static int update(ProductRecord pr) {
@@ -113,7 +115,7 @@ public class ProductRecord {
 
   public ProductRecord(
     int id, String name, String description,
-    double price, int stock_quantity, int category_id
+    double price, int stock_quantity, int category_id, int image_id
   ) throws SQLException {
     m_id             = id;
     m_name           = name;
@@ -121,5 +123,6 @@ public class ProductRecord {
     m_price          = price;
     m_stock_quantity = stock_quantity;
     m_category_id    = category_id;
+    m_image_id       = image_id;
   }
 }

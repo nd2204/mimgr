@@ -57,6 +57,19 @@ public class ImageRecord {
     return DBQueries.select(QUERY_SELECT_ALL);
   }
 
+  public static ImageRecord selectByName(String name) {
+    name = name.substring(0, name.indexOf("."));
+    try (ResultSet rs = DBQueries.select(
+      String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_NAME),
+      name)
+    ) {
+      if (rs == null || !rs.next()) return null;
+      return new ImageRecord(rs);
+    } catch (SQLException ex) {
+      return null;
+    }
+  }
+
   public static ImageRecord selectById(int id) {
     try (ResultSet rs = DBQueries.select(QUERY_SELECT_BY_ID, id)) {
       if (rs == null || !rs.next()) return null;
