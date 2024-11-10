@@ -1,5 +1,6 @@
 package dev.mimgr;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -24,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
+import dev.mimgr.component.MediaGridView;
 import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.DropPanel;
 import dev.mimgr.custom.MButton;
@@ -33,6 +35,7 @@ import dev.mimgr.custom.MTextArea;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.CategoryRecord;
+import dev.mimgr.db.ImageRecord;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.MTransferListener;
@@ -224,6 +227,29 @@ public class UploadPanel extends JPanel {
     this.btnDelete.setBorderWidth(2);
   }
 
+  private class SelectFromMediaLayout extends MediaGridView implements ActionListener {
+    SelectFromMediaLayout(ColorScheme colors) {
+      super(colors);
+      this.clearButtonsActionListener();
+      for (MButton button : this.getButtons()) {
+        button.addActionListener(this);
+      }
+      this.optionBar.setVisible(false);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      if (e.getSource() instanceof MButton button) {
+        this.clearSelectedButtons();
+        ImageRecord ir = this.getAssociatedImageRecord(button);
+        dropContainerPanel.clearData();
+        dropContainerPanel.addData(Path.of(ir.m_url).toAbsolutePath().toFile());
+        this.setButtonSelected(button, true);
+      }
+    }
+
+  }
+
   private class MediaDropPanel extends RoundedPanel implements ActionListener, MTransferListener {
     public MediaDropPanel() {
       this.setBorderColor(colors.m_bg_2);
@@ -232,6 +258,7 @@ public class UploadPanel extends JPanel {
       this.setBorderRadius(15);
 
       dropContainerPanel = new DropContainerPanel(colors);
+      selectFromMediaLayout = new SelectFromMediaLayout(colors);
       dropContainerPanel.addActionListener(this);
 
       btnClearImages = dropContainerPanel.getConfirmButton();
@@ -279,7 +306,7 @@ public class UploadPanel extends JPanel {
       gbc.fill = GridBagConstraints.NONE;
       this.add(btnSelectFromMedia, gbc);
 
-      DropPanel dropArea = new DropPanel(colors);
+      dropArea = new DropPanel(colors);
       {
         GridBagConstraints gc = new GridBagConstraints();
         dropArea.setLayout(new GridBagLayout());
@@ -318,6 +345,11 @@ public class UploadPanel extends JPanel {
       gbc.fill = GridBagConstraints.HORIZONTAL;
       gbc.gridwidth = 2;
       this.add(dropArea, gbc);
+      selectFromMediaLayout.setVisible(false);
+      selectFromMediaLayout.setMaximumSize(new Dimension(680, Integer.MAX_VALUE));
+      selectFromMediaLayout.setMinimumSize(new Dimension(680, 300));
+      selectFromMediaLayout.setPreferredSize(new Dimension(680, 330));
+      this.add(selectFromMediaLayout, gbc);
 
       gbc.insets = new Insets(0, 20, 20, 20);
       gbc.gridx = 0;
@@ -371,6 +403,11 @@ public class UploadPanel extends JPanel {
         // Clear the data
         UploadPanel.this.dropContainerPanel.clearData();
       }
+
+      if (e.getSource() == btnSelectFromMedia) {
+        dropArea.setVisible(!dropArea.isVisible());
+        selectFromMediaLayout.setVisible(!selectFromMediaLayout.isVisible());
+      }
     }
 
     @Override
@@ -399,6 +436,8 @@ public class UploadPanel extends JPanel {
     private JLabel lblMedia = new JLabel("Media");
     private MButton btnSelectFiles = new MButton("Select Files");
     private MButton btnSelectFromMedia = new MButton("Select Files");
+    private SelectFromMediaLayout selectFromMediaLayout;
+    private DropPanel dropArea;
   }
 
   private class PricingPanel extends RoundedPanel {

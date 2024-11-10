@@ -8,7 +8,6 @@ import dev.mimgr.IconManager;
 import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MScrollPane;
-import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -22,7 +21,6 @@ import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +39,7 @@ public class MediaGridView extends JPanel implements IMediaView {
     pnImageBtns.setLayout(new BoxLayout(pnImageBtns, BoxLayout.Y_AXIS));
     pnImageBtns.setBorder(new EmptyBorder(0, 5, 0, 20));
 
+    optionBar = new OptionBar();
     // Wrap the image panel in a scroll pane for vertical scrolling
     scrollPane = new MScrollPane(colors);
     scrollPane.add(pnImageBtns);
@@ -52,7 +51,7 @@ public class MediaGridView extends JPanel implements IMediaView {
 
     setLayout(new BorderLayout());
     add(scrollPane, BorderLayout.CENTER);
-    add(new OptionBar(), BorderLayout.NORTH);
+    add(optionBar, BorderLayout.NORTH);
 
 
     refresh();
@@ -87,8 +86,8 @@ public class MediaGridView extends JPanel implements IMediaView {
   }
 
   public void updateGrid(ResultSet queryResult) {
-    buttonToImage = new HashMap<>();
-    buttons = new ArrayList<>();
+    buttonToImage.clear();
+    buttons.clear();
     MButton button = null;
     try {
       while (queryResult.next()) {
@@ -110,22 +109,20 @@ public class MediaGridView extends JPanel implements IMediaView {
     createImageGrid();
   }
 
-  private void setButtonUnselected(MButton button) {
-    button.setBorderColor(colors.m_bg_5);
-    selectedImages.remove(button);
+  public void setButtonSelected(MButton button, boolean isSelected) {
+    if (isSelected) {
+      button.setBorderColor(colors.m_green);
+      selectedImages.put(button, buttonToImage.get(button));
+    } else {
+      button.setBorderColor(colors.m_bg_5);
+      selectedImages.remove(button);
+    }
     int count = selectedImages.size();
     if (count <= 0) {
       lblSelectCount.setText("");
     } else {
       lblSelectCount.setText(count + " Selected");
     }
-  }
-
-  private void setButtonSelected(MButton button) {
-    button.setBorderColor(colors.m_green);
-    selectedImages.put(button, buttonToImage.get(button));
-    int count = selectedImages.size();
-    lblSelectCount.setText(count + " Selected");
   }
 
   private void createImageGrid() {
@@ -167,34 +164,24 @@ public class MediaGridView extends JPanel implements IMediaView {
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == btnSelectAll) {
         for (MButton button : buttons) {
-          if (selectedImages.get(button) == null) {
-            setButtonSelected(button);
-          }
+          setButtonSelected(button, true);
         }
         return;
       }
 
       if (e.getSource() == btnClearAll) {
-        for (MButton button : buttons) {
-          if (selectedImages.get(button) != null) {
-            setButtonUnselected(button);
-          }
-        }
+        clearSelectedButtons();
         return;
       }
 
       if (e.getSource() instanceof MButton button)  {
-        if (selectedImages.containsKey(button)) {
-          setButtonUnselected(button);
-        } else {
-          setButtonSelected(button);
-        }
+        setButtonSelected(button, !selectedImages.containsKey(button));
         return;
       }
     }
   }
 
-  private class OptionBar extends JPanel {
+  public class OptionBar extends JPanel {
     public OptionBar() {
       Init();
     }
@@ -245,20 +232,39 @@ public class MediaGridView extends JPanel implements IMediaView {
     }
   }
 
-  private Map<MButton, ImageRecord> selectedImages = new HashMap<>();
+  public ImageRecord getAssociatedImageRecord(MButton button) {
+    return buttonToImage.get(button);
+  }
+
+  public void clearButtonsActionListener() {
+    buttonListener = null;
+    refresh();
+  }
+
+  public void clearSelectedButtons() {
+    for (MButton button : buttons) {
+      setButtonSelected(button, false);
+    }
+  }
+
+  public List<MButton> getButtons() {
+    return this.buttons;
+  }
+
+  public Map<MButton, ImageRecord> selectedImages = new HashMap<>();
   private Map<MButton, ImageRecord> buttonToImage = new HashMap<>();
-  private List<MButton> buttons;
+  public List<MButton> buttons = new ArrayList<>();
+  public OptionBar optionBar;
 
   private MButton btnSelectAll;
   private MButton btnClearAll;
 
   private JLabel lblSelectCount;
-  private ButtonListener buttonListener = new ButtonListener();
+  private ActionListener buttonListener = new ButtonListener();
   private ColorScheme colors;
   private JPanel pnImageBtns;
   private MScrollPane scrollPane;
   private final int imageSize = 100; // Fixed size for images
   private final int rowHeight = 110;  // Fixed height for each row
-
 }
 
