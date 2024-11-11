@@ -1,6 +1,5 @@
 package dev.mimgr;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -22,17 +21,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
-import dev.mimgr.component.MediaViewSwitcher;
 import dev.mimgr.component.IMediaView;
+import dev.mimgr.component.MediaViewSwitcher;
 import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.DropPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
-
-import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.MTransferListener;
@@ -42,7 +41,7 @@ import dev.mimgr.utils.ResourceManager;
  *
  * @author dn200
  */
-public class FormMedia extends JPanel {
+public class FormMedia extends JPanel implements DocumentListener {
   public FormMedia(ColorScheme colors) {
     this.colors = colors;
     InitializeComponent();
@@ -210,13 +209,15 @@ public class FormMedia extends JPanel {
       }
 
       if (e.getSource() == btnTableView) {
-        mediaViewSwitcher.setCurrentView(MediaViewSwitcher.VIEW_TABLE);
+        IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+        mediaViewSwitcher.setCurrentView(MediaViewSwitcher.VIEW_TABLE, currentView.getCurrentQueryInvoker());
         btnGridView.setIcon(FormMedia.this.gridIcon);
         btnTableView.setIcon(IconManager.changeIconColor(FormMedia.this.tableIcon, colors.m_grey_2));
       }
 
       if (e.getSource() == btnGridView) {
-        mediaViewSwitcher.setCurrentView(MediaViewSwitcher.VIEW_GRID);
+        IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+        mediaViewSwitcher.setCurrentView(MediaViewSwitcher.VIEW_GRID, currentView.getCurrentQueryInvoker());
         btnGridView.setIcon(IconManager.changeIconColor(FormMedia.this.gridIcon, colors.m_grey_2));
         btnTableView.setIcon(FormMedia.this.tableIcon);
       }
@@ -378,6 +379,7 @@ public class FormMedia extends JPanel {
     this.filterTextField.setBorderColor(colors.m_bg_5);
     this.filterTextField.setInputForeground(colors.m_fg_0);
     this.filterTextField.setFont(nunito_bold_14);
+    this.filterTextField.getDocument().addDocumentListener(this);
 
     this.selectFilesButton = new MButton("Select Files");
     this.selectFilesButton.setBackground(colors.m_bg_dim);
@@ -461,6 +463,34 @@ public class FormMedia extends JPanel {
     }
   }
 
+   @Override
+  public void insertUpdate(DocumentEvent e) {
+    get_images(this.filterTextField.getText());
+  }
+
+  @Override
+  public void removeUpdate(DocumentEvent e) {
+    get_images(this.filterTextField.getText());
+  }
+
+  @Override
+  public void changedUpdate(DocumentEvent e) {
+    get_images(this.filterTextField.getText());
+  }
+
+  private void get_images(String name) {
+    if (name.equals(this.filterTextField.getPlaceholder())) {
+      return;
+    }
+    if (!name.isBlank()) {
+      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.updateView(() -> ImageRecord.selectLikeName(name));
+    } else {
+      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.refresh();
+    }
+  }
+
   private Icon gridIcon;
   private Icon tableIcon;
 
@@ -472,6 +502,7 @@ public class FormMedia extends JPanel {
   private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
 
   // Controller Component
+  
   private MTextField filterTextField;
   private MComboBox<String> bulkAction;
   private MButton addMediaButton;

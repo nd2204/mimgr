@@ -23,6 +23,7 @@ public class ImageRecord {
 
   public static final String QUERY_SELECT_ALL = String.format("SELECT * FROM %s", TABLE);
   public static final String QUERY_SELECT_BY_ID = String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_ID);
+  public static final String QUERY_SELECT_LIKE_NAME = String.format("SELECT * FROM %s WHERE %s LIKE ?", TABLE, FIELD_NAME);
   public static final String QUERY_INSERT = String.format(
     "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)",
     TABLE, FIELD_NAME, FIELD_URL, FIELD_CAPTION, FIELD_AUTHOR
@@ -77,6 +78,10 @@ public class ImageRecord {
     } catch (SQLException ex) {
       return null;
     }
+  }
+
+  public static ResultSet selectLikeName(String name) {
+    return DBQueries.select(QUERY_SELECT_LIKE_NAME, '%' + name + '%');
   }
 
   public static int delete(ImageRecord ir) {

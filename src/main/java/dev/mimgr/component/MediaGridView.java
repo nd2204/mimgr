@@ -1,17 +1,11 @@
 package dev.mimgr.component;
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-
-import dev.mimgr.FontManager;
-import dev.mimgr.IconManager;
-import dev.mimgr.custom.DropContainerPanel;
-import dev.mimgr.custom.MButton;
-import dev.mimgr.custom.MScrollPane;
-import dev.mimgr.db.ImageRecord;
-import dev.mimgr.theme.builtin.ColorScheme;
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -25,6 +19,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.border.EmptyBorder;
+
+import dev.mimgr.FontManager;
+import dev.mimgr.IconManager;
+import dev.mimgr.custom.DropContainerPanel;
+import dev.mimgr.custom.MButton;
+import dev.mimgr.custom.MScrollPane;
+import dev.mimgr.db.ImageRecord;
+import dev.mimgr.theme.builtin.ColorScheme;
 
 public class MediaGridView extends JPanel implements IMediaView {
   public MediaGridView(ColorScheme colors) {
@@ -54,7 +64,7 @@ public class MediaGridView extends JPanel implements IMediaView {
     add(optionBar, BorderLayout.NORTH);
 
 
-    refresh();
+    updateView(() -> ImageRecord.selectAll());
     // Adjust the number of images per row when window is resized
     this.addComponentListener(new java.awt.event.ComponentAdapter() {
       public void componentResized(java.awt.event.ComponentEvent evt) {
@@ -82,13 +92,25 @@ public class MediaGridView extends JPanel implements IMediaView {
 
   @Override
   public void refresh() {
-    updateGrid(ImageRecord.selectAll());
+    updateGrid(currentQueryInvoker);
   }
 
-  public void updateGrid(ResultSet queryResult) {
+  @Override
+  public void updateView(Supplier<ResultSet> queryInvoker) {
+    updateGrid(queryInvoker);
+  }
+
+  @Override
+  public Supplier<ResultSet> getCurrentQueryInvoker() {
+    return this.currentQueryInvoker;
+  }
+
+  public void updateGrid(Supplier<ResultSet> queryInvoker) {
     buttonToImage.clear();
     buttons.clear();
     MButton button = null;
+    ResultSet queryResult = queryInvoker.get();
+    currentQueryInvoker = queryInvoker;
     try {
       while (queryResult.next()) {
         ImageRecord ir = new ImageRecord(queryResult);
@@ -251,6 +273,7 @@ public class MediaGridView extends JPanel implements IMediaView {
     return this.buttons;
   }
 
+  private Supplier<ResultSet> currentQueryInvoker;
   public Map<MButton, ImageRecord> selectedImages = new HashMap<>();
   private Map<MButton, ImageRecord> buttonToImage = new HashMap<>();
   public List<MButton> buttons = new ArrayList<>();

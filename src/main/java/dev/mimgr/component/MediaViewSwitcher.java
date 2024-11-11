@@ -1,11 +1,12 @@
 package dev.mimgr.component;
 
 import java.awt.CardLayout;
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.ResultSet;
+import java.util.function.Supplier;
 
 import javax.swing.JPanel;
 
+import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -17,15 +18,15 @@ public class MediaViewSwitcher {
 
     panelSwitcher = new CardLayout();
     this.mainPanel = new JPanel(panelSwitcher);
-    setCurrentView(VIEW_TABLE);
+    setCurrentView(VIEW_TABLE, () -> ImageRecord.selectAll());
   }
 
   public JPanel getPanel() {
     return this.mainPanel;
   }
 
-  public void setCurrentView(String view) {
-    Object mediaView = MediaViewFactory.createMediaView(view, colors);
+  public void setCurrentView(String view, Supplier<ResultSet> queryInvoker) {
+    Object mediaView = MediaViewFactory.createMediaView(view, colors, queryInvoker);
     this.mainPanel.add((JPanel) mediaView, view);
     this.panelSwitcher.show(this.mainPanel, view);
     this.currentMediaInterface = (IMediaView) mediaView;
@@ -36,12 +37,16 @@ public class MediaViewSwitcher {
   }
 
   private class MediaViewFactory {
-    public static Object createMediaView(String view, ColorScheme colors) {
+    public static Object createMediaView(String view, ColorScheme colors, Supplier<ResultSet> queryInvoker) {
       if (view.equals(VIEW_TABLE)) {
-        return new MediaTableView(colors);
+        MediaTableView mediaTableView = new MediaTableView(colors);
+        mediaTableView.updateTable(queryInvoker, mediaTableView.model);
+        return mediaTableView;
       }
       if (view.equals(VIEW_GRID)) {
-        return new MediaGridView(colors);
+        MediaGridView mediaGridView = new MediaGridView(colors);
+        mediaGridView.updateGrid(queryInvoker);
+        return mediaGridView;
       }
       return new MediaTableView(colors);
     }

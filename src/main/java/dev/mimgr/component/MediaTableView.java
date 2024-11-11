@@ -1,5 +1,6 @@
 package dev.mimgr.component;
 
+import java.awt.BorderLayout;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -19,14 +21,10 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-import java.awt.BorderLayout;
-
 import dev.mimgr.IconManager;
 import dev.mimgr.TableView;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTable;
-import dev.mimgr.db.DBConnection;
-import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -71,7 +69,7 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
     this.tv.load_column(table, model);
 
     model.addTableModelListener(this);
-    refresh();
+    updateView(() -> ImageRecord.selectAll());
 
     this.setLayout(new BorderLayout());
     this.add(tableScrollPane);
@@ -79,9 +77,11 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
     this.setVisible(true);
   }
 
-  public void updateTable(ResultSet queryResult, DefaultTableModel model) {
+  public void updateTable(Supplier<ResultSet> queryInvoker, DefaultTableModel model) {
     model.setRowCount(0);
     imageList = new ArrayList<>();
+    ResultSet queryResult = queryInvoker.get();
+    currentQueryInvoker = queryInvoker;
     try {
       while (queryResult.next()) {
         ImageRecord ir = new ImageRecord(queryResult);
@@ -121,7 +121,17 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
 
   @Override
   public void refresh() {
-    updateTable(ImageRecord.selectAll(), model);
+    updateTable(currentQueryInvoker, model);
+  }
+
+  @Override
+  public void updateView(Supplier<ResultSet> queryInvoker) {
+    updateTable(queryInvoker, model);
+  }
+
+  @Override
+  public Supplier<ResultSet> getCurrentQueryInvoker() {
+    return this.currentQueryInvoker;
   }
 
   public Set<Integer> getSelectedImagesId() {
@@ -155,11 +165,12 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
     }
   }
 
+  private Supplier<ResultSet> currentQueryInvoker;
   private HashMap<Integer, ImageRecord> selectedImages = new HashMap<>();
   private ArrayList<ImageRecord> imageList = new ArrayList<>();
   private JScrollPane       tableScrollPane;
   private MTable            table;
-  private DefaultTableModel model;
+  public DefaultTableModel model;
   private ColorScheme       colors;
   private TableView         tv;
 }
