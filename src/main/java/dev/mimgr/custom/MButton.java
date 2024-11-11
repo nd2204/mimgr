@@ -58,15 +58,15 @@ public class MButton extends JButton implements MouseListener {
     // Set the button background color
     drawBackground(g2);
 
-    // Draw the button border
-    drawBorder(g2);
-
     // Draw text
     drawText(g2);
 
-    g2.dispose();
-
     super.paintComponent(g); // Ensure button text is rendered
+
+    // Draw the button border
+    drawBorder(g2);
+
+    g2.dispose();
   }
 
   private void drawBackground(Graphics2D g2) {

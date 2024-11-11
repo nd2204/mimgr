@@ -487,7 +487,7 @@ public class FormMedia extends JPanel implements DocumentListener {
       currentView.updateView(() -> ImageRecord.selectLikeName(name));
     } else {
       IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
-      currentView.refresh();
+      currentView.reset();
     }
   }
 

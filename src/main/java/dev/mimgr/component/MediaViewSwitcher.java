@@ -40,7 +40,7 @@ public class MediaViewSwitcher {
     public static Object createMediaView(String view, ColorScheme colors, Supplier<ResultSet> queryInvoker) {
       if (view.equals(VIEW_TABLE)) {
         MediaTableView mediaTableView = new MediaTableView(colors);
-        mediaTableView.updateTable(queryInvoker, mediaTableView.model);
+        mediaTableView.updateTable(queryInvoker);
         return mediaTableView;
       }
       if (view.equals(VIEW_GRID)) {

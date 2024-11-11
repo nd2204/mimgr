@@ -16,7 +16,6 @@ import javax.swing.event.DocumentListener;
 
 import dev.mimgr.component.ProductTableView;
 import dev.mimgr.custom.MButton;
-import dev.mimgr.custom.MCheckBox;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
@@ -32,13 +31,9 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   public FormProduct(ColorScheme colors) {
     this.colors = colors;
     InitializeComponent();
-    // =======================================================
-    // Setup Layout
-    // =======================================================
+
     this.setLayout(new GridBagLayout());
-
     int padding = 25;
-
     // Top
     GridBagConstraints c = new GridBagConstraints();
     c.insets = new Insets(25, padding, 25, padding);
@@ -59,7 +54,6 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     c.gridx = 3;
     c.insets = new Insets(20, 5, 20, padding);
     this.add(btnAddProduct, c);
-
     // Content
     {
       GridBagConstraints cc = new GridBagConstraints();
@@ -169,10 +163,6 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     this.filterTextField.setFont(nunito_bold_14);
     this.filterTextField.getDocument().addDocumentListener(this);
 
-    this.checkBoxModel.setCheckColor(colors.m_green);
-    this.checkBoxModel.setBoxColor(colors.m_bg_4);
-    this.checkBoxModel.setBackground(colors.m_bg_0);
-
     this.btnApplyBulkAction.setForeground(colors.m_grey_2);
     this.btnApplyBulkAction.setBackground(colors.m_bg_0);
     this.btnApplyBulkAction.setBorderColor(colors.m_bg_5);
@@ -252,7 +242,6 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   private ColorScheme colors;
   private ProductTableView productTableView;
 
-  private MCheckBox checkBoxModel = new MCheckBox();
   private RoundedPanel contentContainer = new RoundedPanel();
   private JLabel topLabel = new JLabel("Products");
 

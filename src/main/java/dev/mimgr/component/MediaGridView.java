@@ -101,6 +101,11 @@ public class MediaGridView extends JPanel implements IMediaView {
   }
 
   @Override
+  public void reset() {
+    updateGrid(() -> ImageRecord.selectAll());
+  }
+
+  @Override
   public Supplier<ResultSet> getCurrentQueryInvoker() {
     return this.currentQueryInvoker;
   }
@@ -121,6 +126,7 @@ public class MediaGridView extends JPanel implements IMediaView {
         button.setForeground(colors.m_fg_0);
         button.setHoverBorderColor(colors.m_blue);
         button.setBorderColor(colors.m_bg_5);
+        button.setBorderWidth(2);
         button.addActionListener(buttonListener);
         buttonToImage.put(button, ir);
         buttons.add(button);

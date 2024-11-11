@@ -6,11 +6,7 @@ import java.util.function.BiConsumer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import dev.mimgr.custom.MCheckBoxCellEditor;
-import dev.mimgr.custom.MCheckBoxCellRenderer;
-import dev.mimgr.custom.MCheckBoxHeader;
-import dev.mimgr.custom.MImageCellRenderer;
-import dev.mimgr.custom.MTable;
+import dev.mimgr.custom.*;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class TableView {
@@ -49,10 +45,30 @@ public class TableView {
     };
   }
 
+  public static BiConsumer<MTable, Integer> setup_status_column(ColorScheme colors) {
+    return (table, colIndex) -> {
+      TableColumn column = table.getColumnModel().getColumn(colIndex);
+      column.setMinWidth(150);
+      column.setMaxWidth(200);
+      column.setPreferredWidth(150);
+      column.setCellRenderer(new MStatusCellRenderer(colors));
+    };
+  }
+
+
   public static BiConsumer<MTable, Integer> setup_default_column() {
     return (table, colIndex) -> {
       TableColumn column = table.getColumnModel().getColumn(colIndex);
       column.setPreferredWidth(150);
+    };
+  }
+
+  public static BiConsumer<MTable, Integer> setup_custom_column(int min, int prefered, int max) {
+    return (table, colIndex) -> {
+      TableColumn column = table.getColumnModel().getColumn(colIndex);
+      column.setMinWidth(min);
+      column.setMaxWidth(max);
+      column.setPreferredWidth(prefered);
     };
   }
 

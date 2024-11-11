@@ -45,10 +45,10 @@ CREATE TABLE IF NOT EXISTS images (
 
 CREATE TABLE IF NOT EXISTS orders (
   order_id       INT           AUTO_INCREMENT PRIMARY KEY,
-  order_status   VARCHAR(50)   NOT NULL,
   order_date     TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
-  total_amount   DECIMAL(10,2) NOT NULL,
-  payment_status VARCHAR(50)   NOT NULL
+  order_status   VARCHAR(50)   NOT NULL,
+  payment_status VARCHAR(50)   NOT NULL,
+  total_amount   DECIMAL(10,2) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS order_items (
@@ -58,8 +58,8 @@ CREATE TABLE IF NOT EXISTS order_items (
   quantity      INT NOT NULL,
   unit_price    DECIMAL(10, 2) NOT NULL,
   total_price   DECIMAL(10, 2) NOT NULL,
-  FOREIGN KEY (order_id) REFERENCES orders(order_id),
-  FOREIGN KEY (product_id) REFERENCES products(product_id)
+  FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );
 
 CREATE TABLE remember_me_tokens (

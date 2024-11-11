@@ -37,8 +37,8 @@ public class DBQueries {
     if (dbcon == null) return null;
     try {
       PreparedStatement preparedStatement = dbcon.prepareStatement(stmt);
-      for (int i = 1; i < args.length + 1; ++i) {
-        preparedStatement.setObject(i, args[i-1]);
+      for (int i = 0; i < args.length; ++i) {
+        preparedStatement.setObject(i + 1, args[i]);
       }
       resultSet = preparedStatement.executeQuery();
     } catch (SQLException e) {

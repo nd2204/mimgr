@@ -77,7 +77,7 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
     this.setVisible(true);
   }
 
-  public void updateTable(Supplier<ResultSet> queryInvoker, DefaultTableModel model) {
+  public void updateTable(Supplier<ResultSet> queryInvoker) {
     model.setRowCount(0);
     imageList = new ArrayList<>();
     ResultSet queryResult = queryInvoker.get();
@@ -121,12 +121,17 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
 
   @Override
   public void refresh() {
-    updateTable(currentQueryInvoker, model);
+    updateTable(currentQueryInvoker);
+  }
+
+  @Override
+  public void reset() {
+    updateTable(() -> ImageRecord.selectAll());
   }
 
   @Override
   public void updateView(Supplier<ResultSet> queryInvoker) {
-    updateTable(queryInvoker, model);
+    updateTable(queryInvoker);
   }
 
   @Override

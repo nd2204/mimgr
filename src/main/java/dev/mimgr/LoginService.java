@@ -13,7 +13,7 @@ public class LoginService {
     if (userRecord == null) return false;
     if (rememberMe) {
       String token = Security.generateToken();
-      Instant expirationTime = Instant.now().plus(Duration.ofHours(1));
+      Instant expirationTime = Instant.now().plus(Duration.ofDays(1));
       SessionManager.saveSession(token, expirationTime, userRecord.m_id);
     } else {
       SessionManager.clearSession();

@@ -1,16 +1,11 @@
 package dev.mimgr.component;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
@@ -22,7 +17,6 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-import dev.mimgr.FormAddProduct;
 import dev.mimgr.FormEditProduct;
 
 import java.awt.BorderLayout;
@@ -35,8 +29,6 @@ import dev.mimgr.UploadPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTable;
-import dev.mimgr.db.DBConnection;
-import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
@@ -74,9 +66,9 @@ public class ProductTableView extends JPanel implements TableModelListener {
 
     tv.add_column(table, "", TableView.setup_checkbox_column(colors));
     tv.add_column(table, "", TableView.setup_image_column(colors));
-    tv.add_column(table, "Name", TableView.setup_default_column());
-    tv.add_column(table, "Price", TableView.setup_default_column());
-    tv.add_column(table, "Stock", TableView.setup_default_column());
+    tv.add_column(table, "Name", TableView.setup_custom_column(150, 150, Integer.MAX_VALUE));
+    tv.add_column(table, "Price", TableView.setup_custom_column(80, 80, 120));
+    tv.add_column(table, "Stock", TableView.setup_custom_column(50, 50, 100));
     tv.add_column(table, "Description", TableView.setup_default_column());
     tv.load_column(table, model);
 
@@ -131,7 +123,7 @@ public class ProductTableView extends JPanel implements TableModelListener {
             Boolean.FALSE,
             icon,
             pr.m_name,
-            pr.m_price,
+            "€ " + pr.m_price,
             pr.m_stock_quantity,
             pr.m_description
         });
