@@ -623,7 +623,7 @@ class CategoryTree {
 
 
   private static void addCategoryToComboBox(MComboBox<CategoryRecord> comboBox, List<CategoryRecord> categories, int level) {
-    for (CategoryRecord cat :categories) {
+    for (CategoryRecord cat : categories) {
       cat.m_name = "    ".repeat(level) + cat.m_name;
       comboBox.addItem(cat);
       addCategoryToComboBox(comboBox, cat.childs, level + 1);

@@ -112,10 +112,10 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
   class MComboBoxEditor extends BasicComboBoxEditor {
     @Override
     public void setItem(Object item) {
-      if (item instanceof CategoryRecord) {
+      if (item instanceof CategoryRecord cr) {
         // Trim leading/trailing whitespace from the category name for the text field
-        String trimmedName = ((CategoryRecord) item).m_name.trim();
-        super.setItem(trimmedName);
+        cr.m_name = cr.m_name.trim();
+        super.setItem(cr);
       } else {
         super.setItem(item);
       }
