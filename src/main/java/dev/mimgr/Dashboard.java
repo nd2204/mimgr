@@ -1,7 +1,6 @@
 package dev.mimgr;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -9,13 +8,12 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
-import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.custom.MButton;
+import dev.mimgr.theme.builtin.ColorScheme;
 
 public class Dashboard extends JPanel {
   Dashboard(ColorScheme colors) {
@@ -79,7 +77,7 @@ public class Dashboard extends JPanel {
       // Bottom section
       c.weighty = 1.0;
       c.anchor = GridBagConstraints.PAGE_END;
-      sidebarPanel.addMenuButton("Account", accounts_icon, null, c);
+      sidebarPanel.addMenuButton("Account", accounts_icon, new FormAccount(colors), c);
 
       c.weighty = 0.0;
       sep = new JSeparator();

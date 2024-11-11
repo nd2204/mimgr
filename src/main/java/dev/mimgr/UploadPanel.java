@@ -414,9 +414,9 @@ public class UploadPanel extends JPanel {
     public void onStringImported(String string) {
       if (ResourceManager.isImageUrl(string)) {
         // System.out.println(rm.getUploadPath());
-        Path fp = ResourceManager.downloadFileToPath(string, ResourceManager.getInstance().getUploadPath());
+        Path fp = rm.downloadTempFile(string);
         dropContainerPanel.clearData();
-        dropContainerPanel.addData(fp);
+        dropContainerPanel.addData(fp.toFile());
       }
       return;
     }
