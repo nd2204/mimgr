@@ -29,7 +29,7 @@ public class UserRecord {
     String hash, String salt, String role
   ) {
     if (role.isBlank()) {
-      role = roles[ROLE_USER];
+      role = roles[ROLE_EMPLOYEE];
     }
     int result = DBQueries.update(QUERY_INSERT, username, hash, salt, role);
     // Ghi câu lệnh SQL vào file init.sql
