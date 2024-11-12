@@ -2,20 +2,23 @@ package dev.mimgr;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import dev.mimgr.component.DataPoint;
+import dev.mimgr.component.DataPointLegend;
 import dev.mimgr.component.LineChart;
+import dev.mimgr.component.TotalSalePanel;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
@@ -24,72 +27,81 @@ public class FormAnalytic extends JPanel {
   public FormAnalytic() {
     super();
     this.colors = ColorTheme.getInstance().getCurrentScheme();
-    this.setBackground(colors.m_bg_0);
-    this.setLayout(new BorderLayout());
+    this.setBackground(colors.m_bg_dim);
+    this.setLayout(new GridBagLayout());
 
-    List<String> xLabels = new ArrayList<>();
-    List<Integer> dataPoints = new ArrayList<>();
+    InitComponents();
 
-    Random random = new Random();
-    for (int i = 0; i < 50; ++i) {
-      int value = random.nextInt(0, 101);
-      dataPoints.add(value);
-      xLabels.add(String.valueOf(i));
-    }
+    GridBagConstraints c = new GridBagConstraints();
+    int padding = 25;
+    c.insets = new Insets(25, padding, 25, padding);
+    c.gridx = 0;
+    c.gridy = 0;
+    c.anchor = GridBagConstraints.FIRST_LINE_START;
+    this.add(lblAnalytic, c);
 
-    DataPoint dataPoint = new DataPoint(dataPoints, xLabels, colors.m_blue);
-    dataPoint.dataLegend = "Test test";
+    c.anchor = GridBagConstraints.CENTER;
+    c.fill = GridBagConstraints.HORIZONTAL;
 
-    LineChart chart = new LineChart(dataPoint);
-    this.add(chart, BorderLayout.CENTER);
-    this.add(new DataPointLegend(dataPoint), BorderLayout.SOUTH);
+    c.insets = new Insets(0, padding, 25, padding);
+    c.gridx = 0;
+    c.gridy = 1;
+    c.weightx = 0.5;
+    // c.weighty = 1.0;
+    c.gridwidth = 1;
+    this.add(new TotalSalePanel(), c);
 
+    c.insets = new Insets(0, 0, 25, padding);
+    c.gridx = 1;
+    this.add(new TotalOrderPanel(), c);
   }
 
-  public class DataPointLegend extends JPanel {
-    public DataPointLegend(DataPoint dp) {
+  private void InitComponents() {
+    this.lblAnalytic = new JLabel("Analytics Dashboard");
+    this.lblAnalytic.setFont(nunito_bold_20);
+    this.lblAnalytic.setForeground(colors.m_fg_0);
+  }
+
+
+  public class TotalOrderPanel extends RoundedPanel {
+    public TotalOrderPanel() {
       this.colors = ColorTheme.getInstance().getCurrentScheme();
-      this.dp = dp;
-      this.setMinimumSize(new Dimension(40, 50));
-      this.setPreferredSize(new Dimension(40, 30));
-      this.setVisible(true);
-    }
+      this.setLayout(new BorderLayout());
+      this.setBackground(colors.m_bg_0);
+      this.setMinimumSize(new Dimension(400, 500));
+      this.setPreferredSize(new Dimension(400, 500));
+      this.setBorder(new EmptyBorder(15, 15, 15, 15));
 
-    @Override
-    public void paintComponent(Graphics g) {
-      super.paintComponent(g);
+      List<String> xLabels = new ArrayList<>();
+      List<Double> dataPoints = new ArrayList<>();
 
-      Graphics2D g2 = (Graphics2D) g.create();
-
-      g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-      if (dp.dataLegend != null && dp.dataLegend.length() > 0) {
-        g2.setFont(FontManager.getFont("Nunito", 14f).deriveFont(Font.BOLD));
-        FontMetrics fm = g2.getFontMetrics();
-
-        int legendHeight = (int) (getHeight());
-        int legendWidth = fm.stringWidth(dp.dataLegend) + legendHeight + 15;
-        // int x = (getWidth() - legendWidth) / 2;
-        int y = (getHeight() - legendHeight) / 2;
-
-        g2.setColor(colors.m_bg_1);
-        int radius = (int) (legendHeight * 0.2);
-        g2.fillRoundRect(0, y, legendWidth - 1, legendHeight - 1, radius, radius);
-        g2.setColor(dp.lineColor);
-        g2.fillRoundRect(8, y + 7, legendHeight - 17, legendHeight - 17, radius, radius);
-
-        int textX = legendHeight / 2 + 14;
-        int textY = getHeight() / 2 + fm.getAscent() / 2 - fm.getDescent() / 2 - 1;
-        g2.setColor(colors.m_fg_0);
-        g2.drawString(dp.dataLegend, textX, textY);
+      Random random = new Random();
+      for (int i = 0; i < 50; ++i) {
+        double value = random.nextDouble(0, 101);
+        dataPoints.add(value);
+        xLabels.add(String.valueOf(i));
       }
 
-      g2.dispose();
-    }
+      DataPoint dataPoint = new DataPoint(dataPoints, xLabels, colors.m_blue);
+      dataPoint.dataLegend = "Test";
 
-    private DataPoint dp;
+      // Legends
+      JPanel legendsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+      legendsPanel.add(new DataPointLegend(dataPoint));
+      legendsPanel.setOpaque(false);
+
+      LineChart chart = new LineChart(dataPoint);
+      this.add(chart, BorderLayout.CENTER);
+      this.add(legendsPanel, BorderLayout.SOUTH);
+    }
     private ColorScheme colors;
   }
 
+  private Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
+  private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
+  private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
+  private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
+
   private ColorScheme colors;
+  private JLabel lblAnalytic;
 }

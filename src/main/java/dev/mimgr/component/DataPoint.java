@@ -10,13 +10,13 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class DataPoint {
-  public List<Integer> data = new ArrayList<>();
-  public List<String> xLabels;
+  public List<Double> data = new ArrayList<>();
+  public List<String> xLabels = new ArrayList<>();
   public Stroke lineStroke;
   public Color lineColor;
   public String dataLegend;
 
-  public DataPoint(List<Integer> dataPoints, List<String> xLabels, Color lineColor, String dataLegend, Stroke lineStroke) {
+  public DataPoint(List<Double> dataPoints, List<String> xLabels, Color lineColor, String dataLegend, Stroke lineStroke) {
     Init();
     this.data = dataPoints;
     this.xLabels = xLabels;
@@ -25,7 +25,7 @@ public class DataPoint {
     this.lineStroke = lineStroke;
   }
 
-  public DataPoint(List<Integer> dataPoints, List<String> xLabels, Color lineColor, String dataLegend) {
+  public DataPoint(List<Double> dataPoints, List<String> xLabels, Color lineColor, String dataLegend) {
     Init();
     this.data = dataPoints;
     this.xLabels = xLabels;
@@ -33,17 +33,21 @@ public class DataPoint {
     this.dataLegend = dataLegend;
   }
 
-  public DataPoint(List<Integer> dataPoints, List<String> xLabels, Color lineColor) {
+  public DataPoint(List<Double> dataPoints, List<String> xLabels, Color lineColor) {
     Init();
     this.data = dataPoints;
     this.xLabels = xLabels;
     this.lineColor = lineColor;
   }
 
-  public DataPoint(List<Integer> dataPoints, List<String> xLabels) {
+  public DataPoint(List<Double> dataPoints, List<String> xLabels) {
     Init();
     this.data = dataPoints;
     this.xLabels = xLabels;
+  }
+
+  public DataPoint() {
+    Init();
   }
 
   private void Init() {

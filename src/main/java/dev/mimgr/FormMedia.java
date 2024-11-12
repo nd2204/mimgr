@@ -502,7 +502,6 @@ public class FormMedia extends JPanel implements DocumentListener {
   private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
 
   // Controller Component
-  
   private MTextField filterTextField;
   private MComboBox<String> bulkAction;
   private MButton addMediaButton;

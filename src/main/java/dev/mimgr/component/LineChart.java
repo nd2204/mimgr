@@ -14,20 +14,27 @@ import java.util.function.Function;
 import javax.swing.JPanel;
 
 import dev.mimgr.FontManager;
-import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class LineChart extends JPanel {
   public LineChart(DataPoint dataPoint) {
-    this.dataPointList = new ArrayList<>();
+    InitComponents();
     this.dataPointList.add(dataPoint);
+  }
+
+  public LineChart() {
+    InitComponents();
+  }
+
+  private void InitComponents() {
+    this.dataPointList = new ArrayList<>();
     ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
     this.setBackground(colors.m_bg_0);
     this.chartBackground = colors.m_bg_0;
     this.chartAxisLabel = colors.m_grey_0;
     this.chartAxisColor = colors.m_bg_2;
-    this.maxYDivision = 2;
+    this.maxYDivision = 3;
     this.maxXDivision = 2;
     this.yLabelsFormatter = (s) -> s;
 
@@ -52,9 +59,10 @@ public class LineChart extends JPanel {
 
     int maxDataPointValue = getMaxDataPointValue(dataPointList);
     DataPoint longestDataPointList = getLongestDataPointList(dataPointList);
+    DataPoint newestDataPointList = dataPointList.getLast();
 
     drawHorizontalDataPointAxisLine(g2, width, height, longestDataPointList, maxDataPointValue);
-    drawVerticalDataPointAxisLine(g2, width, height, longestDataPointList, longestDataPointList.xLabels);
+    drawVerticalDataPointAxisLine(g2, width, height, newestDataPointList, newestDataPointList.xLabels);
     for (DataPoint dataPoints : dataPointList) {
       drawDataPointLine(g2, width, height, dataPoints, maxDataPointValue);
     }
@@ -85,13 +93,15 @@ public class LineChart extends JPanel {
   }
 
   private void drawVerticalDataPointAxisLine(Graphics2D g2, int width, int height, DataPoint dataPoint, List<String> xLabels) {
-    for (int i = 0; i < dataPoint.data.size(); i++) {
-      if (dataPoint.data.size() <= 1) break;
-      int x0 = i * (width - chartPadding * 2 - labelPadding) / (dataPoint.data.size() - 1) + chartPadding + labelPadding;
+    int dataPointSize = dataPoint.data.size();
+    int dataPointPerSegment = dataPointSize / maxXDivision;
+    for (int i = 0; i < dataPointSize; i++) {
+      if (dataPointSize <= 1) break;
+      int x0 = i * (width - chartPadding * 2 - labelPadding) / (dataPointSize - 1) + chartPadding + labelPadding;
       int x1 = x0;
       int y0 = height - chartPadding - labelPadding;
       // Draw Label and line only in subdivision range
-      if ((i % ((dataPoint.data.size() / (float) maxXDivision))) == 0 || i + 1 == dataPoint.data.size()) {
+      if (i % dataPointPerSegment == 0 || i + 1 == dataPointSize) {
         if (flagIsOn(FLAG_DRAW_VERTICAL_DATAPOINT_LINE)) {
           g2.setColor(chartAxisColor);
           g2.drawLine(x0, height - chartPadding - labelPadding - 1, x1, chartPadding);
@@ -113,10 +123,12 @@ public class LineChart extends JPanel {
     int dataPointSize = dataPoint.data.size();
     g2.setColor(dataPoint.lineColor);
     for (int i = 0; i < dataPointSize - 1; i++) {
+      int value1 = dataPoint.data.get(i).intValue();
+      int value2 = dataPoint.data.get(i+1).intValue();
       int x1 = i * (width - chartPadding * 2 - labelPadding) / (dataPointSize - 1) + chartPadding + labelPadding;
-      int y1 = height - ((dataPoint.data.get(i) * (height - chartPadding * 2 - labelPadding)) / maxDataPointValue + chartPadding + labelPadding);
+      int y1 = height - ((value1 * (height - chartPadding * 2 - labelPadding)) / maxDataPointValue + chartPadding + labelPadding);
       int x2 = (i + 1) * (width - chartPadding * 2 - labelPadding) / (dataPointSize - 1) + chartPadding + labelPadding;
-      int y2 = height - ((dataPoint.data.get(i + 1) * (height - chartPadding * 2 - labelPadding)) / maxDataPointValue + chartPadding + labelPadding);
+      int y2 = height - ((value2 * (height - chartPadding * 2 - labelPadding)) / maxDataPointValue + chartPadding + labelPadding);
       dp.add(new Point(x1, y1));
       if (i + 1 == dataPointSize - 1) {
         dp.add(new Point(x2, y2));
@@ -125,7 +137,7 @@ public class LineChart extends JPanel {
 
     List<Point> points;
     if (flagIsOn(FLAG_DRAW_SMOOTH_DATAPOINT)) {
-      points = calculateSpline(dp, 160);
+      points = calculateSpline(dp, 1000);
     } else {
       points = dp;
     }
@@ -134,7 +146,9 @@ public class LineChart extends JPanel {
       Point p1 = points.get(i);
       Point p2 = points.get(i + 1);
       g2.setStroke(dataPoint.lineStroke);
-      if (i > 0) g2.fillOval(p1.x - 3, p1.y - 3, 6, 6);
+      if (flagIsOn(FLAG_DRAW_DATAPOINT_POINT)) {
+        if (i > 0) g2.fillOval(p1.x - 3, p1.y - 3, 6, 6);
+      }
       g2.drawLine(p1.x, p1.y, p2.x, p2.y);
     }
   }
@@ -171,13 +185,13 @@ public class LineChart extends JPanel {
   }
 
   private int getMaxDataPointValue(List<DataPoint> dataPoints) {
-    int max = Integer.MIN_VALUE;
+    double max = Integer.MIN_VALUE;
     for (DataPoint dp : dataPoints) {
-      for (int value : dp.data) {
+      for (double value : dp.data) {
         max = Math.max(max, value);
       }
     }
-    return max + 10;
+    return Double.valueOf(max * 1.1).intValue();
   }
 
   private DataPoint getLongestDataPointList(List<DataPoint> dataPoints) {
@@ -192,7 +206,7 @@ public class LineChart extends JPanel {
   }
 
   public void setDrawFlags(int flags) {
-    this.flags = flags;
+    this.flags = this.flags | flags;
     repaint();
   }
 
@@ -214,11 +228,22 @@ public class LineChart extends JPanel {
     repaint();
   }
 
+  public void setMaxYDivision(int MaxDivision) {
+    this.maxYDivision = MaxDivision; 
+    repaint();
+  }
+
+  public void setMaxXDivision(int MaxDivision) {
+    this.maxXDivision = MaxDivision; 
+    repaint();
+  }
+
   public static final int FLAG_DRAW_VERTICAL_DATAPOINT_LINE = 1 << 0;
   public static final int FLAG_DRAW_HORIZONTAL_DATAPOINT_LINE = 1 << 1;
   public static final int FLAG_DRAW_SMOOTH_DATAPOINT = 1 << 2;
+  public static final int FLAG_DRAW_DATAPOINT_POINT = 1 << 3;
 
-  private int flags = FLAG_DRAW_HORIZONTAL_DATAPOINT_LINE;
+  private int flags = FLAG_DRAW_HORIZONTAL_DATAPOINT_LINE | FLAG_DRAW_VERTICAL_DATAPOINT_LINE;
 
   private Function<String, String> yLabelsFormatter;
   private List<DataPoint> dataPointList;

@@ -4,8 +4,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.function.Supplier;
 
 import dev.mimgr.db.OrderRecord;
 import dev.mimgr.db.OrderItemRecord;
@@ -13,11 +15,15 @@ import dev.mimgr.db.ProductRecord;
 
 public class RandomOrderGenerator {
   public static void main(String[] args) {
-    Instant start = Instant.parse("2023-01-01T00:00:00Z");
-    Instant end = Instant.now();
+    // Instant start = Instant.parse("2023-01-01T00:00:00Z");
+    createRandomOrder(30, () -> getRandomThis30DayInstant());
+    createRandomOrder(30, () -> getRandomPrevious30DayInstant());
+  }
+
+  public static void createRandomOrder(int count, Supplier<Instant> timestampGen) {
     Random random = new Random();
-    for (int i = 0; i < 10; ++i) {
-      OrderRecord or = new OrderRecord(0, getRandomInstant(start, end), 0, getRandomPaymentStatus(), getRandomOrderStatus());
+    for (int i = 0; i < count; ++i) {
+      OrderRecord or = new OrderRecord(0, timestampGen.get(), 0, getRandomPaymentStatus(), getRandomOrderStatus());
       OrderRecord.insert(or);
       System.out.println("[Created Order] " + or);
 
@@ -27,6 +33,16 @@ public class RandomOrderGenerator {
         createRandomOrderItem(ordb.m_id);
       }
     }
+  }
+
+  public static Instant getRandomPrevious30DayInstant() {
+    Instant end = Instant.now().minus(Duration.ofDays(30)).truncatedTo(ChronoUnit.SECONDS);
+    return getRandomInstant(end.minus(Duration.ofDays(30)).truncatedTo(ChronoUnit.SECONDS), end);
+  }
+
+  public static Instant getRandomThis30DayInstant() {
+    Instant end = Instant.now();
+    return getRandomInstant(end.minus(Duration.ofDays(30)).truncatedTo(ChronoUnit.SECONDS), end);
   }
 
   public static Instant getRandomInstant(Instant start, Instant end) {
