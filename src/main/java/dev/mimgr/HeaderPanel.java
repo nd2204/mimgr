@@ -15,10 +15,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.db.UserRecord;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class HeaderPanel extends JPanel {
@@ -83,21 +86,6 @@ public class HeaderPanel extends JPanel {
     this.add(new UserInfoPanel(), c);
   }
 
-  private String getShortenedName(String name) {
-    String[] strs = name.split(" ", 3);
-    String result = "";
-    if (strs.length < 2) {
-      for (int i = 0; i < 2; ++i) {
-        result += strs[0].charAt(i);
-      }
-    } else {
-      for (String s : strs) {
-        result += s.charAt(0);
-      }
-    }
-    return result.toUpperCase().trim();
-  }
-
   private class UserInfoPanel extends JPanel {
     public UserInfoPanel() {
       UserRecord ur = SessionManager.getCurrentUser();
@@ -141,6 +129,21 @@ public class HeaderPanel extends JPanel {
       c.weighty = 1.0;
       c.gridheight = 2;
       this.add(new AvatarPanel(getShortenedName(ur.m_username), colors.m_aqua, colors.m_fg_1), c);
+    }
+
+    private String getShortenedName(String name) {
+      String[] strs = name.split(" ", 3);
+      String result = "";
+      if (strs.length < 2) {
+        for (int i = 0; i < 2; ++i) {
+          result += strs[0].charAt(i);
+        }
+      } else {
+        for (String s : strs) {
+          result += s.charAt(0);
+        }
+      }
+      return result.toUpperCase().trim();
     }
   }
 
@@ -198,6 +201,7 @@ public class HeaderPanel extends JPanel {
   }
 
   private ColorScheme colors;
+  MButton btnTheme;
   MButton btnAccount;
   MTextField tfSearch;
   MButton btnToggleSidebar;

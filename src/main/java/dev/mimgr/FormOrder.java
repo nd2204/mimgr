@@ -105,6 +105,14 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
     c.weightx = 1.0;
     c.weighty = 1.0;
     c.gridwidth = 4;
+
+    c.insets = new Insets(0, padding, 20, padding);
+    c.fill = GridBagConstraints.BOTH;
+    c.gridx = 0;
+    c.gridy = 2;
+    c.weightx = 1.0;
+    c.weighty = 1.0;
+    c.gridwidth = 4;
     this.add(contentContainer, c);
   }
 

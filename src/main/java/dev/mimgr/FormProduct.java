@@ -21,6 +21,7 @@ import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.theme.ColorTheme;
 
 /**
  *
@@ -28,8 +29,8 @@ import dev.mimgr.theme.builtin.ColorScheme;
  */
 public class FormProduct extends JPanel implements ActionListener, DocumentListener {
 
-  public FormProduct(ColorScheme colors) {
-    this.colors = colors;
+  public FormProduct() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     InitializeComponent();
 
     this.setLayout(new GridBagLayout());

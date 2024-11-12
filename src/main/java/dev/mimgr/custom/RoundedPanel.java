@@ -20,7 +20,7 @@ public class RoundedPanel extends JPanel {
 
   public RoundedPanel() {
     super();
-    colors = ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST);
+    colors = ColorTheme.getInstance().getCurrentScheme();
     Init();
   }
 

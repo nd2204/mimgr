@@ -204,7 +204,7 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
   private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
 
-  private ColorScheme colors = ColorTheme.get_currentScheme();
+  private ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
   private ComboBoxUI comboBoxUI = new MComboBoxUI();
   private JTextField comboBoxTextField;
 }

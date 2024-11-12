@@ -13,7 +13,7 @@ import dev.mimgr.theme.builtin.ColorScheme;
 public class MediaViewSwitcher {
   public MediaViewSwitcher(ColorScheme colors) {
     this.colors = (colors == null)
-      ? ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST)
+      ? ColorTheme.getInstance().getCurrentScheme()
       : colors;
 
     panelSwitcher = new CardLayout();

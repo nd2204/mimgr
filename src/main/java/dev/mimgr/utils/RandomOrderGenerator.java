@@ -13,7 +13,7 @@ import dev.mimgr.db.ProductRecord;
 
 public class RandomOrderGenerator {
   public static void main(String[] args) {
-    Instant start = Instant.parse("2020-01-01T00:00:00Z");
+    Instant start = Instant.parse("2023-01-01T00:00:00Z");
     Instant end = Instant.now();
     Random random = new Random();
     for (int i = 0; i < 10; ++i) {
@@ -21,7 +21,7 @@ public class RandomOrderGenerator {
       OrderRecord.insert(or);
       System.out.println("[Created Order] " + or);
 
-      int itemCount = random.nextInt(1, 10);
+      int itemCount = random.nextInt(1, 5);
       OrderRecord ordb = OrderRecord.selectByFields(or);
       for (int j = 0; j < itemCount; ++j) {
         createRandomOrderItem(ordb.m_id);
@@ -48,7 +48,7 @@ public class RandomOrderGenerator {
   public static void createRandomOrderItem(int orderId) {
     Random random = new Random();
     ProductRecord randomProduct = getRandomProduct();
-    int randomQuantity = random.nextInt(1, 10);
+    int randomQuantity = random.nextInt(1, 5);
     OrderItemRecord orderItemRecord = new OrderItemRecord(
       0,
       orderId,
@@ -58,6 +58,12 @@ public class RandomOrderGenerator {
       randomProduct.m_price * randomQuantity
     );
     OrderItemRecord.insert(orderItemRecord);
+    System.out.println(
+        "   OrderId:" + orderItemRecord.m_order_id + 
+        ", ProductId: " + orderItemRecord.m_product_id + 
+        ", Quantity: " + orderItemRecord.m_quantity +
+        ", Unit Price: " + orderItemRecord.m_unit_price +
+        ", Total: " + orderItemRecord.m_total_price);
   }
 
   private static ProductRecord getRandomProduct() {

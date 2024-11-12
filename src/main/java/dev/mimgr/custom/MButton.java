@@ -236,7 +236,7 @@ public class MButton extends JButton implements MouseListener {
     repaint();
   }
 
-  private ColorScheme colors         = ColorTheme.get_colorscheme(ColorTheme.THEME_LIGHT_DEFAULT);
+  private ColorScheme colors         = ColorTheme.getInstance().getCurrentScheme();
 
   private Color borderColor          = colors.m_bg_5;
   private Color clickBorderColor     = null;

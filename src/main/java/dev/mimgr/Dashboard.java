@@ -70,8 +70,8 @@ public class Dashboard extends JPanel {
       c.insets = new Insets(padding_vertical, padding_horizontal, padding_vertical, padding_horizontal);
       sidebarPanel.addComponent(sep, c);
       sidebarPanel.addMenuButton("Orders", orders_icon, new FormOrder(colors), c);
-      firstButton = sidebarPanel.addMenuButton("Products", products_icon, new FormProduct(colors), c);
-      sidebarPanel.addMenuButton("Analytics", analytics_icon, new FormAnalytic(colors), c);
+      firstButton = sidebarPanel.addMenuButton("Products", products_icon, new FormProduct(), c);
+      sidebarPanel.addMenuButton("Analytics", analytics_icon, new FormAnalytic(), c);
       sidebarPanel.addMenuButton("Media", media_icon, new FormMedia(colors), c);
 
       // Bottom section

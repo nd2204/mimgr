@@ -3,8 +3,6 @@ package dev.mimgr.theme;
 import dev.mimgr.theme.builtin.*;
 
 public class ColorTheme {
-  private static ColorScheme currentScheme = null;
-
   public static final int THEME_DARK_GRUVBOX     = 0;
   public static final int THEME_DARK_CATPUCCIN   = 1;
   public static final int THEME_DARK_EVERFOREST  = 2;
@@ -14,41 +12,49 @@ public class ColorTheme {
   public static final int THEME_LIGHT_EVERFOREST = 6;
   public static final int THEME_LIGHT_DEFAULT    = 7;
 
-  public static ColorScheme get_colorscheme(int theme) {
+  public static ColorScheme getColorScheme(int theme) {
     switch(theme) {
       case THEME_DARK_DEFAULT:
-        currentScheme = new DefaultDark();
-        break;
+        return new DefaultDark();
       case THEME_DARK_GRUVBOX:
-        currentScheme = new GruvboxDark();
-        break;
+        return new GruvboxDark();
       case THEME_DARK_CATPUCCIN:
-        currentScheme = new CatpuccinDark();
-        break;
+        return new CatpuccinDark();
       case THEME_DARK_EVERFOREST:
-        currentScheme = new EverforestDark();
-        break;
+        return new EverforestDark();
       case THEME_LIGHT_DEFAULT:
-        currentScheme = new DefaultLight();
-        break;
+        return new DefaultLight();
       case THEME_LIGHT_GRUVBOX:
-        currentScheme = new GruvboxLight();
-        break;
+        return new GruvboxLight();
       case THEME_LIGHT_CATPUCCIN:
-        currentScheme = new CatpuccinLight();
-        break;
+        return new CatpuccinLight();
       case THEME_LIGHT_EVERFOREST:
-        currentScheme = new EverforestLight();
-        break;
+        return new EverforestLight();
       default:
-        currentScheme = new DefaultDark();
-        break;
+        return new EverforestDark();
     }
-    return currentScheme;
   }
 
-  public static ColorScheme get_currentScheme() {
+  private ColorTheme() {
+    this.currentScheme = new EverforestDark();
+  }
+
+  private class ColorThemeHolder {
+    public static final ColorTheme INSTANCE = new ColorTheme();
+  }
+
+  public static ColorTheme getInstance() {
+    return ColorThemeHolder.INSTANCE;
+  }
+
+  public void setColorScheme(int scheme) {
+    this.currentScheme = getColorScheme(scheme);
+ }
+
+  public ColorScheme getCurrentScheme() {
     if (currentScheme == null) return new EverforestDark();
     return currentScheme;
   }
+
+  private ColorScheme currentScheme = null;
 }

@@ -180,7 +180,7 @@ public class FormAddProduct extends JFrame {
   }
 
   public static void main(String arg[]) {
-    ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST);
+    ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
     new FormAddProduct(colors);
   }
 

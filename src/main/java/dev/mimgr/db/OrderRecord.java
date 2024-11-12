@@ -85,9 +85,9 @@ public class OrderRecord {
   @Override
   public String toString() {
     return
-      m_order_status + " " +
-      m_payment_status + " " +
-      m_date;
+      m_date + ", " +
+      m_order_status + ", " +
+      m_payment_status;
   }
 
   public static ResultSet selectAll() {

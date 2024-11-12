@@ -32,6 +32,7 @@ class Entry extends JFrame {
     FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
     FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
 
+    ColorScheme colors = theme.getCurrentScheme();
     // Register startup panel
     UserRecord ur = SessionManager.loadSession();
     if (ur == null) {
@@ -90,7 +91,7 @@ class Entry extends JFrame {
     });
   }
 
-  ColorScheme colors = ColorTheme.get_colorscheme(ColorTheme.THEME_DARK_EVERFOREST);
+  ColorTheme theme = ColorTheme.getInstance();
   ResourceManager resman = ResourceManager.getInstance();
 
   private double m_aspect_ratio;
