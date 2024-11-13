@@ -10,17 +10,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
@@ -68,7 +61,7 @@ public class TotalSalePanel extends RoundedPanel {
       legendsPanel.add(new DataPointLegend(dataPoint));
     }
 
-    lblGrowthRate.setText(String.format("%s", (int) (thisMonthSum / lastMonthSum) * 100 + "%"));
+    lblGrowthRate.setText(String.format("%s", (int) ((thisMonthSum / lastMonthSum) * 100) + "%"));
 
     JPanel detailPanel = new JPanel(new GridBagLayout());
     detailPanel.setBackground(colors.m_bg_0);

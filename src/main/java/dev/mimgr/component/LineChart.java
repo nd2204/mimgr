@@ -75,9 +75,8 @@ public class LineChart extends JPanel {
     for (int i = 0; i < maxYDivision + 1; i++) {
       int x0 = chartPadding + labelPadding;
       int y0 = height - ((i * (height - chartPadding * 2 - labelPadding)) / maxYDivision + chartPadding + labelPadding);
-      int x1 = chartPadding + labelPadding;
       int y1 = y0;
-      if (dataPoint.data.size() > 0) {
+      if (!dataPoint.data.isEmpty()) {
         if (flagIsOn(FLAG_DRAW_HORIZONTAL_DATAPOINT_LINE)) {
           g2.setColor(chartAxisColor);
           g2.drawLine(chartPadding + labelPadding + 1, y0, width - chartPadding, y1);
@@ -101,7 +100,7 @@ public class LineChart extends JPanel {
       int x1 = x0;
       int y0 = height - chartPadding - labelPadding;
       // Draw Label and line only in subdivision range
-      if (i % dataPointPerSegment == 0 || i + 1 == dataPointSize) {
+      if (i % dataPointPerSegment == 0) {
         if (flagIsOn(FLAG_DRAW_VERTICAL_DATAPOINT_LINE)) {
           g2.setColor(chartAxisColor);
           g2.drawLine(x0, height - chartPadding - labelPadding - 1, x1, chartPadding);
@@ -149,7 +148,9 @@ public class LineChart extends JPanel {
       if (flagIsOn(FLAG_DRAW_DATAPOINT_POINT)) {
         if (i > 0) g2.fillOval(p1.x - 3, p1.y - 3, 6, 6);
       }
-      g2.drawLine(p1.x, p1.y, p2.x, p2.y);
+      if (flagIsOn(FLAG_DRAW_DATAPOINT_LINE)) {
+        g2.drawLine(p1.x, p1.y, p2.x, p2.y);
+      }
     }
   }
 
@@ -210,6 +211,11 @@ public class LineChart extends JPanel {
     repaint();
   }
 
+  public void unsetDrawFlags(int flags) {
+    this.flags = this.flags ^ flags;
+    repaint();
+  }
+
   private boolean flagIsOn(int flag) {
     return (flags & flag) != 0;
   }
@@ -238,12 +244,15 @@ public class LineChart extends JPanel {
     repaint();
   }
 
-  public static final int FLAG_DRAW_VERTICAL_DATAPOINT_LINE = 1 << 0;
+  public static final int FLAG_DRAW_VERTICAL_DATAPOINT_LINE = 1;
   public static final int FLAG_DRAW_HORIZONTAL_DATAPOINT_LINE = 1 << 1;
   public static final int FLAG_DRAW_SMOOTH_DATAPOINT = 1 << 2;
   public static final int FLAG_DRAW_DATAPOINT_POINT = 1 << 3;
+  public static final int FLAG_DRAW_DATAPOINT_LINE = 1 << 4;
 
-  private int flags = FLAG_DRAW_HORIZONTAL_DATAPOINT_LINE | FLAG_DRAW_VERTICAL_DATAPOINT_LINE;
+  private int flags = FLAG_DRAW_HORIZONTAL_DATAPOINT_LINE 
+    | FLAG_DRAW_VERTICAL_DATAPOINT_LINE
+    | FLAG_DRAW_DATAPOINT_LINE;
 
   private Function<String, String> yLabelsFormatter;
   private List<DataPoint> dataPointList;
