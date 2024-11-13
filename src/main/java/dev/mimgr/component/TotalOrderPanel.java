@@ -16,12 +16,14 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.Box;
+import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import dev.mimgr.FontManager;
+import dev.mimgr.IconManager;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.DBQueries;
 import dev.mimgr.theme.ColorTheme;
@@ -60,7 +62,7 @@ public class TotalOrderPanel extends RoundedPanel {
       legendsPanel.add(new DataPointLegend(dataPoint));
     }
 
-    lblGrowthRate.setText(String.format("%s", (int) ((thisMonthSum / lastMonthSum) * 100) + "%"));
+    lblGrowthRate.setRate(thisMonthSum / lastMonthSum);
 
     JPanel detailPanel = new JPanel(new GridBagLayout());
     detailPanel.setBackground(colors.m_bg_0);
@@ -89,6 +91,7 @@ public class TotalOrderPanel extends RoundedPanel {
       c.gridx = 2;
       c.gridy = 1;
       c.weightx = 1.0;
+      c.weighty = 1.0;
       c.anchor = GridBagConstraints.FIRST_LINE_END;
       detailPanel.add(lblGrowthRate, c);
 
@@ -114,11 +117,11 @@ public class TotalOrderPanel extends RoundedPanel {
 
     lblTotalOrder = new JLabel("NO DATA");
     lblTotalOrder.setForeground(colors.m_fg_0);
-    lblTotalOrder.setFont(nunito_bold_20);
+    lblTotalOrder.setFont(nunito_extrabold_22);
     lblTotalOrder.setHorizontalAlignment(SwingConstants.LEFT);
     lblTotalOrder.setVerticalAlignment(SwingConstants.CENTER);
 
-    lblGrowthRate = new JLabel();
+    lblGrowthRate = new GrowthRateLabel();
     lblGrowthRate.setFont(nunito_bold_16);
     lblGrowthRate.setForeground(colors.m_green);
     lblGrowthRate.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -146,6 +149,7 @@ public class TotalOrderPanel extends RoundedPanel {
     Instant start = null;
     Instant end = null;
     try (ResultSet rs = DBQueries.select(query, monthsBefore + 1, monthsBefore)) {
+
       while (rs.next()) {
         if (rs.isFirst()) {
           start = rs.getTimestamp("order_day").toInstant();
@@ -156,6 +160,7 @@ public class TotalOrderPanel extends RoundedPanel {
         dataPoint.data.add(rs.getDouble("count"));
         dataPoint.xLabels.add(formatInstant(rs.getTimestamp("order_day").toInstant(), "MMM d"));
       }
+      if (start == null || end == null) return dataPoint;
       dataPoint.dataLegend = formatInstant(start, "MMM d - ") + formatInstant(end, "MMM d, yyyy");
       dataPoint.lineColor = colors.m_blue;
       dataPoint.lineStroke = new BasicStroke(2);
@@ -172,20 +177,33 @@ public class TotalOrderPanel extends RoundedPanel {
     return zdt.format(dtf);
   }
 
-  private class GrowthRateLabel extends JLabel {
-    public GrowthRateLabel(double rate) {
-      super(String.valueOf(rate * 100));
+  public class GrowthRateLabel extends JLabel {
+    public GrowthRateLabel() {
+      this.setFont(nunito_bold_16);
     }
+
+    public void setRate(double rate) {
+      if (rate < 1.0) {
+        this.setText(String.format("%d%s", (int) ((1.0 - rate) * 100), "%"));
+        this.setIcon(IconManager.getIcon("down_arrow.png", 14, 16, colors.m_red));
+        this.setForeground(colors.m_red);
+      } else {
+        this.setText(String.format("%d%s", (int) ((rate - 1.0) * 100), "%"));
+        this.setIcon(IconManager.getIcon("up_arrow.png", 14, 16, colors.m_green));
+        this.setForeground(colors.m_green);
+      }
+    }
+
+    ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
   }
 
-  private Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
+  private Font nunito_extrabold_22 = FontManager.getFont("NunitoExtraBold", 22f);
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
-  private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
 
   private ColorScheme colors;
   private JLabel lblTitle;
   private JLabel lblTotalOrder;
-  private JLabel lblGrowthRate;
+  private GrowthRateLabel lblGrowthRate;
   private JLabel lblChart;
 }

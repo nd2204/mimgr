@@ -22,8 +22,10 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import dev.mimgr.FontManager;
+import dev.mimgr.IconManager;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.DBQueries;
+import dev.mimgr.db.OrderRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -32,7 +34,7 @@ public class TotalSalePanel extends RoundedPanel {
     this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.setLayout(new BorderLayout());
     this.setBackground(colors.m_bg_0);
-    this.setMinimumSize(new Dimension(400, 500));
+    this.setMinimumSize(new Dimension(400, 200));
     this.setPreferredSize(new Dimension(400, 500));
     this.setBorder(new EmptyBorder(15, 15, 15, 15));
 
@@ -61,7 +63,7 @@ public class TotalSalePanel extends RoundedPanel {
       legendsPanel.add(new DataPointLegend(dataPoint));
     }
 
-    lblGrowthRate.setText(String.format("%s", (int) ((thisMonthSum / lastMonthSum) * 100) + "%"));
+    lblGrowthRate.setRate(thisMonthSum / lastMonthSum);
 
     JPanel detailPanel = new JPanel(new GridBagLayout());
     detailPanel.setBackground(colors.m_bg_0);
@@ -90,6 +92,7 @@ public class TotalSalePanel extends RoundedPanel {
       c.gridx = 2;
       c.gridy = 1;
       c.weightx = 1.0;
+      c.weighty = 1.0;
       c.anchor = GridBagConstraints.FIRST_LINE_END;
       detailPanel.add(lblGrowthRate, c);
 
@@ -115,11 +118,11 @@ public class TotalSalePanel extends RoundedPanel {
 
     lblTotalSales = new JLabel("NO DATA");
     lblTotalSales.setForeground(colors.m_fg_0);
-    lblTotalSales.setFont(nunito_bold_20);
+    lblTotalSales.setFont(nunito_extrabold_22);
     lblTotalSales.setHorizontalAlignment(SwingConstants.LEFT);
     lblTotalSales.setVerticalAlignment(SwingConstants.CENTER);
 
-    lblGrowthRate = new JLabel();
+    lblGrowthRate = new GrowthRateLabel();
     lblGrowthRate.setFont(nunito_bold_16);
     lblGrowthRate.setForeground(colors.m_green);
     lblGrowthRate.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -145,12 +148,13 @@ public class TotalSalePanel extends RoundedPanel {
   }
 
   private DataPoint getDataPointByMonth(int monthsBefore) {
-    String query = """
-    SELECT DATE(order_date) AS order_day, oi.total_price
+    String query = String.format("""
+    SELECT DATE(order_date) AS order_day, oi.total_price, %s
     FROM orders o
     JOIN
       (
-        SELECT order_id,
+        SELECT
+          order_id,
           COUNT(order_item_id) AS total_item,
           SUM(total_price) AS total_price
         FROM order_items
@@ -160,7 +164,7 @@ public class TotalSalePanel extends RoundedPanel {
     WHERE o.order_date >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
       AND o.order_date <= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
     ORDER BY o.order_date ASC;
-    """;
+    """, OrderRecord.FIELD_PAYMENT_STATUS);
     DataPoint dataPoint = new DataPoint();
     Instant start = null;
     Instant end = null;
@@ -172,12 +176,18 @@ public class TotalSalePanel extends RoundedPanel {
         if (rs.isLast()) {
           end = rs.getTimestamp("order_day").toInstant();
         }
+        // Skip the row if the order haven't been paid
+        if (!rs.getString(OrderRecord.FIELD_PAYMENT_STATUS)
+                .equals(OrderRecord.paymentStatuses[OrderRecord.PAYMENT_STATUS_PAID])
+        ) continue;
         dataPoint.data.add(rs.getDouble("total_price"));
         dataPoint.xLabels.add(formatInstant(rs.getTimestamp("order_day").toInstant(), "MMM d"));
       }
-      dataPoint.dataLegend = formatInstant(start, "MMM d - ") + formatInstant(end, "MMM d, yyyy");
+      // Setup the dataPoint
       dataPoint.lineColor = colors.m_blue;
       dataPoint.lineStroke = new BasicStroke(2);
+      if (start == null || end == null) return dataPoint;
+      dataPoint.dataLegend = formatInstant(start, "MMM d - ") + formatInstant(end, "MMM d, yyyy");
     } catch (SQLException ex) {
       ex.printStackTrace();
     }
@@ -191,20 +201,33 @@ public class TotalSalePanel extends RoundedPanel {
     return zdt.format(dtf);
   }
 
-  private class GrowthRateLabel extends JLabel {
-    public GrowthRateLabel(double rate) {
-      super(String.valueOf(rate * 100));
+  public class GrowthRateLabel extends JLabel {
+    public GrowthRateLabel() {
+      this.setFont(nunito_bold_16);
     }
+
+    public void setRate(double rate) {
+      if (rate < 1.0) {
+        this.setText(String.format("%d%s", (int) ((1.0 - rate) * 100), "%"));
+        this.setIcon(IconManager.getIcon("down_arrow.png", 14, 16, colors.m_red));
+        this.setForeground(colors.m_red);
+      } else {
+        this.setText(String.format("%d%s", (int) ((rate - 1.0) * 100), "%"));
+        this.setIcon(IconManager.getIcon("up_arrow.png", 14, 16, colors.m_green));
+        this.setForeground(colors.m_green);
+      }
+    }
+
+    ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
   }
 
-  private Font nunito_extrabold_14 = FontManager.getFont("NunitoExtraBold", 14f);
+  private Font nunito_extrabold_22 = FontManager.getFont("NunitoExtraBold", 22f);
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
-  private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
 
   private ColorScheme colors;
   private JLabel lblTitle;
   private JLabel lblTotalSales;
-  private JLabel lblGrowthRate;
+  private GrowthRateLabel lblGrowthRate;
   private JLabel lblChart;
 }

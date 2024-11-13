@@ -28,10 +28,12 @@ import dev.mimgr.TableView;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers;
 
 public class OrderTableView extends JPanel implements TableModelListener {
   public OrderTableView(ColorScheme colors) {
     this.colors = colors;
+    this.defaultQueryInvoker = () -> OrderRecord.selectAllNewest();
 
     // Initialization
     this.table = new MTable(colors);
@@ -62,15 +64,15 @@ public class OrderTableView extends JPanel implements TableModelListener {
 
     tv.add_column(table, "", TableView.setup_checkbox_column(colors));
     tv.add_column(table, "Order", TableView.setup_custom_column(60, 60, 80));
-    tv.add_column(table, "Date", TableView.setup_custom_column(180, 180, 180));
-    tv.add_column(table, "Total", TableView.setup_custom_column(80, 80, 120));
+    tv.add_column(table, "Date", TableView.setup_custom_column(180, 180, 200));
+    tv.add_column(table, "Total", TableView.setup_custom_column(100, 100, 200));
     tv.add_column(table, "Order status", TableView.setup_status_column(colors));
     tv.add_column(table, "Payment status", TableView.setup_status_column(colors));
     tv.add_column(table, "Items", TableView.setup_default_column());
     tv.load_column(table, model);
 
     model.addTableModelListener(this);
-    updateView(() -> OrderRecord.selectAll());
+    updateView(defaultQueryInvoker);
 
     this.setLayout(new BorderLayout());
     this.add(tableScrollPane);
@@ -109,22 +111,25 @@ public class OrderTableView extends JPanel implements TableModelListener {
       while (queryResult.next()) {
         or = new OrderRecord(queryResult);
         orderList.add(or);
-        ZonedDateTime zonedDateTime = or.m_date.atZone(ZoneId.systemDefault());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
         SimpleEntry<Integer, Double> pair = getOrderItemCountAndTotal(or.m_id);
         model.addRow(new Object[] {
           Boolean.FALSE,
           "#" + or.m_id,
-          zonedDateTime.format(formatter),
+          Helpers.formatRelativeDatetime(or.m_date),
           "€ " + pair.getValue(),
           new SimpleEntry<String, Color>(or.m_order_status, getStatusColor(or.m_order_status)),
           new SimpleEntry<String, Color>(or.m_payment_status, getStatusColor(or.m_payment_status)),
-          pair.getKey()
+          getItemPlural(pair.getKey())
         });
       }
     } catch (SQLException e) {
       e.printStackTrace();
     }
+  }
+
+  private String getItemPlural(int value) {
+    String itemStr = value + " item";
+    return (value > 1) ? itemStr + "s" : itemStr;
   }
 
   public void deleteSelected() {
@@ -144,7 +149,7 @@ public class OrderTableView extends JPanel implements TableModelListener {
   }
 
   public void reset() {
-    updateView(() -> OrderRecord.selectAll());
+    updateView(defaultQueryInvoker);
   }
 
   private void deleteOrder(OrderRecord pr) {
@@ -215,6 +220,7 @@ public class OrderTableView extends JPanel implements TableModelListener {
   // }
 
   private Supplier<ResultSet> currentQueryInvoker;
+  private Supplier<ResultSet> defaultQueryInvoker;
   private HashMap<Integer, OrderRecord> selectedOrders = new HashMap<>();
   private ArrayList<OrderRecord> orderList = new ArrayList<>();
   private JScrollPane       tableScrollPane;

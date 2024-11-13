@@ -20,12 +20,23 @@ public class OrderRecord {
   public static final String FIELD_PAYMENT_STATUS  = "payment_status";
 
   public static final String QUERY_SELECT_ALL = String.format("SELECT * FROM %s", TABLE);
+  public static final String QUERY_SELECT_ALL_NEWEST = String.format(
+    "SELECT * FROM %s ORDER BY %s DESC",
+    TABLE, FIELD_DATE
+  );
+  public static final String QUERY_SELECT_ALL_OLDEST = String.format(
+    "SELECT * FROM %s ORDER BY %s ASC",
+    TABLE, FIELD_DATE
+  );
   public static final String QUERY_SELECT_BY_KEY = String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_ID);
   public static final String QUERY_SELECT_BY_FIELDS = String.format(
     "SELECT * FROM %s WHERE %s = ? AND %s = ? AND %s = ? AND %s = ?",
     TABLE,
     FIELD_DATE, FIELD_TOTAL, FIELD_ORDER_STATUS, FIELD_PAYMENT_STATUS
   );
+
+  public static final String QUERY_SELECT_BY_FIELD = "SELECT * FROM %s WHERE %s = ? ORDER BY order_date DESC";
+
   public static final String QUERY_SELECT_LIKE = String.format(
     """
     SELECT *
@@ -94,6 +105,14 @@ public class OrderRecord {
     return DBQueries.select(QUERY_SELECT_ALL);
   }
 
+  public static ResultSet selectAllNewest() {
+    return DBQueries.select(QUERY_SELECT_ALL_NEWEST);
+  }
+
+  public static ResultSet selectAllOldest() {
+    return DBQueries.select(QUERY_SELECT_ALL_OLDEST);
+  }
+
   public static ResultSet selectByKey(int id) {
     return DBQueries.select(QUERY_SELECT_BY_KEY, id);
   }
@@ -118,6 +137,13 @@ public class OrderRecord {
       }
     } catch (SQLException e) {}
     return null;
+  }
+
+  public static ResultSet selectByField(String field, String value) {
+    return DBQueries.select(
+      String.format(QUERY_SELECT_BY_FIELD, TABLE, field),
+      value
+    );
   }
 
   public static int delete(OrderRecord or) {

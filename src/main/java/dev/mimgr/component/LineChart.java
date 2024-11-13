@@ -1,6 +1,7 @@
 package dev.mimgr.component;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -20,7 +21,9 @@ import dev.mimgr.theme.builtin.ColorScheme;
 public class LineChart extends JPanel {
   public LineChart(DataPoint dataPoint) {
     InitComponents();
-    this.dataPointList.add(dataPoint);
+    this.setMinimumSize(new Dimension(400, 250));
+    this.setPreferredSize(new Dimension(400, 250));
+    this.addDataPoint(dataPoint);
   }
 
   public LineChart() {
@@ -221,12 +224,18 @@ public class LineChart extends JPanel {
   }
 
   public void addDataPoint(DataPoint dp) {
-    if (dataPointList.size() <= 3) {
-      this.dataPointList.add(dp);
-      repaint();
+    if (dataPointList.size() <= 5) {
+      if (!dp.data.isEmpty()) {
+        this.dataPointList.add(dp);
+        this.setVisible(true);
+      } else {
+        this.setVisible(false);
+      }
     } else {
       System.err.println("Maximum data point list reached");
     }
+    revalidate();
+    repaint();
   }
 
   public void setYLabelFormatter(Function<String, String> format) {
