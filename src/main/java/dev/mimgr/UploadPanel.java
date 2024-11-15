@@ -37,6 +37,7 @@ import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.CategoryRecord;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.db.ProductRecord;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.MTransferListener;
 import dev.mimgr.utils.ResourceManager;
@@ -106,8 +107,8 @@ public class UploadPanel extends JPanel {
     return name_result;
   }
 
-  UploadPanel(ColorScheme colors) {
-    this.colors = colors;
+  UploadPanel() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     this.setBackground(colors.m_bg_dim);
     this.setup_form_style();
@@ -115,7 +116,7 @@ public class UploadPanel extends JPanel {
     this.setPreferredSize(new Dimension(1000, this.getPreferredSize().height));
     this.setMaximumSize(new Dimension(1000, Integer.MAX_VALUE));
 
-    MScrollPane scrollPane = new MScrollPane(colors);
+    MScrollPane scrollPane = new MScrollPane();
     scrollPane.getVerticalScrollBar().setUnitIncrement(100);
     this.add(scrollPane);
 
@@ -228,8 +229,8 @@ public class UploadPanel extends JPanel {
   }
 
   private class SelectFromMediaLayout extends MediaGridView implements ActionListener {
-    SelectFromMediaLayout(ColorScheme colors) {
-      super(colors);
+    SelectFromMediaLayout() {
+      super();
       this.clearButtonsActionListener();
       for (MButton button : this.getButtons()) {
         button.addActionListener(this);
@@ -258,7 +259,7 @@ public class UploadPanel extends JPanel {
       this.setBorderRadius(15);
 
       dropContainerPanel = new DropContainerPanel(colors);
-      selectFromMediaLayout = new SelectFromMediaLayout(colors);
+      selectFromMediaLayout = new SelectFromMediaLayout();
       dropContainerPanel.addActionListener(this);
 
       btnClearImages = dropContainerPanel.getConfirmButton();

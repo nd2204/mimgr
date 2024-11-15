@@ -13,7 +13,7 @@ public class TableView {
   public static BiConsumer<MTable, Integer> setup_checkbox_column(ColorScheme colors) {
     return (table, colIndex) -> {
       TableColumn column = table.getColumnModel().getColumn(colIndex);
-      MCheckBoxHeader checkBoxHeader = new MCheckBoxHeader(colors, table, colIndex);
+      MCheckBoxHeader checkBoxHeader = new MCheckBoxHeader(table, colIndex);
       checkBoxHeader.getCheckBoxComponent().setCheckColor(colors.m_green);
       checkBoxHeader.getCheckBoxComponent().setBoxColor(colors.m_bg_3);
       checkBoxHeader.getCheckBoxComponent().setBoxSelectedColor(colors.m_green);
@@ -51,7 +51,7 @@ public class TableView {
       column.setMinWidth(150);
       column.setMaxWidth(200);
       column.setPreferredWidth(150);
-      column.setCellRenderer(new MStatusCellRenderer(colors));
+      column.setCellRenderer(new MStatusCellRenderer());
     };
   }
 

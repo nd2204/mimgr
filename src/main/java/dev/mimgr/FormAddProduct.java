@@ -38,8 +38,8 @@ public class FormAddProduct extends JFrame {
     return this.btnSubmit;
   }
 
-  public FormAddProduct(ColorScheme colors) {
-    this.colors = colors;
+  public FormAddProduct() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     m_aspect_ratio = 16.0f / 10.0f;
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
@@ -58,7 +58,7 @@ public class FormAddProduct extends JFrame {
     UploadButtonListener uploadButtonListener = new UploadButtonListener();
     TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();
     // Main window
-    uploadPanel = new UploadPanel(colors);
+    uploadPanel = new UploadPanel();
     dropContainerPanel = uploadPanel.getDropContainerPanel();
     btnSubmit = uploadPanel.getSubmitComponent();
     btnSubmit.addActionListener(uploadButtonListener);
@@ -180,8 +180,7 @@ public class FormAddProduct extends JFrame {
   }
 
   public static void main(String arg[]) {
-    ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
-    new FormAddProduct(colors);
+    new FormAddProduct();
   }
 
   private DropContainerPanel dropContainerPanel;

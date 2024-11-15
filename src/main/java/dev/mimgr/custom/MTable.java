@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import dev.mimgr.FontManager;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 import java.awt.Color;
@@ -21,9 +22,9 @@ public class MTable extends JTable {
     super(data, column);
   }
 
-  public MTable(ColorScheme colors) {
+  public MTable() {
     super();
-    this.colors = colors;
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.borderColor = colors.m_bg_3;
     this.headerCellColor = colors.m_bg_dim;
     this.headerCellTextColor = colors.m_grey_0;
@@ -44,8 +45,8 @@ public class MTable extends JTable {
   }
 
   public void setup_scrollbar(JScrollPane sp) {
-    sp.setVerticalScrollBar(new MScrollBar(colors));
-    sp.setHorizontalScrollBar(new MScrollBar(colors));
+    sp.setVerticalScrollBar(new MScrollBar());
+    sp.setHorizontalScrollBar(new MScrollBar());
     JPanel panel = new JPanel();
     panel.setBackground(headerCellColor);
     sp.setCorner(JScrollPane.UPPER_RIGHT_CORNER, panel);

@@ -120,7 +120,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     // Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
     Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
 
-    this.productTableView = new ProductTableView(colors);
+    this.productTableView = new ProductTableView();
     this.setBackground(colors.m_bg_dim);
 
     this.topLabel.setFont(nunito_bold_20);
@@ -179,7 +179,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == this.btnAddProduct) {
-      FormAddProduct jFrameAddProduct = new FormAddProduct(colors);
+      FormAddProduct jFrameAddProduct = new FormAddProduct();
       jFrameAddProduct.setVisible(true);
       productTableView.setButtonRefreshOnClick(
         jFrameAddProduct.getAddProductSubmitButton()

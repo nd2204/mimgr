@@ -35,10 +35,11 @@ import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.theme.ColorTheme;
 
 public class MediaGridView extends JPanel implements IMediaView {
-  public MediaGridView(ColorScheme colors) {
-    this.colors = colors;
+  public MediaGridView() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     initializeUI();
   }
 
@@ -51,7 +52,7 @@ public class MediaGridView extends JPanel implements IMediaView {
 
     optionBar = new OptionBar();
     // Wrap the image panel in a scroll pane for vertical scrolling
-    scrollPane = new MScrollPane(colors);
+    scrollPane = new MScrollPane();
     scrollPane.add(pnImageBtns);
     scrollPane.setViewportView(pnImageBtns);
     scrollPane.setOpaque(true);

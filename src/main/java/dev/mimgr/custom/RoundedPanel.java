@@ -12,12 +12,6 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class RoundedPanel extends JPanel {
-  public RoundedPanel(ColorScheme colors) {
-    super();
-    this.colors = colors;
-    Init();
-  }
-
   public RoundedPanel() {
     super();
     colors = ColorTheme.getInstance().getCurrentScheme();

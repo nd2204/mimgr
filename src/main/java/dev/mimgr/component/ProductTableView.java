@@ -32,15 +32,16 @@ import dev.mimgr.custom.MTable;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.theme.ColorTheme;
 
 public class ProductTableView extends JPanel implements TableModelListener {
-  public ProductTableView(ColorScheme colors) {
-    this.colors = colors;
+  public ProductTableView() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
 
     // Initialization
-    this.table = new MTable(colors);
+    this.table = new MTable();
     this.tv = new TableView();
-    this.tableScrollPane = new MScrollPane(this.colors);
+    this.tableScrollPane = new MScrollPane();
     this.model = new DefaultTableModel() {
       @Override
       public Class<?> getColumnClass(int columnIndex) {

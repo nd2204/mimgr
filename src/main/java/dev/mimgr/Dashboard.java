@@ -13,17 +13,18 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
 import dev.mimgr.custom.MButton;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class Dashboard extends JPanel {
-  Dashboard(ColorScheme colors) {
+  Dashboard() {
     super();
-    this.colors = colors;
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.setLayout(new BorderLayout());
     this.setBackground(colors.m_bg_dim);
 
     // Header
-    HeaderPanel headerPanel = new HeaderPanel(colors);
+    HeaderPanel headerPanel = new HeaderPanel();
     headerPanel.setPreferredSize(new Dimension(this.getWidth(), 65));
     btnToggleSidebar = headerPanel.getToggleSidebarComponent();
     btnToggleSidebar.addActionListener(new HeaderBarListener());
@@ -34,7 +35,7 @@ public class Dashboard extends JPanel {
     this.add(contentPanel, BorderLayout.CENTER);
 
     // ContentPanel controller
-    sidebarPanel = new SidebarPanel(contentPanel, colors);
+    sidebarPanel = new SidebarPanel(contentPanel);
     sidebarPanel.setPreferredSize(new Dimension(300, this.getHeight()));
     this.add(sidebarPanel, BorderLayout.WEST);
     {
@@ -69,15 +70,15 @@ public class Dashboard extends JPanel {
       // Menu Buttons
       c.insets = new Insets(padding_vertical, padding_horizontal, padding_vertical, padding_horizontal);
       sidebarPanel.addComponent(sep, c);
-      sidebarPanel.addMenuButton("Orders", orders_icon, new FormOrder(colors), c);
+      sidebarPanel.addMenuButton("Orders", orders_icon, new FormOrder(), c);
       firstButton = sidebarPanel.addMenuButton("Products", products_icon, new FormProduct(), c);
       sidebarPanel.addMenuButton("Analytics", analytics_icon, new FormAnalytic(), c);
-      sidebarPanel.addMenuButton("Media", media_icon, new FormMedia(colors), c);
+      sidebarPanel.addMenuButton("Media", media_icon, new FormMedia(), c);
 
       // Bottom section
       c.weighty = 1.0;
       c.anchor = GridBagConstraints.PAGE_END;
-      sidebarPanel.addMenuButton("Account", accounts_icon, new FormAccount(colors), c);
+      sidebarPanel.addMenuButton("Account", accounts_icon, new FormAccount(), c);
 
       c.weighty = 0.0;
       sep = new JSeparator();
@@ -102,7 +103,7 @@ public class Dashboard extends JPanel {
     public void actionPerformed(ActionEvent e) {
       if (e.getSource() == btnLogOut) {
         PanelManager.get_main_panel().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        Entry.registerLoginSignup(colors);
+        Entry.registerLoginSignup();
         Entry.removeDashBoard();
         PanelManager.get_main_panel().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         PanelManager.show("FORM_LOGIN");

@@ -34,6 +34,7 @@ import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.utils.MTransferListener;
 import dev.mimgr.utils.ResourceManager;
 
@@ -42,8 +43,8 @@ import dev.mimgr.utils.ResourceManager;
  * @author dn200
  */
 public class FormMedia extends JPanel implements DocumentListener {
-  public FormMedia(ColorScheme colors) {
-    this.colors = colors;
+  public FormMedia() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     InitializeComponent();
     // =======================================================
     // Setup Layout
@@ -352,7 +353,7 @@ public class FormMedia extends JPanel implements DocumentListener {
 
     this.rm = ResourceManager.getInstance();
 
-    this.mediaViewSwitcher = new MediaViewSwitcher(colors);
+    this.mediaViewSwitcher = new MediaViewSwitcher();
 
     this.droppedItemsPanel = new DropContainerPanel(this.colors);
     this.droppedItemsPanel.addActionListener(mediaButtonActionListener);
@@ -406,7 +407,7 @@ public class FormMedia extends JPanel implements DocumentListener {
 
   private class LayoutSelectorComponent extends RoundedPanel {
     public LayoutSelectorComponent() {
-      super(colors); 
+      super(); 
       this.setBackground(colors.m_bg_dim);
       this.setBorderColor(colors.m_bg_5);
       this.setPreferredSize(new Dimension(50, this.getPreferredSize().height));

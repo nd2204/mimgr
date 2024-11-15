@@ -19,10 +19,11 @@ import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.UserRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.theme.ColorTheme;
 
 public class FormAccount extends JPanel {
-  FormAccount(ColorScheme colors) {
-    this.colors = colors;
+  FormAccount() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     this.setBackground(colors.m_bg_dim);
     this.setup_form_style();
@@ -30,7 +31,7 @@ public class FormAccount extends JPanel {
     this.setPreferredSize(new Dimension(1000, this.getPreferredSize().height));
     this.setMaximumSize(new Dimension(1000, Integer.MAX_VALUE));
 
-    MScrollPane scrollPane = new MScrollPane(colors);
+    MScrollPane scrollPane = new MScrollPane();
     scrollPane.getVerticalScrollBar().setUnitIncrement(100);
     this.add(scrollPane);
 

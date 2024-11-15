@@ -23,11 +23,12 @@ import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class FormOrder extends JPanel implements ActionListener, DocumentListener {
-  public FormOrder(ColorScheme colors) {
-    this.colors = colors;
+  public FormOrder() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.setBackground(this.colors.m_bg_dim);
 
     InitializeComponent();
@@ -141,7 +142,7 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
     // Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
     Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
 
-    this.orderTableView = new OrderTableView(colors);
+    this.orderTableView = new OrderTableView();
     this.setBackground(colors.m_bg_dim);
 
     this.topLabel.setFont(nunito_bold_20);

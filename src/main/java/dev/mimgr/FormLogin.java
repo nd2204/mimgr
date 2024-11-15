@@ -14,17 +14,20 @@ import javax.swing.event.DocumentListener;
 
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.DBConnection;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.shader.BuiltinShaders.*;
 import dev.mimgr.custom.MTextField;
-import dev.mimgr.custom.GradientPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MPasswordField;
 import dev.mimgr.custom.MCheckBox;
 
-public class FormLogin extends GradientPanel implements ActionListener, DocumentListener {
-  FormLogin(ColorScheme colors) {
-    super(new Color(0x1379a9), colors.m_blue);
-    m_colors = colors;
+public class FormLogin extends AnimatedPanel implements ActionListener, DocumentListener {
+  FormLogin() {
+    super(new LoginShader());
+    // super(new Color(0x1379a9), ColorTheme.getInstance().getCurrentScheme().m_blue);
+    colors = ColorTheme.getInstance().getCurrentScheme();
+    this.start();
 
     Font font_bold = FontManager.getFont("RobotoMonoBold", 14f);
     // =======================================================
@@ -33,34 +36,34 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
 
     form_label = new JLabel("Đăng nhập", JLabel.CENTER);
     form_label.setFont(FontManager.getFont("RobotoMonoBold", 20f));
-    form_label.setForeground(m_colors.m_fg_0);
+    form_label.setForeground(colors.m_fg_0);
 
     tf_username = new MTextField(30);
-    tf_username.setInputForeground(m_colors.m_fg_0);
+    tf_username.setInputForeground(colors.m_fg_0);
     tf_username.setPlaceholder(username_placeholder);
-    tf_username.setBackground(m_colors.m_bg_1);
-    tf_username.setBorderColor(m_colors.m_bg_4);
-    tf_username.setFocusBorderColor(m_colors.m_blue);
+    tf_username.setBackground(colors.m_bg_1);
+    tf_username.setBorderColor(colors.m_bg_4);
+    tf_username.setFocusBorderColor(colors.m_blue);
     tf_username.setBorderWidth(2);
     tf_username.setFont(font_bold);
     tf_username.setIcon(
-      IconManager.getIcon("user.png", 20, 20, m_colors.m_grey_1),
+      IconManager.getIcon("user.png", 20, 20, colors.m_grey_1),
       MPasswordField.ICON_PREFIX
     );
-    tf_username.setPlaceholderForeground(m_colors.m_grey_1);
+    tf_username.setPlaceholderForeground(colors.m_grey_1);
     tf_username.getDocument().addDocumentListener(this);
 
     pf_password = new MPasswordField(30);
-    pf_password.setInputForeground(m_colors.m_fg_0);
-    pf_password.setPlaceholderForeground(m_colors.m_grey_1);
+    pf_password.setInputForeground(colors.m_fg_0);
+    pf_password.setPlaceholderForeground(colors.m_grey_1);
     pf_password.setPlaceholder(password_placeholder);
-    pf_password.setBackground(m_colors.m_bg_1);
-    pf_password.setBorderColor(m_colors.m_bg_4);
-    pf_password.setFocusBorderColor(m_colors.m_blue);
+    pf_password.setBackground(colors.m_bg_1);
+    pf_password.setBorderColor(colors.m_bg_4);
+    pf_password.setFocusBorderColor(colors.m_blue);
     pf_password.setBorderWidth(2);
     pf_password.setFont(font_bold);
     pf_password.setIcon(
-      IconManager.getIcon("lock_locked.png", 20, 20, m_colors.m_grey_1),
+      IconManager.getIcon("lock_locked.png", 20, 20, colors.m_grey_1),
       MPasswordField.ICON_PREFIX
     );
     pf_password.getDocument().addDocumentListener(this);
@@ -68,33 +71,33 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
     this.remember = new MCheckBox("Nhớ phiên đăng nhập");
     this.remember.setFocusable(false);
     this.remember.setFont(font_bold);
-    this.remember.setBackground(m_colors.m_bg_1);
-    this.remember.setForeground(m_colors.m_grey_2);
-    this.remember.setBoxColor(m_colors.m_bg_5);
-    this.remember.setBoxHoverColor(m_colors.m_grey_0);
-    this.remember.setCheckColor(m_colors.m_blue);
+    this.remember.setBackground(colors.m_bg_1);
+    this.remember.setForeground(colors.m_grey_2);
+    this.remember.setBoxColor(colors.m_bg_5);
+    this.remember.setBoxHoverColor(colors.m_grey_0);
+    this.remember.setCheckColor(colors.m_blue);
     this.remember.setHorizontalAlignment(SwingConstants.LEFT);
-    this.remember.setBoxSelectedColor(m_colors.m_blue);
+    this.remember.setBoxSelectedColor(colors.m_blue);
     this.remember.setBackground(null);
 
-    this.show_password_button = new MButton(IconManager.getIcon("eye_closed.png", 20, 16, m_colors.m_grey_0));
+    this.show_password_button = new MButton(IconManager.getIcon("eye_closed.png", 20, 16, colors.m_grey_0));
     this.show_password_button.setBorderWidth(2);
-    this.show_password_button.setBackground(m_colors.m_bg_0);
-    this.show_password_button.setBorderColor(m_colors.m_bg_4);
-    this.show_password_button.setForeground(m_colors.m_grey_0);
-    this.show_password_button.setHoverBorderColor(m_colors.m_bg_5);
-    this.show_password_button.setHoverBackgroundColor(m_colors.m_bg_3);
+    this.show_password_button.setBackground(colors.m_bg_0);
+    this.show_password_button.setBorderColor(colors.m_bg_4);
+    this.show_password_button.setForeground(colors.m_grey_0);
+    this.show_password_button.setHoverBorderColor(colors.m_bg_5);
+    this.show_password_button.setHoverBackgroundColor(colors.m_bg_3);
     this.show_password_button.addActionListener(this);
     // this.show_password_button.setBackground(null);
-    // this.show_password_button.setIcon(IconManager.getIcon("eye_closed.png", 20, 16, m_colors.m_blue));
+    // this.show_password_button.setIcon(IconManager.getIcon("eye_closed.png", 20, 16, colors.m_blue));
     // this.show_password_button.setBorderColor(null);
 
 
     this.login_button = new MButton("Đăng nhập");
     this.login_button.setFont(font_bold);
-    this.login_button.setBackground(m_colors.m_bg_4);
-    this.login_button.setBorderColor(m_colors.m_bg_4);
-    this.login_button.setForeground(m_colors.m_grey_1);
+    this.login_button.setBackground(colors.m_bg_4);
+    this.login_button.setBorderColor(colors.m_bg_4);
+    this.login_button.setForeground(colors.m_grey_1);
     this.login_button.setBorderWidth(2);
     this.login_button.setEnabled(false);
     this.login_button.addActionListener(this);
@@ -102,11 +105,11 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
     this.signup_button = new MButton("Đăng ký");
     this.signup_button.setFont(font_bold);
     this.signup_button.setBorderWidth(2);
-    this.signup_button.setBackground(m_colors.m_bg_0);
-    this.signup_button.setBorderColor(m_colors.m_bg_4);
-    this.signup_button.setForeground(m_colors.m_grey_0);
-    this.signup_button.setHoverBorderColor(m_colors.m_bg_5);
-    this.signup_button.setHoverBackgroundColor(m_colors.m_bg_3);
+    this.signup_button.setBackground(colors.m_bg_0);
+    this.signup_button.setBorderColor(colors.m_bg_4);
+    this.signup_button.setForeground(colors.m_grey_0);
+    this.signup_button.setHoverBorderColor(colors.m_bg_5);
+    this.signup_button.setHoverBackgroundColor(colors.m_bg_3);
     this.signup_button.addActionListener(this);
 
     // =======================================================
@@ -115,7 +118,7 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
     GridBagConstraints c = new GridBagConstraints();
 
     RoundedPanel input_container = new RoundedPanel();
-    input_container.setBackground(m_colors.m_bg_0);
+    input_container.setBackground(colors.m_bg_0);
     input_container.setBorder(BorderFactory.createLineBorder(null, 0, true));
 
     int padding = 40;
@@ -177,7 +180,7 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
     c.weightx = 0.5;
     c.gridy = 5;
     JSeparator sep = new JSeparator();
-    sep.setForeground(m_colors.m_bg_4);
+    sep.setForeground(colors.m_bg_4);
     sep.setBackground(null);
     input_container.add(sep, c);
 
@@ -204,14 +207,14 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
     if (e.getSource() == show_password_button) {
       if (!isShowingPassword) {
         pf_password.setEchoChar('\0');
-        show_password_button.setIcon(IconManager.getIcon("eye_opened.png", 20, 16, m_colors.m_blue));
-        show_password_button.setHoverBorderColor(m_colors.m_blue);
+        show_password_button.setIcon(IconManager.getIcon("eye_opened.png", 20, 16, colors.m_blue));
+        show_password_button.setHoverBorderColor(colors.m_blue);
       } else {
         if (!pf_password.getTextString().isEmpty()) {
           pf_password.setEchoChar('*');
         }
-        show_password_button.setIcon(IconManager.getIcon("eye_closed.png", 20, 16, m_colors.m_grey_0));
-        show_password_button.setHoverBorderColor(m_colors.m_grey_0);
+        show_password_button.setIcon(IconManager.getIcon("eye_closed.png", 20, 16, colors.m_grey_0));
+        show_password_button.setHoverBorderColor(colors.m_grey_0);
       }
       isShowingPassword = !isShowingPassword;
       pf_password.setShowingPassword(isShowingPassword);
@@ -237,7 +240,7 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
 
       if (LoginService.loginUser(username, password, remember.isSelected())) {
         Entry.removeLoginSignup();
-        Entry.registerDashBoard(m_colors);
+        Entry.registerDashBoard();
       } else {
         JOptionPane.showMessageDialog(null, "Tài khoản hoặc mật khẩu không hợp lệ");
       }
@@ -247,16 +250,16 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
 
   private void checkFields() {
     if (!tf_username.getTextString().isEmpty() && !pf_password.getTextString().isEmpty()) {
-      this.login_button.setBackground(m_colors.m_blue);
-      this.login_button.setBorderColor(m_colors.m_blue);
-      this.login_button.setDefaultForeground(m_colors.m_fg_1);
+      this.login_button.setBackground(colors.m_blue);
+      this.login_button.setBorderColor(colors.m_blue);
+      this.login_button.setDefaultForeground(colors.m_fg_1);
       this.login_button.setCursor(new Cursor(Cursor.HAND_CURSOR));
       this.login_button.setEnabled(true);
     } else {
       this.login_button.setEnabled(false);
-      this.login_button.setBackground(m_colors.m_bg_4);
-      this.login_button.setBorderColor(m_colors.m_bg_4);
-      this.login_button.setDefaultForeground(m_colors.m_grey_1);
+      this.login_button.setBackground(colors.m_bg_4);
+      this.login_button.setBorderColor(colors.m_bg_4);
+      this.login_button.setDefaultForeground(colors.m_grey_1);
       this.login_button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
   }
@@ -278,7 +281,7 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
 
   private MTextField     tf_username;
   private MPasswordField pf_password;
-  private ColorScheme    m_colors;
+  private ColorScheme    colors;
   private JLabel         form_label;
   private MButton        login_button;
   private MButton        signup_button;
@@ -289,3 +292,19 @@ public class FormLogin extends GradientPanel implements ActionListener, Document
   private final String username_placeholder = "Tên người dùng";
   private final String password_placeholder = "Mật khẩu";
 }
+
+class LoginShader extends TriLatticeShader {
+  public LoginShader() {
+    ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
+    int rgb1 = colors.m_bg_dim.getRGB();
+    this.col.x = ((rgb1 >> 16) & 255) / 255.0f;
+    this.col.y = ((rgb1 >> 8) & 255) / 255.0f;
+    this.col.z = ((rgb1 >> 0) & 255) / 255.0f;
+
+    int rgb2 = colors.m_bg_1.getRGB();
+    this.lineCol.x = ((rgb2 >> 16) & 255) / 255.0f;
+    this.lineCol.y = ((rgb2 >> 8) & 255) / 255.0f;
+    this.lineCol.z = ((rgb2 >> 0) & 255) / 255.0f;
+  }
+}
+

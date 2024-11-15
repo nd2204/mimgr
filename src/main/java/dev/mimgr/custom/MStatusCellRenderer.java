@@ -14,12 +14,13 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.FontManager;
 
 public class MStatusCellRenderer extends JPanel implements TableCellRenderer {
-  public MStatusCellRenderer(ColorScheme colors) {
-    this.colors = colors;
+  public MStatusCellRenderer() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
   }
 
   @Override

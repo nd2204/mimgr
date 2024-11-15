@@ -14,11 +14,13 @@ import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.theme.ColorTheme;
+
 
 public class MCheckBoxHeader extends JPanel implements TableCellRenderer {
-  public MCheckBoxHeader(ColorScheme colors, MTable table, int checkBoxColumnIdx) {
+  public MCheckBoxHeader(MTable table, int checkBoxColumnIdx) {
     setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-    this.colors = colors;
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.selectAllCheckBox = new MCheckBox();
     this.selectAllCheckBox.setBorder(null);
     this.selectAllCheckBox.setBorderPainted(false);

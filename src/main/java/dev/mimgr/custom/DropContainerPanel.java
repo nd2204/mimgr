@@ -49,7 +49,7 @@ public class DropContainerPanel extends JPanel implements ActionListener {
       JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
     );
 
-    MScrollBar hsb = new MScrollBar(colors);
+    MScrollBar hsb = new MScrollBar();
     hsb.setOrientation(MScrollBarUI.HORIZONTAL);
     scrollPane.setHorizontalScrollBar(hsb);
 

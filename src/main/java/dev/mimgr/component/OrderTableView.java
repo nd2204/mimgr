@@ -28,17 +28,18 @@ import dev.mimgr.TableView;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.utils.Helpers;
 
 public class OrderTableView extends JPanel implements TableModelListener {
-  public OrderTableView(ColorScheme colors) {
-    this.colors = colors;
+  public OrderTableView() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.defaultQueryInvoker = () -> OrderRecord.selectAllNewest();
 
     // Initialization
-    this.table = new MTable(colors);
+    this.table = new MTable();
     this.tv = new TableView();
-    this.tableScrollPane = new MScrollPane(this.colors);
+    this.tableScrollPane = new MScrollPane();
     this.model = new DefaultTableModel() {
       @Override
       public Class<?> getColumnClass(int columnIndex) {
@@ -193,6 +194,10 @@ public class OrderTableView extends JPanel implements TableModelListener {
       ex.printStackTrace();
     }
     return new SimpleEntry<>(0, 0.0);
+  }
+
+  public void setDefaultQueryInvoker(Supplier<ResultSet> invoker) {
+    this.defaultQueryInvoker = invoker;
   }
 
   public Color getStatusColor(String status) {

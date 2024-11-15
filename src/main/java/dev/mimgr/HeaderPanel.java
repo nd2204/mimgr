@@ -25,8 +25,8 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class HeaderPanel extends JPanel {
-  HeaderPanel(ColorScheme colors) {
-    this.colors = colors;
+  HeaderPanel() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.setBackground(colors.m_bg_0);
     this.setLayout(new GridBagLayout());
 

@@ -18,6 +18,7 @@ import javax.swing.SwingConstants;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.RoundedPanel;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 /**
@@ -25,9 +26,9 @@ import dev.mimgr.theme.builtin.ColorScheme;
  * @author dn200
  */
 public class SidebarPanel extends RoundedPanel implements ActionListener {
-  SidebarPanel(JPanel contentPanel, ColorScheme colors) {
-    super(colors);
-    this.colors = colors;
+  SidebarPanel(JPanel contentPanel) {
+    super();
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.contentPanel = contentPanel;
     this.contentPanelSwitcher = new CardLayout();
     this.contentPanel.setLayout(contentPanelSwitcher);

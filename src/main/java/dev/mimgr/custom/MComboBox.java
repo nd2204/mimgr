@@ -87,13 +87,13 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
           scroll.setBackground(colors.m_bg_dim);
           scroll.setBorder(new LineBorder(colors.m_bg_5, 1));
 
-          MScrollBar vsb = new MScrollBar(colors);
+          MScrollBar vsb = new MScrollBar();
           vsb.setPreferredSize(new Dimension(5, 5));
           vsb.setForeground(colors.m_grey_0);
           vsb.setUnitIncrement(30);
           scroll.setVerticalScrollBar(vsb);
 
-          MScrollBar hsb = new MScrollBar(colors);
+          MScrollBar hsb = new MScrollBar();
           hsb.setForeground(colors.m_grey_0);
           hsb.setUnitIncrement(30);
           hsb.setOrientation(MScrollBar.HORIZONTAL);

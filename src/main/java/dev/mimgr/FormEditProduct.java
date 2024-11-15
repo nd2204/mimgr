@@ -85,7 +85,7 @@ public class FormEditProduct extends JFrame {
     mainPanel.setBackground(colors.m_bg_dim);
     currentUploadPanel = new JPanel();
     currentUploadPanel.setBackground(colors.m_bg_0);
-    sidebarPanel = new SidebarPanel(currentUploadPanel, colors);
+    sidebarPanel = new SidebarPanel(currentUploadPanel);
     sidebarPanel.setBackground(colors.m_bg_0);
     sidebarPanel.setPreferredSize(new Dimension(300, this.getHeight()));
     sidebarPanel.setupButtonStyle = (button) -> {
@@ -110,7 +110,7 @@ public class FormEditProduct extends JFrame {
     gc.weightx = gc.weighty = 1.0;
     gc.insets = new Insets(20, 10, 20, 10);
     gc.fill = GridBagConstraints.BOTH;
-    MScrollPane sp = new MScrollPane(colors);
+    MScrollPane sp = new MScrollPane();
     JPanel buttonMenu = new ButtonMenu();
     sp.add(buttonMenu);
     sp.setViewportView(buttonMenu);
@@ -146,7 +146,7 @@ public class FormEditProduct extends JFrame {
   }
 
   private UploadPanel createProductEditPanel(ProductRecord pr) {
-    UploadPanel uploadPanel = new UploadPanel(colors);
+    UploadPanel uploadPanel = new UploadPanel();
     return uploadPanel;
   }
 

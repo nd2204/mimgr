@@ -4,13 +4,14 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 
 import javax.swing.JScrollBar;
-import dev.mimgr.theme.builtin.ColorScheme;
 
+import dev.mimgr.theme.ColorTheme;
+import dev.mimgr.theme.builtin.ColorScheme;
 
 // Custom ScrollBar
 public class MScrollBar extends JScrollBar {
-  public MScrollBar(ColorScheme colors) {
-    this.colors = colors;
+  public MScrollBar() {
+    this.colors = ColorTheme.getInstance().getCurrentScheme();
     setUI(new MScrollBarUI());
     setPreferredSize(new Dimension(5, 5));
     setForeground(this.colors.m_grey_0);

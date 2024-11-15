@@ -18,19 +18,21 @@ import javax.swing.JSeparator;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import dev.mimgr.custom.GradientPanel;
+import dev.shader.BuiltinShaders.*;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MPasswordField;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.UserRecord;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
-public class FormSignUp extends GradientPanel implements ActionListener, DocumentListener {
-  FormSignUp(ColorScheme colors) {
-    super(colors.m_green, new Color(0x357b01));
-    m_colors = colors;
+public class FormSignUp extends AnimatedPanel implements ActionListener, DocumentListener {
+  FormSignUp() {
+    super(new SignupShader());
+    this.m_colors = ColorTheme.getInstance().getCurrentScheme();
+    this.start();
     m_connection = DBConnection.getInstance().getConection();
 
     this.setup_form_style();
@@ -319,7 +321,7 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
       if (valid_username(username) && valid_password(password)) {
         UserRecord.insertUser(username, Security.hash_string(password + salt), salt, "");
         Entry.removeLoginSignup();
-        Entry.registerDashBoard(m_colors);
+        Entry.registerDashBoard();
       }
       return;
   }
@@ -371,5 +373,20 @@ public class FormSignUp extends GradientPanel implements ActionListener, Documen
   private final String username_placeholder = "Tên người dùng";
   private final String password_placeholder = "Mật khẩu";
   private final String password_confirm_placeholder = "Xác nhận mật khẩu";
-
 }
+
+class SignupShader extends TriLatticeShader {
+  public SignupShader() {
+    ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
+    int rgb1 = colors.m_bg_dim.getRGB();
+    this.col.x = ((rgb1 >> 16) & 255) / 255.0f;
+    this.col.y = ((rgb1 >> 8) & 255) / 255.0f;
+    this.col.z = ((rgb1 >> 0) & 255) / 255.0f;
+
+    int rgb2 = colors.m_bg_1.getRGB();
+    this.lineCol.x = ((rgb2 >> 16) & 255) / 255.0f;
+    this.lineCol.y = ((rgb2 >> 8) & 255) / 255.0f;
+    this.lineCol.z = ((rgb2 >> 0) & 255) / 255.0f;
+  }
+}
+

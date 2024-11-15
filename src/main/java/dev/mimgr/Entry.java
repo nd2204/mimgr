@@ -2,19 +2,16 @@ package dev.mimgr;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.UserRecord;
 import dev.mimgr.theme.ColorTheme;
-import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.ResourceManager;
 
 class Entry extends JFrame {
@@ -32,13 +29,14 @@ class Entry extends JFrame {
     FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
     FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
 
-    ColorScheme colors = theme.getCurrentScheme();
+    theme.setColorScheme(ColorTheme.THEME_DARK_EVERFOREST);
+
     // Register startup panel
     UserRecord ur = SessionManager.loadSession();
     if (ur == null) {
-      registerLoginSignup(colors);
+      registerLoginSignup();
     } else {
-      registerDashBoard(colors);
+      registerDashBoard();
     }
 
 //     for (JPanel panel : PanelManager.getAllPanels()) {
@@ -66,9 +64,9 @@ class Entry extends JFrame {
     };
   }
 
-  public static void registerLoginSignup(ColorScheme colors) {
-    PanelManager.register_panel(new FormLogin(colors), "FORM_LOGIN");
-    PanelManager.register_panel(new FormSignUp(colors), "FORM_SIGNUP");
+  public static void registerLoginSignup() {
+    PanelManager.register_panel(new FormLogin(), "FORM_LOGIN");
+    PanelManager.register_panel(new FormSignUp(), "FORM_SIGNUP");
     PanelManager.show("FORM_LOGIN");
   }
 
@@ -77,8 +75,8 @@ class Entry extends JFrame {
     PanelManager.unregister_panel("FORM_SIGNUP");
   }
 
-  public static void registerDashBoard(ColorScheme colors) {
-    PanelManager.register_panel(new Dashboard(colors), "DASHBOARD");
+  public static void registerDashBoard() {
+    PanelManager.register_panel(new Dashboard(), "DASHBOARD");
   }
 
   public static void removeDashBoard() {
