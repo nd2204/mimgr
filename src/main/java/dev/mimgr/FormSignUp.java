@@ -309,21 +309,26 @@ public class FormSignUp extends AnimatedPanel implements ActionListener, Documen
   }
 
   private void trySignUp() {
-      String username = tf_username.getTextString();
-      String password = pf_password.getTextString();
-      String salt = Security.generate_salt(16);
+    this.pause();
+    String username = tf_username.getTextString();
+    String password = pf_password.getTextString();
+    String salt = Security.generate_salt(16);
 
-      if (DBConnection.getInstance().getConection() == null) {
-        JOptionPane.showMessageDialog(null, "FATAL: Cannot connect to database");
-        return;
-      }
-
-      if (valid_username(username) && valid_password(password)) {
-        UserRecord.insertUser(username, Security.hash_string(password + salt), salt, "");
-        Entry.removeLoginSignup();
-        Entry.registerDashBoard();
-      }
+    if (DBConnection.getInstance().getConection() == null) {
+      JOptionPane.showMessageDialog(null, "FATAL: Cannot connect to database");
       return;
+    }
+
+    if (valid_username(username) && valid_password(password)) {
+      this.stop();
+      UserRecord.insertUser(username, Security.hash_string(password + salt), salt, "");
+      Entry.removeLoginSignup();
+      Entry.registerDashBoard();
+      return;
+    }
+
+    this.resume();
+    return;
   }
 
   @Override
@@ -343,8 +348,8 @@ public class FormSignUp extends AnimatedPanel implements ActionListener, Documen
 
   private void checkFields() {
     if (!tf_username.getTextString().isEmpty()
-        && !pf_password.getTextString().isEmpty()
-        && !pf_password_confirm.getTextString().isEmpty()) {
+    && !pf_password.getTextString().isEmpty()
+    && !pf_password_confirm.getTextString().isEmpty()) {
       this.signup_button.setEnabled(true);
       this.signup_button.setBackground(m_colors.m_green);
       this.signup_button.setBorderColor(m_colors.m_green);

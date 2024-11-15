@@ -22,10 +22,16 @@ import java.util.concurrent.*;
 public class AnimatedPanel extends JPanel {
   private ShaderInputs shaderInputs;
   private IShaderEntry entry;
-  private final ExecutorService executorService;
-  private final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
+
+  private final int targetFPS = 15; // Target frame rate
   private BufferedImage currentBuffer;
   private boolean useBuffer0 = true;
+
+  private final ExecutorService executorService;
+  private final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
+  private volatile boolean running = false;
+  private volatile boolean paused = false; // Pause control
+  private final Object pauseLock = new Object(); // Lock for pause/resume synchronization
 
   public AnimatedPanel(IShaderEntry entry) {
     this.setMinimumSize(new Dimension(800, 600));
@@ -68,9 +74,10 @@ public class AnimatedPanel extends JPanel {
       }
     }
 
+    shaderInputs.tick();
+
     currentBuffer = renderingBuffer;
     useBuffer0 = !useBuffer0;
-    shaderInputs.tick();
   }
 
   private void processChunk(WritableRaster raster, int startY, int endY, int width) {
@@ -94,11 +101,57 @@ public class AnimatedPanel extends JPanel {
   }
 
   public void start() {
-    Timer timer = new Timer(32, e -> {
-      this.updateFrame();
-      this.repaint();
+    running = true;
+    Thread renderThread = new Thread(() -> {
+      long frameTime = 1000 / targetFPS;
+
+      while (running) {
+        long startTime = System.currentTimeMillis();
+
+        synchronized (pauseLock) {
+          while (paused) {
+            try {
+              pauseLock.wait(); // Wait until resumed
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+            }
+          }
+        }
+
+        updateFrame();
+        repaint();
+
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        long sleepTime = frameTime - elapsedTime;
+
+        if (sleepTime > 0) {
+          try {
+            Thread.sleep(sleepTime);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
+        }
+      }
     });
-    timer.start();
+
+    renderThread.setDaemon(true);
+    renderThread.start();
+  }
+
+  public void stop() {
+    running = false;
+    executorService.shutdownNow();
+  }
+
+  public void pause() {
+    paused = true;
+  }
+
+  public void resume() {
+    synchronized (pauseLock) {
+      paused = false;
+      pauseLock.notifyAll(); // Wake up the rendering thread
+    }
   }
 
   public static void main(String[] args) {

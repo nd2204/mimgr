@@ -230,6 +230,7 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
   }
 
   private void tryLogin() {
+      this.pause();
       String username = tf_username.getTextString();
       String password = pf_password.getTextString();
 
@@ -239,10 +240,12 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
       }
 
       if (LoginService.loginUser(username, password, remember.isSelected())) {
+        this.stop();
         Entry.removeLoginSignup();
         Entry.registerDashBoard();
       } else {
         JOptionPane.showMessageDialog(null, "Tài khoản hoặc mật khẩu không hợp lệ");
+        this.resume();
       }
 
       return;
