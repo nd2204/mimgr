@@ -14,6 +14,16 @@ public class vec2 {
     this.y = v;
   }
 
+  public void set(float x, float y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  public void set(float v) {
+    this.x = v;
+    this.y = v;
+  }
+
   public static vec2 add(vec2 a, vec2 b) {
     return new vec2(a.x + b.x, a.y + b.y);
   }

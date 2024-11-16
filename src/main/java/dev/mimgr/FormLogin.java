@@ -24,9 +24,10 @@ import dev.mimgr.custom.MCheckBox;
 
 public class FormLogin extends AnimatedPanel implements ActionListener, DocumentListener {
   FormLogin() {
-    super(new LoginShader());
+    super(new LoginShader(), Entry.m_width, Entry.m_height);
     // super(new Color(0x1379a9), ColorTheme.getInstance().getCurrentScheme().m_blue);
     colors = ColorTheme.getInstance().getCurrentScheme();
+    this.setBackground(colors.m_bg_dim);
 
     Font font_bold = FontManager.getFont("RobotoMonoBold", 14f);
     // =======================================================
@@ -97,6 +98,7 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     this.login_button.setBackground(colors.m_bg_4);
     this.login_button.setBorderColor(colors.m_bg_4);
     this.login_button.setForeground(colors.m_grey_1);
+    this.login_button.setDefaultForeground(colors.m_grey_1);
     this.login_button.setBorderWidth(2);
     this.login_button.setEnabled(false);
     this.login_button.addActionListener(this);
@@ -198,8 +200,8 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     c.anchor = GridBagConstraints.CENTER;
     c.weighty = 1.0;
     this.add(input_container, c);
-    this.setVisible(false);
     this.start();
+    this.setVisible(false);
   }
 
   @Override
@@ -225,19 +227,20 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     }
 
     if (e.getSource() == signup_button) {
+      this.stop();
+      PanelManager.register_panel(new FormSignUp(), "FORM_SIGNUP");
       PanelManager.show("FORM_SIGNUP");
+      PanelManager.unregister_panel("FORM_LOGIN");
       return;
     }
   }
 
   private void tryLogin() {
-    this.pause();
     String username = tf_username.getTextString();
     String password = pf_password.getTextString();
 
     if (DBConnection.getInstance().getConection() == null) {
       JOptionPane.showMessageDialog(null, "FATAL: Cannot connect to database");
-      this.resume();
       return;
     }
 
@@ -247,7 +250,6 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
       Entry.registerDashBoard();
     } else {
       JOptionPane.showMessageDialog(null, "Tài khoản hoặc mật khẩu không hợp lệ");
-      this.resume();
     }
 
     return;
@@ -257,6 +259,7 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     if (!tf_username.getTextString().isEmpty() && !pf_password.getTextString().isEmpty()) {
       this.login_button.setBackground(colors.m_blue);
       this.login_button.setBorderColor(colors.m_blue);
+      this.login_button.setForeground(colors.m_fg_1);
       this.login_button.setDefaultForeground(colors.m_fg_1);
       this.login_button.setCursor(new Cursor(Cursor.HAND_CURSOR));
       this.login_button.setEnabled(true);
@@ -264,6 +267,7 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
       this.login_button.setEnabled(false);
       this.login_button.setBackground(colors.m_bg_4);
       this.login_button.setBorderColor(colors.m_bg_4);
+      this.login_button.setForeground(colors.m_grey_1);
       this.login_button.setDefaultForeground(colors.m_grey_1);
       this.login_button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
@@ -302,14 +306,14 @@ class LoginShader extends TriLatticeShader {
   public LoginShader() {
     ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
     int rgb1 = colors.m_bg_dim.getRGB();
-    this.col.x = ((rgb1 >> 16) & 255) / 255.0f;
-    this.col.y = ((rgb1 >> 8) & 255) / 255.0f;
-    this.col.z = ((rgb1 >> 0) & 255) / 255.0f;
+    col.x = ((rgb1 >> 16) & 255) / 255.0f;
+    col.y = ((rgb1 >> 8) & 255) / 255.0f;
+    col.z = ((rgb1 >> 0) & 255) / 255.0f;
 
     int rgb2 = colors.m_bg_1.getRGB();
-    this.lineCol.x = ((rgb2 >> 16) & 255) / 255.0f;
-    this.lineCol.y = ((rgb2 >> 8) & 255) / 255.0f;
-    this.lineCol.z = ((rgb2 >> 0) & 255) / 255.0f;
+    lineCol.x = ((rgb2 >> 16) & 255) / 255.0f;
+    lineCol.y = ((rgb2 >> 8) & 255) / 255.0f;
+    lineCol.z = ((rgb2 >> 0) & 255) / 255.0f;
   }
 }
 

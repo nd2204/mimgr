@@ -9,11 +9,11 @@ import dev.shader.ShaderTypes.vec4;
 import dev.shader.ShaderFunctions;
 
 public class TriLatticeShader implements IShaderEntry {
-  private final vec2 co = new vec2(12.9898f, 78.233f).mult(43758.5453f);
-  private final vec2 lt = new vec2(1.0f, 0.5f);
-  private final vec2 rt = new vec2(-1.0f, 0.5f);
-  protected vec3 col = new vec3(0.0f);
-  protected vec3 lineCol = new vec3(1.0f);
+  private static final vec2 co = new vec2(12.9898f, 78.233f).mult(43758.5453f);
+  private static final vec2 lt = new vec2(1.0f, 0.5f);
+  private static final vec2 rt = new vec2(-1.0f, 0.5f);
+  public static final vec3 col = new vec3(0.0f);
+  public static final vec3 lineCol = new vec3(1.0f);
 
   private float rand(vec2 uv) {
     return ShaderFunctions.fract((float) Math.sin(ShaderFunctions.dot(uv, co)));
@@ -26,7 +26,7 @@ public class TriLatticeShader implements IShaderEntry {
   }
 
   @Override
-  public vec4 mainImage(ShaderInputs si, vec2 fragCoord) {
+  public void mainImage(final ShaderInputs si, vec4 fragColor, final vec2 fragCoord) {
     vec2 uv = (si.iResolution.div(2.0f).sub(fragCoord)).div(si.iResolution.y).mult(32.0f);
 
     vec3 p = new vec3(ShaderFunctions.dot(uv, lt), ShaderFunctions.dot(uv, rt), uv.y);
@@ -46,11 +46,9 @@ public class TriLatticeShader implements IShaderEntry {
       ShaderFunctions.smoothstep(-0.02f,0.0f,d-0.2f*(1.0f+(float)Math.sin(r)))
     );
 
-    vec4 fragColor = new vec4(1.0f);
     fragColor.x = c.x;
     fragColor.y = c.y;
     fragColor.z = c.z;
-
-    return fragColor;
+    fragColor.w = 1.0f;
   }
 }

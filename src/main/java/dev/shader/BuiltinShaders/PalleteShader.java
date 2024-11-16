@@ -17,9 +17,8 @@ public class PalleteShader implements IShaderEntry {
   }
 
   @Override
-  public vec4 mainImage(ShaderInputs si, vec2 fragCoord) {
+  public void mainImage(final ShaderInputs si, vec4 fragColor, final vec2 fragCoord) {
     vec2 p = fragCoord.div(si.iResolution);
-    vec4 fragColor = new vec4(1.0f);
     vec3 col = new vec3(0.0f);
 
     // animate
@@ -44,7 +43,6 @@ public class PalleteShader implements IShaderEntry {
     fragColor.x = col.x;
     fragColor.y = col.y;
     fragColor.z = col.z;
-    return fragColor;
   }
 }
 

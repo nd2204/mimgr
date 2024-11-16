@@ -203,6 +203,6 @@ public class ShaderFunctions {
   }
 
   public interface IShaderEntry {
-    public vec4 mainImage(ShaderInputs si, vec2 fragCoord);
+    public void mainImage(final ShaderInputs si, vec4 fragColor, final vec2 fragCoord);
   }
 }

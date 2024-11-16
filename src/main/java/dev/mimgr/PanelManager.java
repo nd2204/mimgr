@@ -22,10 +22,8 @@ public class PanelManager {
   }
 
   public static void unregister_panel(String id) {
+    if (!panelMap.containsKey(id)) return;
     JPanel panel = panelMap.remove(id);
-    assert panel != null : 
-      "Error: No panel found with ID '" + id + "'";
-
     m_main_panel.remove(panel);
 //    if (currentPanelId.equals(id)) {
 //      currentPanelId = null;

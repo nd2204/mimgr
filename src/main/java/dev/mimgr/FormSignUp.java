@@ -30,10 +30,9 @@ import dev.mimgr.theme.builtin.ColorScheme;
 
 public class FormSignUp extends AnimatedPanel implements ActionListener, DocumentListener {
   FormSignUp() {
-    super(new SignupShader());
+    super(new SignupShader(), Entry.m_width, Entry.m_height);
     this.m_colors = ColorTheme.getInstance().getCurrentScheme();
-    this.start();
-    m_connection = DBConnection.getInstance().getConection();
+    this.setBackground(m_colors.m_bg_dim);
 
     this.setup_form_style();
 
@@ -123,6 +122,7 @@ public class FormSignUp extends AnimatedPanel implements ActionListener, Documen
     c.anchor = GridBagConstraints.CENTER;
     c.weighty = 1.0;
     this.add(input_container, c);
+    this.start();
     this.setVisible(false);
   }
 
@@ -299,7 +299,10 @@ public class FormSignUp extends AnimatedPanel implements ActionListener, Documen
       isShowingPassword = !isShowingPassword;
     }
     if (e.getSource() == login_button) {
+      this.stop();
+      PanelManager.register_panel(new FormLogin(), "FORM_LOGIN");
       PanelManager.show("FORM_LOGIN");
+      PanelManager.unregister_panel("FORM_SIGNUP");
       return;
     }
 
@@ -309,7 +312,6 @@ public class FormSignUp extends AnimatedPanel implements ActionListener, Documen
   }
 
   private void trySignUp() {
-    this.pause();
     String username = tf_username.getTextString();
     String password = pf_password.getTextString();
     String salt = Security.generate_salt(16);
@@ -326,9 +328,6 @@ public class FormSignUp extends AnimatedPanel implements ActionListener, Documen
       Entry.registerDashBoard();
       return;
     }
-
-    this.resume();
-    return;
   }
 
   @Override
@@ -373,7 +372,6 @@ public class FormSignUp extends AnimatedPanel implements ActionListener, Documen
   private MButton        signup_button;
   private MButton        show_password_button;
   private boolean        isShowingPassword = false;
-  private Connection     m_connection;
 
   private final String username_placeholder = "Tên người dùng";
   private final String password_placeholder = "Mật khẩu";
@@ -384,14 +382,14 @@ class SignupShader extends TriLatticeShader {
   public SignupShader() {
     ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
     int rgb1 = colors.m_bg_dim.getRGB();
-    this.col.x = ((rgb1 >> 16) & 255) / 255.0f;
-    this.col.y = ((rgb1 >> 8) & 255) / 255.0f;
-    this.col.z = ((rgb1 >> 0) & 255) / 255.0f;
+    col.x = ((rgb1 >> 16) & 255) / 255.0f;
+    col.y = ((rgb1 >> 8) & 255) / 255.0f;
+    col.z = (rgb1 & 255) / 255.0f;
 
     int rgb2 = colors.m_bg_1.getRGB();
-    this.lineCol.x = ((rgb2 >> 16) & 255) / 255.0f;
-    this.lineCol.y = ((rgb2 >> 8) & 255) / 255.0f;
-    this.lineCol.z = ((rgb2 >> 0) & 255) / 255.0f;
+    lineCol.x = ((rgb2 >> 16) & 255) / 255.0f;
+    lineCol.y = ((rgb2 >> 8) & 255) / 255.0f;
+    lineCol.z = (rgb2 & 255) / 255.0f;
   }
 }
 

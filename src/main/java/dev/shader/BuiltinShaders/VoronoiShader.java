@@ -54,13 +54,16 @@ class VoronoiShader implements IShaderEntry {
   }
 
   @Override
-  public vec4 mainImage(ShaderInputs si, vec2 fragCoord) {
+  public void mainImage(final ShaderInputs si, vec4 fragColor, final vec2 fragCoord) {
     vec2  p = fragCoord.div(new vec2(si.iResolution.y));
     vec4 v = voronoi(si ,p.mult(6.0f), 0.3f );
     // gamma
     vec3 col = ShaderFunctions.sqrt(new vec3(v.y, v.z, v.w));
     col = col.mult(new vec3(1.0f-0.8f*v.x*ShaderFunctions.step(p.y,0.0f)));
-    return new vec4( col, 1.0f );
+    fragColor.x = col.x;
+    fragColor.y = col.y;
+    fragColor.z = col.z;
+    fragColor.w = 1.0f;
   }
 }
 

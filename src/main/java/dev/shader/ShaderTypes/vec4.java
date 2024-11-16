@@ -73,6 +73,74 @@ public class vec4 {
     this.w = zw.y;
   }
 
+  public void set(float a, float b, float c, float d) {
+    x = a;
+    y = b;
+    z = b;
+    w = b;
+  }
+
+  public void set(vec4 v) {
+    x = v.x;
+    y = v.y;
+    z = v.z;
+    w = v.w;
+  }
+
+  public void set(float v) {
+    x = v;
+    y = v;
+    z = v;
+    w = v;
+  }
+
+  public void set(vec3 v3, float w) {
+    this.x = v3.x;
+    this.y = v3.y;
+    this.z = v3.z;
+    this.w = w;
+  }
+
+  public void set(float x, vec3 v3) {
+    this.x = x;
+    this.y = v3.x;
+    this.z = v3.y;
+    this.w = v3.z;
+  }
+
+  public void set(vec3 v3) {
+    this.x = v3.x;
+    this.y = v3.y;
+    this.z = v3.z;
+  }
+
+  public void set(vec2 v2) {
+    this.x = v2.x;
+    this.y = v2.y;
+  }
+
+  public void set(vec2 v2, float z, float w) {
+    this.x = v2.x;
+    this.y = v2.y;
+    this.z = z;
+    this.w = w;
+  }
+
+  public void set(float x, vec2 yz, float w) {
+    this.x = x;
+    this.y = yz.x;
+    this.z = yz.y;
+    this.w = w;
+  }
+
+  public void set(float x, float y, vec2 zw) {
+    this.x = x;
+    this.y = y;
+    this.z = zw.x;
+    this.w = zw.y;
+  }
+
+
   public static vec4 add(vec4 a, vec4 b) {
     return new vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
   }

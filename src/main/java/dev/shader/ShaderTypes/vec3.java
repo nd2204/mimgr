@@ -34,6 +34,36 @@ public class vec3 {
     this.z = yz.y;
   }
 
+  public void set(float v) {
+    this.x = v;
+    this.y = v;
+    this.z = v;
+  }
+
+  public void set(vec2 v2) {
+    this.x = v2.x;
+    this.y = v2.y;
+  }
+
+  public void set(float x, float y, float z) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
+  public void set(vec2 xy, float z) {
+    this.x = xy.x;
+    this.y = xy.y;
+    this.z = z;
+  }
+
+  public void set(float x, vec2 yz) {
+    this.x = x;
+    this.y = yz.x;
+    this.z = yz.y;
+  }
+
+
   public static vec3 add(vec3 a, vec3 b) {
     return new vec3(a.x + b.x, a.y + b.y, a.z + b.z);
   }

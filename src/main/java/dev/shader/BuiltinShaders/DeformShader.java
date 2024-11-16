@@ -12,11 +12,10 @@ public class DeformShader implements IShaderEntry {
   protected vec3 col = new vec3(0.0f);
   protected vec3 lineCol = new vec3(0.0f);
   @Override
-  public vec4 mainImage(ShaderInputs si, vec2 fragCoord) {
+  public void mainImage(final ShaderInputs si, vec4 fragColor, final vec2 fragCoord) {
     vec2 p;
     vec2 m;
     vec2 uv = new vec2(0);
-    vec4 fragColor = new vec4(1.0f);
 
     float a1;
     float r1;
@@ -41,7 +40,7 @@ public class DeformShader implements IShaderEntry {
     fragColor.x = col.x + w * lineCol.x;
     fragColor.y = col.y + w * lineCol.y;
     fragColor.z = col.z + w * lineCol.z;
-    return fragColor;
+    fragColor.w = 1.0f;
   }
 }
 

@@ -2,6 +2,8 @@ package dev.mimgr;
 
 import javax.swing.*;
 
+import dev.mimgr.theme.ColorTheme;
+import dev.mimgr.theme.builtin.ColorScheme;
 import dev.shader.ShaderInputs;
 import dev.shader.BuiltinShaders.*;
 import dev.shader.ShaderFunctions.IShaderEntry;
@@ -9,97 +11,107 @@ import dev.shader.ShaderTypes.vec2;
 import dev.shader.ShaderTypes.vec4;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.image.DataBufferInt;
 import java.util.concurrent.*;
 
 public class AnimatedPanel extends JPanel {
   private ShaderInputs shaderInputs;
   private IShaderEntry entry;
 
-  private final int targetFPS = 30; // Target frame rate
+  private final int targetFPS = 100; // Target frame rate
   private volatile BufferedImage currentBuffer;
   private boolean useBuffer0 = true;
 
   private final ExecutorService executorService;
   private final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
   private volatile boolean running = false;
-  private volatile boolean paused = false; // Pause control
-  private final Object pauseLock = new Object(); // Lock for pause/resume synchronization
-  private static final ThreadLocal<int[]> threadLocalPixelBuffers = ThreadLocal.withInitial(() -> new int[4]);
+  private ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
 
-  public AnimatedPanel(IShaderEntry entry) {
-    this.setMinimumSize(new Dimension(800, 600));
-    this.setPreferredSize(new Dimension(800, 600));
+  // Variables to track panel size changes
+  private int panelWidth;
+  private int panelHeight;
+
+  public AnimatedPanel(IShaderEntry entry, int width, int height) {
+    this.setMinimumSize(new Dimension(854, 480));
+    this.setPreferredSize(new Dimension(854, 480));
     this.entry = entry;
     this.executorService = Executors.newFixedThreadPool(NUM_THREADS);
-    shaderInputs = new ShaderInputs(this);
+
+    shaderInputs = new ShaderInputs(this, width, height);
+    shaderInputs.UpdateResolution();
   }
 
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
+    g.setColor(colors.m_bg_dim);
+    g.fillRect(0, 0, getWidth(), getHeight());
     if (currentBuffer != null) {
       g.drawImage(currentBuffer, 0, 0, this);
     }
   }
 
   public void updateFrame() {
+    // Check if the buffers need to be updated (in case of resizing)
+    if (shaderInputs.buffers[0].getWidth() != panelWidth || shaderInputs.buffers[0].getHeight() != panelHeight) {
+      shaderInputs.UpdateResolution();
+    }
+
     BufferedImage renderingBuffer = useBuffer0 ? shaderInputs.buffers[0] : shaderInputs.buffers[1];
-    if (renderingBuffer == null) return;
-    WritableRaster raster = renderingBuffer.getRaster();
     int width = (int) shaderInputs.iResolution.x;
     int height = (int) shaderInputs.iResolution.y;
 
-    // List to store futures for each task
-    List<Future<?>> futures = new ArrayList<>();
+    // Access pixel data directly
+    DataBufferInt dataBuffer = (DataBufferInt) renderingBuffer.getRaster().getDataBuffer();
+    int[] pixels = dataBuffer.getData();
+
     int chunkSize = height / NUM_THREADS;
+    CountDownLatch latch = new CountDownLatch(NUM_THREADS);
 
     for (int i = 0; i < NUM_THREADS; i++) {
       int startY = i * chunkSize;
       int endY = (i == NUM_THREADS - 1) ? height : startY + chunkSize;
 
-      // Submit a task for each chunk
-      Future<?> future = executorService.submit(() -> processChunk(raster, startY, endY, width));
-      futures.add(future);
-    }
-    // Wait for all tasks to complete
-    for (Future<?> future : futures) {
-      try {
-        future.get(); // Block until task is complete
-      } catch (InterruptedException | ExecutionException e) {
-        e.printStackTrace();
-      }
+      executorService.submit(() -> {
+        processChunk(pixels, startY, endY, width);
+        latch.countDown();
+      });
     }
 
-    shaderInputs.tick();
+    // Wait for all tasks to complete
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    shaderInputs.iTime = (System.currentTimeMillis() - shaderInputs.startTime) * 0.001f;
+    shaderInputs.iFrame++;
 
     currentBuffer = renderingBuffer;
     useBuffer0 = !useBuffer0;
   }
 
-  private void processChunk(final WritableRaster raster, final int startY, final int endY, final int width) {
+  private void processChunk(final int[] pixels, final int startY, final int endY, final int width) {
     final vec2 fragCoord = new vec2(0, 0);
-    final int[] pixelBuffer = threadLocalPixelBuffers.get(); // Buffer to store RGBA values per pixel
+    final vec4 fragColor = new vec4(0.0f); 
+
     for (int y = startY; y < endY; y++) {
       fragCoord.y = y;
+      int offset = y * width;
       for (int x = 0; x < width; x++) {
         fragCoord.x = x;
         // Calculate the fragment color
-        vec4 fragColor = entry.mainImage(shaderInputs, fragCoord);
+        entry.mainImage(shaderInputs, fragColor, fragCoord);
         // Convert vec4 to RGB and populate pixelBuffer
-        pixelBuffer[0] = (int) (fragColor.x * 255);
-        pixelBuffer[1] = (int) (fragColor.y * 255);
-        pixelBuffer[2] = (int) (fragColor.z * 255);
-        pixelBuffer[3] = (int) (fragColor.w * 255);
-        // Write the pixel to the raster
-        raster.setPixel(x, y, pixelBuffer);
+        int a = (int) (fragColor.w * 255) & 0xFF;
+        int r = (int) (fragColor.x * 255) & 0xFF;
+        int g = (int) (fragColor.y * 255) & 0xFF;
+        int b = (int) (fragColor.z * 255) & 0xFF;
+        pixels[offset + x] = (a << 24) | (r << 16) | (g << 8) | b;
       }
     }
   }
@@ -111,16 +123,6 @@ public class AnimatedPanel extends JPanel {
 
       while (running) {
         long startTime = System.currentTimeMillis();
-
-        synchronized (pauseLock) {
-          while (paused) {
-            try {
-              pauseLock.wait(); // Wait until resumed
-            } catch (InterruptedException e) {
-              Thread.currentThread().interrupt();
-            }
-          }
-        }
 
         updateFrame();
         // Schedule repaint safely
@@ -148,23 +150,12 @@ public class AnimatedPanel extends JPanel {
     executorService.shutdownNow();
   }
 
-  public void pause() {
-    paused = true;
-  }
-
-  public void resume() {
-    synchronized (pauseLock) {
-      paused = false;
-      pauseLock.notifyAll(); // Wake up the rendering thread
-    }
-  }
-
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
       JFrame frame = new JFrame("Shader Simulator");
-      AnimatedPanel shaderPanel = new AnimatedPanel(new TriLatticeShader());
+      AnimatedPanel shaderPanel = new AnimatedPanel(new TriLatticeShader(), Entry.m_width, Entry.m_height);
       frame.add(shaderPanel, BorderLayout.CENTER);
-      frame.setSize(800, 600);
+      frame.pack();
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       frame.setVisible(true);
       shaderPanel.start();

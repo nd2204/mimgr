@@ -9,7 +9,7 @@ import dev.shader.ShaderFunctions;
 
 public class ColorGridShader implements IShaderEntry {
   @Override
-  public vec4 mainImage(ShaderInputs si, vec2 fragCoord) {
+  public void mainImage(final ShaderInputs si, vec4 fragColor, final vec2 fragCoord) {
     vec2 px = (new vec2(si.iResolution.x * -1, si.iResolution.y * -1)
       .add(fragCoord.mult(2.0f))).mult(8.0f)
       .div(si.iResolution.y);
@@ -20,7 +20,11 @@ public class ColorGridShader implements IShaderEntry {
 
     vec2 pa = ShaderFunctions.smoothstep(0.0f, 0.2f, (ShaderFunctions.cos(px.mult(6.2831f)).mult(0.5f).add(0.5f)).mult(id));
 
-    return new vec4( co.mult(pa.x * pa.y), 1.0f );
+    co = co.mult(pa.x * pa.y);
+    fragColor.x = co.x;
+    fragColor.y = co.y;
+    fragColor.z = co.z;
+    fragColor.w = 1.0f;
   }
 }
 

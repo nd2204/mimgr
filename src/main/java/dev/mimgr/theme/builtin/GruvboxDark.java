@@ -15,7 +15,7 @@ public class GruvboxDark extends ColorScheme {
     m_grey_1 = new Color(0x928374);
     m_grey_2 = new Color(0xa89984);
     m_fg_0   = new Color(0xd4be98);
-    m_fg_1   = new Color(0xddc7a1);
+    m_fg_1   = new Color(0x282828);
     m_red    = new Color(0xea6962);
     m_orange = new Color(0xe78a4e);
     m_yellow = new Color(0xd8a657);
