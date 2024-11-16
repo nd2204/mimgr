@@ -79,8 +79,13 @@ public class IconManager {
 
   public static Icon changeIconSize(Icon icon, int width, int height) {
     ImageIcon imageIcon = (ImageIcon) icon;
-    Image scaledImage = imageIcon.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
-    return new ImageIcon(scaledImage);
+    Image originalImage = imageIcon.getImage();
+    BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g2 = bi.createGraphics();
+    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    g2.drawImage(originalImage, 0, 0, width, height, null);
+    g2.dispose();
+    return new ImageIcon(bi);
   }
 
   public static Icon loadIcon(File file) {

@@ -46,15 +46,15 @@ public class vec2 {
     return new vec2(a.x * v, a.y * v);
   }
 
-  public vec2 add(vec2 b) { return add(this, b); }
-  public vec2 add(float v) { return add(this, v); }
+  public vec2 add(vec2 b) { return new vec2(this.x + b.x, this.y + b.y); }
+  public vec2 add(float b) { return new vec2(this.x + b, this.y + b); }
 
-  public vec2 sub(vec2 b) { return sub(this, b); }
-  public vec2 sub(float b) { return sub(this, b); }
+  public vec2 sub(vec2 b) { return new vec2(this.x + b.x, this.y + b.y); }
+  public vec2 sub(float b) { return new vec2(this.x + b, this.y + b); }
 
-  public vec2 div(vec2 b) { return div(this, b); }
-  public vec2 div(float b) { return div(this, b); }
+  public vec2 div(vec2 b) { return new vec2(this.x / b.x, this.y / b.y); }
+  public vec2 div(float b) { return new vec2(this.x / b, this.y / b); }
 
-  public vec2 mult(vec2 b) { return mult(this, b); }
-  public vec2 mult(float v) { return mult(this, v); }
+  public vec2 mult(vec2 b) { return new vec2(this.x * b.x, this.y * b.y); }
+  public vec2 mult(float b) { return new vec2(this.x * b, this.y * b); }
 }

@@ -13,7 +13,7 @@ public class TriLatticeShader implements IShaderEntry {
   private final vec2 lt = new vec2(1.0f, 0.5f);
   private final vec2 rt = new vec2(-1.0f, 0.5f);
   protected vec3 col = new vec3(0.0f);
-  protected vec3 lineCol = new vec3(0.0f);
+  protected vec3 lineCol = new vec3(1.0f);
 
   private float rand(vec2 uv) {
     return ShaderFunctions.fract((float) Math.sin(ShaderFunctions.dot(uv, co)));

@@ -66,15 +66,15 @@ public class vec3 {
     return new vec3(a.x * b, a.y * b, a.z * b);
   }
 
-  public vec3 add(vec3 b) { return add(this, b); }
-  public vec3 add(float v) { return add(this, v); }
+  public vec3 add(vec3 b) { return new vec3(this.x + b.x, this.y + b.y, this.z + b.z); }
+  public vec3 add(float b) { return new vec3(this.x + b, this.y + b, this.z + b); }
 
-  public vec3 sub(vec3 b) { return sub(this, b); }
-  public vec3 sub(float b) { return sub(this, b); }
+  public vec3 sub(vec3 b) { return new vec3(this.x - b.x, this.y - b.y, this.z - b.z); }
+  public vec3 sub(float b) { return new vec3(this.x - b, this.y - b, this.z - b); }
 
-  public vec3 div(vec3 b) { return div(this, b); }
-  public vec3 div(float b) { return div(this, b); }
+  public vec3 div(vec3 b) { return new vec3(this.x / b.x, this.y / b.y, this.z / b.z); }
+  public vec3 div(float b) { return new vec3(this.x / b, this.y / b, this.z / b); }
 
-  public vec3 mult(vec3 b) { return mult(this, b); }
-  public vec3 mult(float b) { return mult(this, b); }
+  public vec3 mult(vec3 b) { return new vec3(this.x * b.x, this.y * b.y, this.z * b.z); }
+  public vec3 mult(float b) { return new vec3(this.x * b, this.y * b, this.z * b); }
 }

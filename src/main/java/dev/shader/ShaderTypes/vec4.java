@@ -74,47 +74,31 @@ public class vec4 {
   }
 
   public static vec4 add(vec4 a, vec4 b) {
-    return new vec4(
-      a.x + b.x,
-      a.y + b.y,
-      a.z + b.z,
-      a.w + b.w
-    );
+    return new vec4(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
   }
 
   public static vec4 sub(vec4 a, vec4 b) {
-    return new vec4(
-      a.x - b.x,
-      a.y - b.y,
-      a.z - b.z,
-      a.w - b.w
-    );
+    return new vec4(a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w);
   }
 
 
   public static vec4 div(vec4 a, vec4 b) {
-    return new vec4(
-      a.x / b.x,
-      a.y / b.y,
-      a.z / b.z,
-      a.w / b.w
-    );
+    return new vec4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
   }
 
   public static vec4 mult(vec4 a, vec4 b) {
-    return new vec4(
-      a.x * b.x,
-      a.y * b.y,
-      a.z * b.z,
-      a.w * b.w
-    );
+    return new vec4(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
   }
 
-  public vec4 add(vec4 b) { return add(this, b); }
+  public vec4 add(vec4 b) { return new vec4(this.x + b.x, this.y + b.y, this.z + b.z, this.w + b.w); }
+  public vec4 add(float b) { return new vec4(this.x + b, this.y + b, this.z + b, this.w + b); }
 
-  public vec4 sub(vec4 b) { return sub(this, b); }
+  public vec4 sub(vec4 b) { return new vec4(this.x - b.x, this.y - b.y, this.z - b.z, this.w - b.w); }
+  public vec4 sub(float b) { return new vec4(this.x - b, this.y - b, this.z - b, this.w - b); }
 
-  public vec4 div(vec4 b) { return div(this, b); }
+  public vec4 div(vec4 b) { return new vec4(this.x / b.x, this.y / b.y, this.z / b.z, this.w / b.w); }
+  public vec4 div(float b) { return new vec4(this.x / b, this.y / b, this.z / b, this.w / b); }
 
-  public vec4 mult(vec4 b) { return mult(this, b); }
+  public vec4 mult(vec4 b) { return new vec4(this.x * b.x, this.y * b.y, this.z * b.z, this.w * b.w); }
+  public vec4 mult(float b) { return new vec4(this.x * b, this.y * b, this.z * b, this.w * b); }
 }

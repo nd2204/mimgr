@@ -62,8 +62,12 @@ public class ShaderInputs implements ComponentListener, MouseMotionListener {
     if (newWidth > 0 && newHeight > 0 && (newWidth != iResolution.x || newHeight != iResolution.y)) {
       iResolution.x = newWidth;
       iResolution.y = newHeight;
-      this.buffers[0] = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
-      this.buffers[1] = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+
+      for (int i = 0; i < buffers.length; i++) {
+        if (buffers[i] != null) buffers[i].flush();
+        buffers[i] = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+      }
+      System.gc();
     }
   }
 
@@ -75,13 +79,13 @@ public class ShaderInputs implements ComponentListener, MouseMotionListener {
   }
 
   public JPanel viewport;
-  public vec2 iResolution;
-  public float iTime;
   public float iTimeDelta;
   public float iFrameRate;
-  public vec2 iMouse;
   public float iFrame;
-  public BufferedImage[] buffers;
+  public volatile vec2 iResolution;
+  public volatile float iTime;
+  public volatile vec2 iMouse;
+  public volatile BufferedImage[] buffers;
 
   private final long startTime;
 }

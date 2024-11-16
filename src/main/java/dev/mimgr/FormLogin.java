@@ -27,7 +27,6 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     super(new LoginShader());
     // super(new Color(0x1379a9), ColorTheme.getInstance().getCurrentScheme().m_blue);
     colors = ColorTheme.getInstance().getCurrentScheme();
-    this.start();
 
     Font font_bold = FontManager.getFont("RobotoMonoBold", 14f);
     // =======================================================
@@ -200,6 +199,7 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     c.weighty = 1.0;
     this.add(input_container, c);
     this.setVisible(false);
+    this.start();
   }
 
   @Override
@@ -223,6 +223,7 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     if (e.getSource() == login_button) {
       tryLogin();
     }
+
     if (e.getSource() == signup_button) {
       PanelManager.show("FORM_SIGNUP");
       return;
@@ -230,25 +231,26 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
   }
 
   private void tryLogin() {
-      this.pause();
-      String username = tf_username.getTextString();
-      String password = pf_password.getTextString();
+    this.pause();
+    String username = tf_username.getTextString();
+    String password = pf_password.getTextString();
 
-      if (DBConnection.getInstance().getConection() == null) {
-        JOptionPane.showMessageDialog(null, "FATAL: Cannot connect to database");
-        return;
-      }
-
-      if (LoginService.loginUser(username, password, remember.isSelected())) {
-        this.stop();
-        Entry.removeLoginSignup();
-        Entry.registerDashBoard();
-      } else {
-        JOptionPane.showMessageDialog(null, "Tài khoản hoặc mật khẩu không hợp lệ");
-        this.resume();
-      }
-
+    if (DBConnection.getInstance().getConection() == null) {
+      JOptionPane.showMessageDialog(null, "FATAL: Cannot connect to database");
+      this.resume();
       return;
+    }
+
+    if (LoginService.loginUser(username, password, remember.isSelected())) {
+      this.stop();
+      Entry.removeLoginSignup();
+      Entry.registerDashBoard();
+    } else {
+      JOptionPane.showMessageDialog(null, "Tài khoản hoặc mật khẩu không hợp lệ");
+      this.resume();
+    }
+
+    return;
   }
 
   private void checkFields() {
