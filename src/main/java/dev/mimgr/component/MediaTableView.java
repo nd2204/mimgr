@@ -1,6 +1,8 @@
 package dev.mimgr.component;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,17 +19,21 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import dev.mimgr.EditImagePanel;
+import dev.mimgr.FormEditImage;
 import dev.mimgr.IconManager;
 import dev.mimgr.TableView;
+import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTable;
 import dev.mimgr.db.ImageRecord;
-import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.theme.ColorTheme;
+import dev.mimgr.theme.builtin.ColorScheme;
 
 public class MediaTableView extends JPanel implements TableModelListener, IMediaView {
   public MediaTableView() {
@@ -54,6 +60,25 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
     this.table.setAutoscrolls(true);
     this.table.setup_scrollbar(tableScrollPane);
     this.table.setModel(model);
+
+    table.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        // Check if it's a double-click
+        if (e.getClickCount() == 2) {
+          int row = table.getSelectedRow();
+          if (row != -1) {
+            FormEditImage frame = new FormEditImage(imageList.get(row));
+            List<EditImagePanel> EditImagePanels = frame.getEditImagePanels();
+            frame.setVisible(true);
+            for (EditImagePanel panel : EditImagePanels) {
+              setButtonRefreshOnClick(panel.getDeleteComponent());
+              setButtonRefreshOnClick(panel.getSubmitComponent());
+            }
+          }
+        }
+      }
+    });
 
     this.tableScrollPane.add(table);
     this.tableScrollPane.setBackground(colors.m_bg_0);
@@ -133,6 +158,17 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
   @Override
   public void updateView(Supplier<ResultSet> queryInvoker) {
     updateTable(queryInvoker);
+  }
+
+  @Override
+  public void setButtonRefreshOnClick(MButton btn) {
+    btn.addActionListener((actionEvent) -> {
+      new Thread(() -> {
+        SwingUtilities.invokeLater(() -> {
+          refresh();
+        });
+      }).start();
+    });
   }
 
   @Override

@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.function.Supplier;
 
+import dev.mimgr.custom.MButton;
 import dev.mimgr.db.ImageRecord;
 
 public interface IMediaView {
@@ -13,4 +14,5 @@ public interface IMediaView {
   public void deleteSelectedImages();
   public void updateView(Supplier<ResultSet> queryInvoker);
   public Supplier<ResultSet> getCurrentQueryInvoker();
+  public void setButtonRefreshOnClick(MButton btn);
 }

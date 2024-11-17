@@ -32,6 +32,11 @@ public class ImageRecord {
     "DELETE FROM %s WHERE %s = ?",
     TABLE, FIELD_ID
   );
+  public static final String QUERY_UPDATE_BY_KEY = String.format(
+    "UPDATE %s SET %s=?, %s=?, %s=?, %s=? WHERE %s=?",
+    TABLE, FIELD_NAME, FIELD_CAPTION, FIELD_URL, 
+    FIELD_AUTHOR, FIELD_ID
+  );
 
   public ImageRecord(ResultSet rs) throws SQLException {
     m_id             = rs.getInt(FIELD_ID);
@@ -105,7 +110,27 @@ public class ImageRecord {
       ir.m_name,
       ir.m_url,
       ir.m_caption,
-      SessionManager.getCurrentUser().m_id
+      SessionManager.getCurrentUser().m_id,
+      ir.m_id
+    );
+    return result;
+  }
+
+  public static int update(String image_name, String image_caption, String image_url, int image_author, int image_id) {
+    image_name = image_name.substring(0, image_name.indexOf("."));
+    int result = DBQueries.update(QUERY_UPDATE_BY_KEY, image_name, image_caption, image_url, image_author, image_id);
+    return result;
+  }
+
+  public static int update(ImageRecord ir) {
+    ir.m_name = ir.m_name.substring(0, ir.m_name.indexOf("."));
+    int result = DBQueries.update(
+      QUERY_UPDATE_BY_KEY,
+      ir.m_name,
+      ir.m_caption,
+      ir.m_url,
+      SessionManager.getCurrentUser().m_id,
+      ir.m_id
     );
     return result;
   }

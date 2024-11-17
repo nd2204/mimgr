@@ -26,6 +26,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import dev.mimgr.FontManager;
@@ -34,8 +35,8 @@ import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.db.ImageRecord;
-import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.theme.ColorTheme;
+import dev.mimgr.theme.builtin.ColorScheme;
 
 public class MediaGridView extends JPanel implements IMediaView {
   public MediaGridView() {
@@ -109,6 +110,17 @@ public class MediaGridView extends JPanel implements IMediaView {
   @Override
   public Supplier<ResultSet> getCurrentQueryInvoker() {
     return this.currentQueryInvoker;
+  }
+
+  @Override
+  public void setButtonRefreshOnClick(MButton btn) {
+    btn.addActionListener((actionEvent) -> {
+      new Thread(() -> {
+        SwingUtilities.invokeLater(() -> {
+          refresh();
+        });
+      }).start();
+    });
   }
 
   public void updateGrid(Supplier<ResultSet> queryInvoker) {

@@ -12,8 +12,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
-import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -24,6 +24,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import dev.mimgr.component.FilterOptionPanel;
 import dev.mimgr.component.IMediaView;
 import dev.mimgr.component.MediaViewSwitcher;
 import dev.mimgr.custom.DropContainerPanel;
@@ -33,8 +34,8 @@ import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.ImageRecord;
-import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.theme.ColorTheme;
+import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.MTransferListener;
 import dev.mimgr.utils.ResourceManager;
 
@@ -108,57 +109,62 @@ public class FormMedia extends JPanel implements DocumentListener {
       contentContainer.setBackground(colors.m_bg_0);
 
       String[] cbBulkAction = {
-        "Bulk actions",
-        "Edit",
-        "Delete Permanently"
+          "Bulk actions",
+          "Edit",
+          "Delete Permanently"
       };
 
       this.bulkAction = new MComboBox<>(cbBulkAction, colors);
       this.bulkAction.setBackground(colors.m_bg_0);
       this.bulkAction.setForeground(colors.m_grey_0);
 
+      // ----------------------------------------------
       cc.gridx = 0;
       cc.gridy = 0;
+      // Row 0 ----------------------------------------
+
+      cc.weightx = 1.0;
+      cc.anchor = GridBagConstraints.FIRST_LINE_START;
+      cc.fill = GridBagConstraints.BOTH;
+      cc.insets = new Insets(5, 5, 0, 5);
+      contentContainer.add(filterOptionPanel, cc);
+
+      // End Row 0 ------------------------------------
+      cc.gridx = 0;
+      cc.gridy = 1;
+      // Row 1 ----------------------------------------
+
+      cc.weightx = 1.0;
+      cc.insets = new Insets(5, 15, 0, 5);
+      cc.anchor = GridBagConstraints.FIRST_LINE_START;
+      cc.fill = GridBagConstraints.BOTH;
+      contentContainer.add(filterTextField, cc);
+      cc.gridx++;
+
       cc.ipadx = 50;
       cc.weightx = 0.0;
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
       cc.fill = GridBagConstraints.VERTICAL;
-      cc.insets = new Insets(15, 15, 0, 5);
+      cc.insets = new Insets(5, 5, 0, 0);
       contentContainer.add(layoutSelectorComponent, cc);
+      cc.gridx++;
+
+      cc.weightx = 0.0;
+      cc.ipadx = 50;
+      cc.insets = new Insets(5, 15, 0, 5);
+      cc.fill = GridBagConstraints.VERTICAL;
+      cc.anchor = GridBagConstraints.FIRST_LINE_END;
+      contentContainer.add(bulkAction, cc);
+      cc.gridx++;
 
       cc.ipadx = 0;
-      cc.gridx = 1;
-      cc.gridy = 0;
-      cc.weightx = 1.0;
-      cc.insets = new Insets(15, 0, 0, 15);
-      cc.fill = GridBagConstraints.BOTH;
-      contentContainer.add(filterTextField, cc);
-
-      cc.gridx = 2;
-      cc.gridy = 0;
-      cc.weightx = 1.0;
-      cc.fill = GridBagConstraints.BOTH;
-      contentContainer.add(Box.createHorizontalGlue(), cc);
-
-      cc.gridx = 3;
-      cc.gridy = 0;
-      cc.weightx = 0.0;
-      cc.ipadx = 55;
-      cc.insets = new Insets(15, 0, 0, 5);
-      cc.fill = GridBagConstraints.VERTICAL;
-      contentContainer.add(bulkAction, cc);
-
-      cc.gridx = 4;
-      cc.gridy = 0;
-      cc.weightx = 0.0;
-      cc.ipadx = 20;
-      cc.insets = new Insets(15, 0, 0, 15);
+      cc.insets = new Insets(5, 0, 0, 15);
       cc.fill = GridBagConstraints.VERTICAL;
       contentContainer.add(applyBulkAction, cc);
 
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
       cc.gridx = 0;
-      cc.gridy = 1;
+      cc.gridy = 3;
       cc.weightx = 1.0;
       cc.weighty = 1.0;
       cc.gridwidth = GridBagConstraints.REMAINDER;
@@ -190,7 +196,7 @@ public class FormMedia extends JPanel implements DocumentListener {
         fileChooser.setDialogTitle("Select Files");
         fileChooser.setMultiSelectionEnabled(true);
         fileChooser.setFileFilter(
-          new javax.swing.filechooser.FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "gif"));
+            new javax.swing.filechooser.FileNameExtensionFilter("Image Files", "jpg", "jpeg", "png", "gif"));
 
         // Show the file chooser dialog and wait for user action
         int userSelection = fileChooser.showOpenDialog(null);
@@ -232,11 +238,10 @@ public class FormMedia extends JPanel implements DocumentListener {
             Path newFilePath = rm.moveStagedFileToUploadDir(file);
             System.out.println(rm.getProjectPath().relativize(newFilePath));
             ImageRecord.insert(
-              String.valueOf(rm.getProjectPath().relativize(newFilePath)).replace("\\", "/"),
-              file.getName(),
-              "",
-              SessionManager.getCurrentUser().m_id
-            );
+                String.valueOf(rm.getProjectPath().relativize(newFilePath)).replace("\\", "/"),
+                file.getName(),
+                "",
+                SessionManager.getCurrentUser().m_id);
             currentView.refresh();
             dropPanel.setVisible(false);
           }
@@ -251,17 +256,25 @@ public class FormMedia extends JPanel implements DocumentListener {
         System.out.println(((String) FormMedia.this.bulkAction.getSelectedItem()));
         if (((String) FormMedia.this.bulkAction.getSelectedItem()).equals("Edit")) {
           // TODO FormEditMedia
+          IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+          List<ImageRecord> selectedImage = currentView.getSelectedImages();
+          FormEditImage frame = new FormEditImage(selectedImage);
+          frame.setVisible(true);
+          List<EditImagePanel> EditImagePanel = frame.getEditImagePanels();
+          for (EditImagePanel panel : EditImagePanel) {
+            currentView.setButtonRefreshOnClick(panel.getDeleteComponent());
+            currentView.setButtonRefreshOnClick(panel.getSubmitComponent());
+          }
         }
         if (((String) FormMedia.this.bulkAction.getSelectedItem()).equals("Delete Permanently")) {
           IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
           List<ImageRecord> selectedImage = currentView.getSelectedImages();
           if (!selectedImage.isEmpty()) {
             int response = JOptionPane.showConfirmDialog(
-              FormMedia.this,
-              "Delete " + selectedImage.size() + " items?",
-              "Confirm Delete",
-              JOptionPane.YES_NO_OPTION
-            );
+                FormMedia.this,
+                "Delete " + selectedImage.size() + " items?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION);
 
             if (response == JOptionPane.YES_OPTION) {
               currentView.deleteSelectedImages();
@@ -350,8 +363,31 @@ public class FormMedia extends JPanel implements DocumentListener {
     this.topLabel.setFont(nunito_bold_20);
     this.topLabel.setForeground(colors.m_fg_0);
 
-
     this.rm = ResourceManager.getInstance();
+
+    Function<String, Consumer<MButton>> buttonSetupGenerator = (text) -> {
+      return (button) -> {
+        button.setText(text);
+        button.setBackground(colors.m_bg_2);
+        button.setBorderColor(colors.m_bg_3);
+        button.setForeground(colors.m_grey_2);
+        button.setHoverBackgroundColor(colors.m_bg_3);
+        button.setHoverBorderColor(colors.m_bg_3);
+        button.setClickBackgroundColor(colors.m_bg_1);
+        button.setClickBorderColor(colors.m_bg_1);
+        button.setPreferredSize(new Dimension(100, button.getPreferredSize().height));
+      };
+    };
+
+    this.filterOptionPanel = new FilterOptionPanel();
+    this.filterOptionPanel.addFilterOption("All", buttonSetupGenerator.apply("All"), (e) -> {
+      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.updateView(() -> ImageRecord.selectAll());
+    });
+    this.filterOptionPanel.addFilterOption("Date", buttonSetupGenerator.apply("Date"), (e) -> {
+      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.updateView(() -> ImageRecord.selectAll());
+    });
 
     this.mediaViewSwitcher = new MediaViewSwitcher();
 
@@ -407,7 +443,7 @@ public class FormMedia extends JPanel implements DocumentListener {
 
   private class LayoutSelectorComponent extends RoundedPanel {
     public LayoutSelectorComponent() {
-      super(); 
+      super();
       this.setBackground(colors.m_bg_dim);
       this.setBorderColor(colors.m_bg_5);
       this.setPreferredSize(new Dimension(50, this.getPreferredSize().height));
@@ -436,7 +472,8 @@ public class FormMedia extends JPanel implements DocumentListener {
       this.setLayout(new GridBagLayout());
 
       GridBagConstraints c = new GridBagConstraints();
-      c.gridx = 0; c.gridy = 0;
+      c.gridx = 0;
+      c.gridy = 0;
       c.fill = GridBagConstraints.BOTH;
       c.weightx = 1.0;
       c.weighty = 1.0;
@@ -464,7 +501,7 @@ public class FormMedia extends JPanel implements DocumentListener {
     }
   }
 
-   @Override
+  @Override
   public void insertUpdate(DocumentEvent e) {
     get_images(this.filterTextField.getText());
   }
@@ -520,4 +557,5 @@ public class FormMedia extends JPanel implements DocumentListener {
   private RoundedPanel contentContainer = new RoundedPanel();
   private DropContainerPanel droppedItemsPanel;
   private LayoutSelectorComponent layoutSelectorComponent;
+  private FilterOptionPanel filterOptionPanel;
 }
