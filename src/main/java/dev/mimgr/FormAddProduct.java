@@ -44,14 +44,6 @@ public class FormAddProduct extends JFrame {
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
 
-    FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
-    FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
-    FontManager.loadFont("RobotoMonoBold", "RobotoMono-Bold.ttf");
-    FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
-    FontManager.loadFont("Nunito", "Nunito-Regular.ttf");
-    FontManager.loadFont("NunitoBold", "Nunito-Bold.ttf");
-    FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
-
     // Get the screen size
     Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
 

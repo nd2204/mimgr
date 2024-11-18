@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.mimgr.PanelManager;
+import dev.mimgr.component.NotificationPopup;
+
 import java.sql.DatabaseMetaData;
 
 public class DBConnection {
@@ -74,7 +77,6 @@ public class DBConnection {
       System.out.println("Connection Info:\n" + getConnectionInfo() + "\n");
       notifyListenerConnected();
     } catch (SQLException sqlex) {
-      System.err.println("Connection Failed.");
       // System.err.println(sqlex);
     } catch (Exception ex) {
       System.err.println(ex);
@@ -88,12 +90,15 @@ public class DBConnection {
     reconnectThread = new Thread(() -> {
       reconnecting = true;
       while (reconnecting) {
+        PanelManager.createPopup(new NotificationPopup("Attempting to reconnect...", NotificationPopup.NOTIFY_LEVEL_WARNING, 5000));
         try {
-          System.out.println("Attempting to reconnect...");
+          Thread.sleep(5000); // Attempt to reconnect every 5 seconds
           tryConnect();
           if (connection != null && isConnectionValid()) {
-            System.out.println("Reconnected successfully.");
+            PanelManager.createPopup(new NotificationPopup("Reconnected successfully.", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
             stopReconnectThread();
+          } else {
+            PanelManager.createPopup(new NotificationPopup("Connection Failed.", NotificationPopup.NOTIFY_LEVEL_ERROR, 5000));
           }
           Thread.sleep(5000); // Attempt to reconnect every 5 seconds
         } catch (InterruptedException ex) {

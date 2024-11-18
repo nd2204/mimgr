@@ -18,6 +18,7 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.shader.BuiltinShaders.*;
 import dev.mimgr.custom.MTextField;
+import dev.mimgr.component.NotificationPopup;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MPasswordField;
 import dev.mimgr.custom.MCheckBox;
@@ -240,7 +241,11 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     String password = pf_password.getTextString();
 
     if (DBConnection.getInstance().getConection() == null) {
-      JOptionPane.showMessageDialog(null, "FATAL: Cannot connect to database");
+      PanelManager.createPopup(new NotificationPopup(
+        "Cannot connect to database.",
+        NotificationPopup.NOTIFY_LEVEL_ERROR,
+        3000
+      ));
       return;
     }
 
@@ -249,7 +254,11 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
       Entry.removeLoginSignup();
       Entry.registerDashBoard();
     } else {
-      JOptionPane.showMessageDialog(null, "Tài khoản hoặc mật khẩu không hợp lệ");
+      PanelManager.createPopup(new NotificationPopup(
+        "Tài khoản hoặc mật khẩu không hợp lệ",
+        NotificationPopup.NOTIFY_LEVEL_WARNING,
+        3000
+      ));
     }
 
     return;

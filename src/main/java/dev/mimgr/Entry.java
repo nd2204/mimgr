@@ -7,6 +7,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import dev.mimgr.db.DBConnection;
@@ -35,9 +36,9 @@ public class Entry extends JFrame {
       registerDashBoard();
     }
 
-//     for (JPanel panel : PanelManager.getAllPanels()) {
-//       System.out.println(panel);
-//     }
+    for (JPanel panel : PanelManager.getAllPanels()) {
+      System.out.println(panel);
+    }
 
     // Main window
     this.setLayout(new BorderLayout());

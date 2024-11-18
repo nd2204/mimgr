@@ -5,14 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Properties;
 
-import dev.mimgr.db.DBConnection;
-import dev.mimgr.db.DBQueries;
+import dev.mimgr.component.NotificationPopup;
 import dev.mimgr.db.SessionRecord;
 import dev.mimgr.db.UserRecord;
 import dev.mimgr.utils.ResourceManager;
@@ -92,6 +90,7 @@ public class SessionManager {
   public static void setCurrentUser(UserRecord ur) {
     currentUser = ur;
     System.out.println("Logged in as user: " + ur.m_username + " as role: " + ur.m_role);
+    PanelManager.createPopup(new NotificationPopup("Chào mừng trở lại " + ur.m_username, NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
   }
 
   private static ResourceManager rm = ResourceManager.getInstance();

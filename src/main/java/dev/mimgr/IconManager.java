@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -172,10 +173,36 @@ public class IconManager {
     // Create a BufferedImage with the icon's dimensions
     BufferedImage bufferedImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = bufferedImage.createGraphics();
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     icon.paintIcon(null, g, 0, 0); // Paints the icon onto the BufferedImage
     g.dispose();
     return bufferedImage;
   }
+
+  public static ImageIcon getRoundedIcon(Icon icon, int cornerRadius) {
+    BufferedImage image = iconToBufferedImage(icon);
+    int w = image.getWidth();
+    int h = image.getHeight();
+    BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+
+    Graphics2D g2 = output.createGraphics();
+    // Enable anti-aliasing and quality rendering
+    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+    // Create a rounded rectangle shape
+    Shape clipShape = new RoundRectangle2D.Float(0, 0, w, h, cornerRadius, cornerRadius);
+
+    // Set the clipping area
+    g2.setClip(clipShape);
+
+    // Draw the original image into the rounded area
+    g2.drawImage(image, 0, 0, null);
+
+    g2.dispose();
+
+    return new ImageIcon(output);
+}
 
   /**
      * Clears the icon cache to free memory.

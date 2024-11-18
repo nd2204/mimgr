@@ -11,7 +11,6 @@ import java.util.Map;
 public class FontManager {
   private static final Map<String, Font> loadedFonts = new HashMap<>();
 
-
   public static Font loadVariableFont(String fontName, String resourcePath, int style, float fontSize) {
     if (loadedFonts.containsKey(fontName)) {
       return loadedFonts.get(fontName).deriveFont(style, fontSize);

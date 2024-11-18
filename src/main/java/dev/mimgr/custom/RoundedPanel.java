@@ -30,12 +30,12 @@ public class RoundedPanel extends JPanel {
     Graphics2D g2d = (Graphics2D) g;
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g2d.setColor(this.getBackground());
-    g2d.fillRoundRect(0, 0, getWidth(), getHeight(), this.borderRadius, this.borderRadius);
+    g2d.fillRoundRect(borderWidth / 2, borderWidth / 2, getWidth() - borderWidth, getHeight() - borderWidth, this.borderRadius, this.borderRadius);
     if (borderColor != null) {
       g2d.setColor(borderColor);
     }
     g2d.setStroke(new BasicStroke(borderWidth));
-    g2d.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, this.borderRadius, this.borderRadius);
+    g2d.drawRoundRect(borderWidth / 2, borderWidth / 2, getWidth() - borderWidth, getHeight() - borderWidth, this.borderRadius, this.borderRadius);
   }
 
   public void setBorderRadius(int radius) {
@@ -44,7 +44,7 @@ public class RoundedPanel extends JPanel {
   }
 
   public void setBorderWidth(int width) {
-    this.borderRadius = width;
+    this.borderWidth = width;
     repaint();
   }
 

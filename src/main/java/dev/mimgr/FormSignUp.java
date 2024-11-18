@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.event.DocumentEvent;

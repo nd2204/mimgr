@@ -3,6 +3,7 @@ package dev.mimgr.custom;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -25,11 +26,11 @@ public class MImageCellRenderer extends JLabel implements TableCellRenderer {
     if (value instanceof ImageIcon) {
       Icon icon = (Icon) value;
       if (icon.getIconHeight() > imageMaxSize) {
-        icon =  IconManager.resizeByAspectRatio((ImageIcon) value, imageMaxSize, imageMaxSize);
+        icon = IconManager.getRoundedIcon(IconManager.resizeByAspectRatio((ImageIcon) value, imageMaxSize, imageMaxSize), 15);
       }
       this.setIcon(icon);
     } else {
-      this.setIcon(null);
+      this.setIcon(defaultIcon);
     }
 
     // Set the background color based on selection
@@ -56,7 +57,9 @@ public class MImageCellRenderer extends JLabel implements TableCellRenderer {
   }
 
   private ColorScheme colors;
-  private int imageMaxSize = 60;
+  private Icon icon = null;
+  private static int imageMaxSize = 60;
+  private static Icon defaultIcon = IconManager.getIcon("image.png", imageMaxSize, imageMaxSize);
 }
 
 
