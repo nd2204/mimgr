@@ -8,8 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -17,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import dev.mimgr.component.NotificationPopup;
 import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
@@ -130,7 +129,8 @@ public class FormAddProduct extends JFrame {
         }
         else {
           ProductRecord.insert(name, price, description, stock_quantity, category_id, processDropData());
-          JOptionPane.showMessageDialog(null, "Success");
+          // JOptionPane.showMessageDialog(null, "Success");
+          PanelManager.createPopup(new NotificationPopup(name + " Added", NotificationPopup.NOTIFY_LEVEL_INFO, 8000));
           FormAddProduct.this.dispose();
         }
         return;

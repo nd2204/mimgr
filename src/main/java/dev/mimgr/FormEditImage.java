@@ -127,6 +127,7 @@ public class FormEditImage extends JFrame {
     this.setSize(1154, m_height);
     this.setLocationRelativeTo(null);
     this.add(mainPanel);
+    this.setTitle("Edit Image");
     mainPanel.add(currentEditImagePanel, BorderLayout.CENTER);
     mainPanel.add(sidebarPanel, BorderLayout.WEST);
     mainPanel.add(new TopPanel(), BorderLayout.NORTH);
@@ -298,7 +299,7 @@ public class FormEditImage extends JFrame {
       }
 
       private void checkFields() {
-        if (!tfName.getText().isEmpty() && !tfPrice.getText().isEmpty() && !tfStock.getText().isEmpty()) {
+        if (!tfName.getText().isEmpty()) {
           btnSubmit.setBackground(colors.m_green);
           btnSubmit.setBorderColor(colors.m_green);
           btnSubmit.setDefaultForeground(colors.m_fg_1);
@@ -319,8 +320,6 @@ public class FormEditImage extends JFrame {
     private EditImagePanel panel;
     private MTextArea taCaption;
     private MTextField tfName;
-    private MTextField tfPrice;
-    private MTextField tfStock;
   }
 
   private ResourceManager rm = ResourceManager.getInstance();

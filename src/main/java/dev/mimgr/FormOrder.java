@@ -16,13 +16,13 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import dev.mimgr.db.OrderRecord;
 import dev.mimgr.component.FilterOptionPanel;
 import dev.mimgr.component.OrderTableView;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
+import dev.mimgr.db.OrderRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -228,6 +228,11 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == this.btnCreateOrder) {
+      FormAddOrder jFrameAddOrder = new FormAddOrder();
+      jFrameAddOrder.setVisible(true);
+      // OrderTableView.setButtonRefreshOnClick(
+      //   jFrameAddOrder.getAddOrderSubmitButton()
+      // );
     }
 
     if (e.getSource() == this.btnApplyBulkAction) {

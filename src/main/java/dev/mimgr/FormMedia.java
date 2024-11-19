@@ -27,6 +27,7 @@ import javax.swing.event.DocumentListener;
 import dev.mimgr.component.FilterOptionPanel;
 import dev.mimgr.component.IMediaView;
 import dev.mimgr.component.MediaViewSwitcher;
+import dev.mimgr.component.NotificationPopup;
 import dev.mimgr.custom.DropContainerPanel;
 import dev.mimgr.custom.DropPanel;
 import dev.mimgr.custom.MButton;
@@ -270,14 +271,16 @@ public class FormMedia extends JPanel implements DocumentListener {
           IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
           List<ImageRecord> selectedImage = currentView.getSelectedImages();
           if (!selectedImage.isEmpty()) {
+            int selectedImagesCount = selectedImage.size();
             int response = JOptionPane.showConfirmDialog(
                 FormMedia.this,
-                "Delete " + selectedImage.size() + " items?",
+                "Delete " + selectedImagesCount + " items?",
                 "Confirm Delete",
                 JOptionPane.YES_NO_OPTION);
 
             if (response == JOptionPane.YES_OPTION) {
               currentView.deleteSelectedImages();
+              PanelManager.createPopup(new NotificationPopup("Deleted " + selectedImagesCount + " image(s)", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
             }
           } else {
             JOptionPane.showMessageDialog(null, "Nothing to delete");
@@ -382,11 +385,18 @@ public class FormMedia extends JPanel implements DocumentListener {
     this.filterOptionPanel = new FilterOptionPanel();
     this.filterOptionPanel.addFilterOption("All", buttonSetupGenerator.apply("All"), (e) -> {
       IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.getSelectedImages().clear();
       currentView.updateView(() -> ImageRecord.selectAll());
     });
-    this.filterOptionPanel.addFilterOption("Date", buttonSetupGenerator.apply("Date"), (e) -> {
+    this.filterOptionPanel.addFilterOption("Oldest", buttonSetupGenerator.apply("Oldest"), (e) -> {
       IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
-      currentView.updateView(() -> ImageRecord.selectAll());
+      currentView.getSelectedImages().clear();
+      currentView.updateView(() -> ImageRecord.selectAllOldest());
+    });
+    this.filterOptionPanel.addFilterOption("Newest", buttonSetupGenerator.apply("Newest"), (e) -> {
+      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.getSelectedImages().clear();
+      currentView.updateView(() -> ImageRecord.selectAllNewest());
     });
 
     this.mediaViewSwitcher = new MediaViewSwitcher();

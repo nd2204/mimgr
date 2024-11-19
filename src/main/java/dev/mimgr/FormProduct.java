@@ -14,14 +14,15 @@ import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import dev.mimgr.component.NotificationPopup;
 import dev.mimgr.component.ProductTableView;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.ProductRecord;
-import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.theme.ColorTheme;
+import dev.mimgr.theme.builtin.ColorScheme;
 
 /**
  *
@@ -200,14 +201,16 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
       }
 
       if (((String) this.cbBulkAction.getSelectedItem()).equals("Delete Permanently")) {
+        int selectedProductsCount = productTableView.getSelectedProducts().size();
         int response = JOptionPane.showConfirmDialog(
             this,
-            "Delete " + productTableView.getSelectedProducts().size() + " items?",
+            "Delete " + selectedProductsCount + " items?",
             "Confirm Delete",
             JOptionPane.YES_NO_OPTION);
 
         if (response == JOptionPane.YES_OPTION) {
           productTableView.deleteSelectedProducts();
+          PanelManager.createPopup(new NotificationPopup("Deleted " + selectedProductsCount + " product(s)", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
         }
       }
     }

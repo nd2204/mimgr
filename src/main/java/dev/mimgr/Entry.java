@@ -26,7 +26,7 @@ public class Entry extends JFrame {
     FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
     FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
 
-    theme.setColorScheme(ColorTheme.THEME_DARK_EVERFOREST);
+    theme.setColorScheme(ColorTheme.THEME_DARK_GRUVBOX);
 
     // Register startup panel
     UserRecord ur = SessionManager.loadSession();

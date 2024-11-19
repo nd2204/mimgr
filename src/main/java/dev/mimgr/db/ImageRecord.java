@@ -37,6 +37,14 @@ public class ImageRecord {
     TABLE, FIELD_NAME, FIELD_CAPTION, FIELD_URL, 
     FIELD_AUTHOR, FIELD_ID
   );
+  public static final String QUERY_SELECT_ALL_NEWEST = String.format(
+    "SELECT * FROM %s ORDER BY %s DESC",
+    TABLE, FIELD_CREATED_AT
+  );
+  public static final String QUERY_SELECT_ALL_OLDEST = String.format(
+    "SELECT * FROM %s ORDER BY %s ASC",
+    TABLE, FIELD_CREATED_AT
+  );
 
   public ImageRecord(ResultSet rs) throws SQLException {
     m_id             = rs.getInt(FIELD_ID);
@@ -145,5 +153,13 @@ public class ImageRecord {
       // TODO: handle exception
     }
     return "N/A";
+  }
+
+  public static ResultSet selectAllNewest() {
+    return DBQueries.select(QUERY_SELECT_ALL_NEWEST);
+  }
+
+  public static ResultSet selectAllOldest() {
+    return DBQueries.select(QUERY_SELECT_ALL_OLDEST);
   }
 }
