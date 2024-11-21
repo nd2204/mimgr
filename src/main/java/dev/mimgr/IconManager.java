@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -183,26 +184,24 @@ public class IconManager {
     BufferedImage image = iconToBufferedImage(icon);
     int w = image.getWidth();
     int h = image.getHeight();
-    BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 
-    Graphics2D g2 = output.createGraphics();
-    // Enable anti-aliasing and quality rendering
+    // Create a rounded rectangle mask
+    BufferedImage mask = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g2 = mask.createGraphics();
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-    // Create a rounded rectangle shape
-    Shape clipShape = new RoundRectangle2D.Float(0, 0, w, h, cornerRadius, cornerRadius);
-
-    // Set the clipping area
-    g2.setClip(clipShape);
-
-    // Draw the original image into the rounded area
-    g2.drawImage(image, 0, 0, null);
-
+    g2.fill(new RoundRectangle2D.Float(0, 0, w, h, cornerRadius, cornerRadius));
     g2.dispose();
 
-    return new ImageIcon(output);
-}
+    // Apply the mask to the image
+    BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g = output.createGraphics();
+    g.drawImage(image, 0, 0, null);
+    g.setComposite(AlphaComposite.DstIn);
+    g.drawImage(mask, 0, 0, null);
+    g.dispose();
+
+    return new ImageIcon(output); 
+  }
 
   /**
      * Clears the icon cache to free memory.

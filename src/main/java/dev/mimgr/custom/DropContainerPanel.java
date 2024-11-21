@@ -149,14 +149,17 @@ public class DropContainerPanel extends JPanel implements ActionListener {
 
   public static MButton createButton(Icon icon) {
     MButton button = new MButton();
+    button.setBorderWidth(3);
     if (icon != null) {
-      int size = 100 - button.getBorderWidth() * 4;
+      int size = 100 - button.getBorderWidth() * 2;
       button.setIcon(
-        IconManager.resizeByAspectRatio(icon, size, size)
+        IconManager.getRoundedIcon(
+          IconManager.resizeByAspectRatio(icon, size, size),
+          16
+        )
       );
     }
-    button.setBorderWidth(2);
-    button.setBorderRadius(0);
+    button.setBorderRadius(16);
     button.setFont(FontManager.getFont("NunitoBold", 14f));
     button.setPreferredSize(new Dimension(100, 100));
     button.setMaximumSize(new Dimension(100, 100));

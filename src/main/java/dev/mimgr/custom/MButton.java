@@ -70,14 +70,14 @@ public class MButton extends JButton implements MouseListener {
   }
 
   private void drawBackground(Graphics2D g2) {
-    if (this.clickBackgroundColor != null && getModel().isPressed()) {
+    if (this.clickBackgroundColor != null && isMousePressed) {
       g2.setColor(this.clickBackgroundColor);
     } else if (this.hoverBackgroundColor != null && getModel().isRollover()) {
       g2.setColor(this.hoverBackgroundColor);
     } else {
       g2.setColor(getBackground());
     }
-    g2.fillRoundRect(0, 0, getWidth(), getHeight(), borderRadius, borderRadius);
+    g2.fillRoundRect(borderWidth/2, borderWidth/2, getWidth() - borderWidth, getHeight() - borderWidth, borderRadius, borderRadius);
   }
 
   private void drawBorder(Graphics2D g2) {
@@ -89,7 +89,7 @@ public class MButton extends JButton implements MouseListener {
       g2.setColor(this.borderColor);
     }
     g2.setStroke(new BasicStroke(this.borderWidth));
-    g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, borderRadius, borderRadius);
+    g2.drawRoundRect(borderWidth / 2, borderWidth / 2, getWidth() - borderWidth, getHeight() - borderWidth, borderRadius, borderRadius);
   }
 
   private void drawText(Graphics g) {
@@ -228,11 +228,13 @@ public class MButton extends JButton implements MouseListener {
 
   @Override
   public void mouseReleased(MouseEvent e) {
+    isMousePressed = false;
     repaint();
   }
 
   @Override
   public void mousePressed(MouseEvent e) {
+    isMousePressed = true;
     repaint();
   }
 
@@ -257,6 +259,8 @@ public class MButton extends JButton implements MouseListener {
   private final int iconPadding      = 20;
   private Icon prefixIcon            = null;
   private Icon postfixIcon           = null;
+
+  private boolean isMousePressed = false;
 
   public static final int ICON_PREFIX  = 1;
   public static final int ICON_POSTFIX = 2;

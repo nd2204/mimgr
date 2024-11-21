@@ -32,7 +32,7 @@ public class MTable extends JTable {
     borders[0] = borders[1] = borders[2] = borders[3] = false;
     this.borders[2] = true;
 
-    this.getTableHeader().setDefaultRenderer(new TableHeader());
+    this.getTableHeader().setDefaultRenderer(new MTableHeaderRenderer());
     this.getTableHeader().setPreferredSize(new Dimension(0, 45));
     this.setShowGrid(false);
     this.setIntercellSpacing(new Dimension(0, 0));
@@ -50,37 +50,6 @@ public class MTable extends JTable {
     JPanel panel = new JPanel();
     panel.setBackground(headerCellColor);
     sp.setCorner(JScrollPane.UPPER_RIGHT_CORNER, panel);
-  }
-
-  public class TableHeader extends DefaultTableCellRenderer {
-    @Override
-    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
-      Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
-      comp.setBackground(headerCellColor);
-      comp.setForeground(headerCellTextColor);
-      comp.setFont(FontManager.getFont("NunitoBold", 14f));
-      borders[0] = true;
-      borders[2] = true;
-      setBorder(new EmptyBorder(0, 5, 0, 5));
-      return comp;
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-      super.paintComponent(g);
-
-      // Draw the border using the specified color
-      Graphics2D g2 = (Graphics2D) g.create();
-      g2.setColor(borderColor);
-
-      // Draw top, left, bottom, and right borders
-      if (borders[0]) g2.drawLine(0, 0, getWidth(), 0); // Top border
-      if (borders[1]) g2.drawLine(0, 0, 0, getHeight()); // Left border
-      if (borders[2]) g2.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1); // Bottom border
-      if (borders[3]) g2.drawLine(getWidth() - 1, 0, getWidth() - 1, getHeight()); // Right border
-
-      g2.dispose();
-    }
   }
 
   public class TableCell extends DefaultTableCellRenderer {

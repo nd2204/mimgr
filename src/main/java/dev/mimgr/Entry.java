@@ -10,7 +10,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import dev.mimgr.custom.MFrame;
 import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.UserRecord;
 import dev.mimgr.theme.ColorTheme;

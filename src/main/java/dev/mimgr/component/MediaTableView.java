@@ -13,10 +13,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -27,6 +30,7 @@ import javax.swing.table.DefaultTableModel;
 import dev.mimgr.EditImagePanel;
 import dev.mimgr.FormEditImage;
 import dev.mimgr.IconManager;
+import dev.mimgr.PanelManager;
 import dev.mimgr.TableView;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MScrollPane;
@@ -46,13 +50,45 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
     this.model = new DefaultTableModel() {
       @Override
       public Class<?> getColumnClass(int columnIndex) {
-        return columnIndex == 0 ? Boolean.class : String.class;
+        return (columnIndex == 0 || columnIndex == 7) ? Boolean.class : String.class;
       }
 
       @Override
       public boolean isCellEditable(int row, int column) {
-        return column == 0;
+        return column == 0 || column == 7;
       }
+    };
+
+    this.editOperation = (list) -> {
+      FormEditImage frame = new FormEditImage(list);
+      List<EditImagePanel> EditImagePanels = frame.getEditImagePanels();
+      frame.setVisible(true);
+      for (EditImagePanel panel : EditImagePanels) {
+        setButtonRefreshOnClick(panel.getDeleteComponent());
+        setButtonRefreshOnClick(panel.getSubmitComponent());
+      }
+    };
+
+    this.deleteOperation = (list) -> {
+      if (!list.isEmpty()) {
+        int selectedImagesCount = list.size();
+        int response = JOptionPane.showConfirmDialog(
+          this,
+          "Delete " + selectedImagesCount + " items?",
+          "Confirm Delete",
+          JOptionPane.YES_NO_OPTION);
+
+        if (response == JOptionPane.YES_OPTION) {
+          deleteSelectedImages();
+          PanelManager.createPopup(new NotificationPopup("Deleted " + selectedImagesCount + " image(s)", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
+        }
+      } else {
+        JOptionPane.showMessageDialog(null, "Nothing to delete");
+      }
+    };
+
+    this.doubleClickOperation = (row) -> {
+      table.setValueAt(!(Boolean) table.getValueAt(row, 0), row, 0);
     };
 
     this.table.setFillsViewportHeight(true);
@@ -68,13 +104,7 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
         if (e.getClickCount() == 2) {
           int row = table.getSelectedRow();
           if (row != -1) {
-            FormEditImage frame = new FormEditImage(imageList.get(row));
-            List<EditImagePanel> EditImagePanels = frame.getEditImagePanels();
-            frame.setVisible(true);
-            for (EditImagePanel panel : EditImagePanels) {
-              setButtonRefreshOnClick(panel.getDeleteComponent());
-              setButtonRefreshOnClick(panel.getSubmitComponent());
-            }
+            doubleClickOperation.accept(row);
           }
         }
       }
@@ -92,10 +122,12 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
     this.tv.add_column(table, "Date", TableView.setup_default_column());
     this.tv.add_column(table, "Author", TableView.setup_default_column());
     this.tv.add_column(table, "Caption", TableView.setup_default_column());
+    this.tv.add_column(table, "Action", TableView.setup_action_button_column());
     this.tv.load_column(table, model);
 
     model.addTableModelListener(this);
-    updateView(() -> ImageRecord.selectAll());
+    defaultQueryInvoker = () -> ImageRecord.selectAllNewest();
+    updateView(defaultQueryInvoker);
 
     this.setLayout(new BorderLayout());
     this.add(tableScrollPane);
@@ -116,14 +148,24 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
         if (icon == null) {
           icon = IconManager.getIcon("image.png", colors.m_grey_0);
         }
+
+        List<JButton> buttons = new ArrayList<>();
+        buttons.add(TableView.createEditActionButton(
+          (e) -> {editOperation.accept(List.of(ir));}
+        ));
+        buttons.add(TableView.createDeleteActionButton(
+          (e) -> {deleteOperation.accept(List.of(ir));}
+        ));
+
         model.addRow(new Object[] {
-            Boolean.FALSE,
-            icon,
-            ir.m_name,
-            ir.m_url.substring(ir.m_url.lastIndexOf("/") + 1),
-            ir.m_created_at,
-            ImageRecord.getImageAuthor(ir),
-            ir.m_caption
+          Boolean.FALSE,
+          icon,
+          ir.m_name,
+          ir.m_url.substring(ir.m_url.lastIndexOf("/") + 1),
+          ir.m_created_at,
+          ImageRecord.getImageAuthor(ir),
+          ir.m_caption,
+          buttons
         });
       }
     } catch (SQLException e) {
@@ -152,7 +194,7 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
 
   @Override
   public void reset() {
-    updateTable(() -> ImageRecord.selectAll());
+    updateTable(this.defaultQueryInvoker);
   }
 
   @Override
@@ -187,27 +229,39 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
     } catch (IOException e) {}
   }
 
+  public void setDefaultQueryInvoker(Supplier<ResultSet> invoker) {
+    this.defaultQueryInvoker = invoker;
+    refresh();
+  }
+
   @Override
   public void tableChanged(TableModelEvent e) {
     int row = e.getFirstRow();
     int column = e.getColumn();
     switch (e.getType()) {
       case TableModelEvent.UPDATE:
-        Object newValue = model.getValueAt(row, column);
-        if (column == 0) {
-          if (newValue instanceof Boolean) {
-            if ((Boolean) newValue) {
-              selectedImages.put(row, imageList.get(row));
-            } else {
-              selectedImages.remove(row);
-            }
+      Object newValue = model.getValueAt(row, column);
+      if (column == 0) {
+        if (newValue instanceof Boolean) {
+          if ((Boolean) newValue) {
+            selectedImages.put(row, imageList.get(row));
+          } else {
+            selectedImages.remove(row);
           }
         }
+      }
+        break;
+      default:
+        selectedImages.clear();
         break;
     }
   }
 
+  private Consumer<Integer> doubleClickOperation;
+  private Consumer<Iterable<ImageRecord>> editOperation;
+  private Consumer<List<ImageRecord>> deleteOperation;
   private Supplier<ResultSet> currentQueryInvoker;
+  private Supplier<ResultSet> defaultQueryInvoker;
   private HashMap<Integer, ImageRecord> selectedImages = new HashMap<>();
   private ArrayList<ImageRecord> imageList = new ArrayList<>();
   private JScrollPane       tableScrollPane;

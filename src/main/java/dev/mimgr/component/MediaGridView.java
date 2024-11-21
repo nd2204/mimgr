@@ -132,14 +132,16 @@ public class MediaGridView extends JPanel implements IMediaView {
     try {
       while (queryResult.next()) {
         ImageRecord ir = new ImageRecord(queryResult);
-        button = DropContainerPanel.createButton(IconManager.loadIcon(
-          Paths.get(ir.m_url).toAbsolutePath().toFile()
-        ));
+        button = DropContainerPanel.createButton(
+          IconManager.getRoundedIcon(
+            IconManager.loadIcon(Paths.get(ir.m_url).toAbsolutePath().toFile()),
+            16
+          )
+        );
         button.setBackground(colors.m_bg_dim);
         button.setForeground(colors.m_fg_0);
         button.setHoverBorderColor(colors.m_blue);
         button.setBorderColor(colors.m_bg_5);
-        button.setBorderWidth(2);
         button.addActionListener(buttonListener);
         buttonToImage.put(button, ir);
         buttons.add(button);
@@ -306,7 +308,7 @@ public class MediaGridView extends JPanel implements IMediaView {
   private ColorScheme colors;
   private JPanel pnImageBtns;
   private MScrollPane scrollPane;
-  private final int imageSize = 100; // Fixed size for images
+  private final int imageSize = 90; // Fixed size for images
   private final int rowHeight = 110;  // Fixed height for each row
 }
 

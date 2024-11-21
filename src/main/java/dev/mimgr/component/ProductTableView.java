@@ -6,10 +6,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
@@ -24,6 +27,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import dev.mimgr.IconManager;
+import dev.mimgr.PanelManager;
 import dev.mimgr.TableView;
 import dev.mimgr.UploadPanel;
 import dev.mimgr.custom.MButton;
@@ -50,9 +54,42 @@ public class ProductTableView extends JPanel implements TableModelListener {
 
       @Override
       public boolean isCellEditable(int row, int column) {
-        return column == 0;
+        return column == 0 || column == 6;
       }
     };
+
+    this.editOperation = (list) -> {
+      FormEditProduct frame = new FormEditProduct(list);
+      List<UploadPanel> uploadPanels = frame.getUploadPanels();
+      frame.setVisible(true);
+      for (UploadPanel panel : uploadPanels) {
+        setButtonRefreshOnClick(panel.getDeleteComponent());
+        setButtonRefreshOnClick(panel.getSubmitComponent());
+      }
+    };
+
+    this.deleteOperation = (list) -> {
+      if (!list.isEmpty()) {
+        int selectedImagesCount = list.size();
+        int response = JOptionPane.showConfirmDialog(
+          this,
+          "Delete " + selectedImagesCount + " items?",
+          "Confirm Delete",
+          JOptionPane.YES_NO_OPTION);
+
+        if (response == JOptionPane.YES_OPTION) {
+          deleteSelectedProducts();
+          PanelManager.createPopup(new NotificationPopup("Deleted " + selectedImagesCount + " image(s)", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
+        }
+      } else {
+        JOptionPane.showMessageDialog(null, "Nothing to delete");
+      }
+    };
+
+    this.doubleClickOperation = (row) -> {
+      table.setValueAt(!(Boolean) table.getValueAt(row, 0), row, 0);
+    };
+
 
     this.table.setFillsViewportHeight(true);
     this.table.setRowHeight(100);
@@ -71,6 +108,7 @@ public class ProductTableView extends JPanel implements TableModelListener {
     tv.add_column(table, "Price", TableView.setup_custom_column(80, 80, 120));
     tv.add_column(table, "Stock", TableView.setup_custom_column(50, 50, 100));
     tv.add_column(table, "Description", TableView.setup_default_column());
+    tv.add_column(table, "Action", TableView.setup_action_button_column());
     tv.load_column(table, model);
 
     model.addTableModelListener(this);
@@ -119,6 +157,15 @@ public class ProductTableView extends JPanel implements TableModelListener {
             icon = testIcon;
           }
         }
+
+        List<JButton> buttons = new ArrayList<>();
+        buttons.add(TableView.createEditActionButton(
+          (e) -> {editOperation.accept(List.of(pr));}
+        ));
+        buttons.add(TableView.createDeleteActionButton(
+          (e) -> {deleteOperation.accept(List.of(pr));}
+        ));
+
         productList.add(pr);
         model.addRow(new Object[] {
             Boolean.FALSE,
@@ -126,7 +173,8 @@ public class ProductTableView extends JPanel implements TableModelListener {
             pr.m_name,
             "€ " + pr.m_price,
             pr.m_stock_quantity,
-            pr.m_description
+            pr.m_description,
+            buttons,
         });
       }
     } catch (SQLException e) {
@@ -188,7 +236,15 @@ public class ProductTableView extends JPanel implements TableModelListener {
     });
   }
 
+  public void setDoubleClickOperation() {
+
+  }
+
+  private Consumer<Integer> doubleClickOperation;
+  private Consumer<Iterable<ProductRecord>> editOperation;
+  private Consumer<List<ProductRecord>> deleteOperation;
   private Supplier<ResultSet> currentQueryInvoker;
+  private Supplier<ResultSet> defaultQueryInvoker;
   private HashMap<Integer, ProductRecord> selectedProducts = new HashMap<>();
   private ArrayList<ProductRecord> productList = new ArrayList<>();
   private JScrollPane       tableScrollPane;

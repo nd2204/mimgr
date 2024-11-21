@@ -137,19 +137,20 @@ public class FormMedia extends JPanel implements DocumentListener {
       cc.gridwidth = 1;
       // Row 1 ----------------------------------------
 
-      cc.weightx = 1.0;
-      cc.insets = new Insets(5, 15, 0, 5);
-      cc.anchor = GridBagConstraints.FIRST_LINE_START;
-      cc.fill = GridBagConstraints.BOTH;
-      contentContainer.add(filterTextField, cc);
-      cc.gridx++;
-
       cc.ipadx = 50;
       cc.weightx = 0.0;
+      cc.insets = new Insets(5, 15, 0, 5);
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
       cc.fill = GridBagConstraints.VERTICAL;
-      cc.insets = new Insets(5, 5, 0, 0);
       contentContainer.add(layoutSelectorComponent, cc);
+      cc.gridx++;
+
+      cc.ipadx = 0;
+      cc.weightx = 1.0;
+      cc.anchor = GridBagConstraints.FIRST_LINE_START;
+      cc.fill = GridBagConstraints.BOTH;
+      cc.insets = new Insets(5, 5, 0, 0);
+      contentContainer.add(filterTextField, cc);
       cc.gridx++;
 
       cc.weightx = 0.0;
@@ -236,6 +237,7 @@ public class FormMedia extends JPanel implements DocumentListener {
         // Do something with the data
         IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
         List<Object> objs = FormMedia.this.droppedItemsPanel.getAllData();
+        int count = 0;
         for (Object obj : objs) {
           if (obj instanceof File file) {
             Path newFilePath = rm.moveStagedFileToUploadDir(file);
@@ -245,10 +247,16 @@ public class FormMedia extends JPanel implements DocumentListener {
                 file.getName(),
                 "",
                 SessionManager.getCurrentUser().m_id);
-            currentView.refresh();
-            dropPanel.setVisible(false);
+            count++;
           }
         }
+        dropPanel.setVisible(false);
+        currentView.refresh();
+        PanelManager.createPopup(new NotificationPopup(
+          "Added " + count + " image(s)",
+          NotificationPopup.NOTIFY_LEVEL_INFO,
+          5000
+        ));
         // Clean temp file from download
         rm.cleanTempFiles();
         // Clear the data
@@ -387,18 +395,21 @@ public class FormMedia extends JPanel implements DocumentListener {
     this.filterOptionPanel = new FilterOptionPanel();
     this.filterOptionPanel.addFilterOption("All", buttonSetupGenerator.apply("All"), (e) -> {
       IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
-      currentView.getSelectedImages().clear();
-      currentView.updateView(() -> ImageRecord.selectAll());
+      currentView.updateView(() -> ImageRecord.selectAllNewest());
     });
     this.filterOptionPanel.addFilterOption("Oldest", buttonSetupGenerator.apply("Oldest"), (e) -> {
       IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
-      currentView.getSelectedImages().clear();
       currentView.updateView(() -> ImageRecord.selectAllOldest());
     });
     this.filterOptionPanel.addFilterOption("Newest", buttonSetupGenerator.apply("Newest"), (e) -> {
       IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
-      currentView.getSelectedImages().clear();
       currentView.updateView(() -> ImageRecord.selectAllNewest());
+    });
+    this.filterOptionPanel.addFilterOption("Mine", buttonSetupGenerator.apply("Mine"), (e) -> {
+      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.updateView(
+        () -> ImageRecord.selectByField(ImageRecord.FIELD_AUTHOR, String.valueOf(SessionManager.getCurrentUser().m_id))
+      );
     });
 
     this.mediaViewSwitcher = new MediaViewSwitcher();

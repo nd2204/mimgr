@@ -1,15 +1,22 @@
 package dev.mimgr;
 
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
+import javax.swing.JButton;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
 import dev.mimgr.custom.*;
+import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class TableView {
+  private static ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
   public static BiConsumer<MTable, Integer> setup_checkbox_column(ColorScheme colors) {
     return (table, colIndex) -> {
       TableColumn column = table.getColumnModel().getColumn(colIndex);
@@ -32,6 +39,17 @@ public class TableView {
       column.setPreferredWidth(50);
       column.setMaxWidth(50);
       column.setMinWidth(50);
+    };
+  }
+
+  public static BiConsumer<MTable, Integer> setup_action_button_column() {
+    return (table, colIndex) -> {
+      TableColumn column = table.getColumnModel().getColumn(colIndex);
+      column.setHeaderRenderer(new MTableHeaderRenderer(SwingConstants.CENTER));
+      column.setMinWidth(80);
+      column.setPreferredWidth(80);
+      column.setCellEditor(new MActionButtonCellEditor());
+      column.setCellRenderer(new MActionButtonCellRenderer());
     };
   }
 
@@ -59,6 +77,7 @@ public class TableView {
   public static BiConsumer<MTable, Integer> setup_default_column() {
     return (table, colIndex) -> {
       TableColumn column = table.getColumnModel().getColumn(colIndex);
+      column.setHeaderRenderer(new MTableHeaderRenderer(SwingConstants.LEFT));
       column.setPreferredWidth(150);
     };
   }
@@ -95,5 +114,29 @@ public class TableView {
     public int colIndex;
     public String colName;
     public BiConsumer<MTable, Integer> colSetupFunction;
+  }
+
+  public static JButton createEditActionButton(ActionListener actionListener) {
+    MButton button = new MButton(IconManager.getIcon("edit.png", 14, 14, colors.m_grey_0));
+    button.setPreferredSize(new Dimension(32, 32));
+    button.setMaximumSize(new Dimension(32, 32));
+    button.setBackground(colors.m_bg_2);
+    button.setBorderColor(colors.m_bg_2);
+    button.setClickBackgroundColor(colors.m_bg_dim);
+    button.setBorderRadius(32);
+    button.addActionListener(actionListener);
+    return button;
+  }
+
+  public static JButton createDeleteActionButton(ActionListener actionListener) {
+    MButton button = new MButton(IconManager.getIcon("trash_bin.png", 14, 14, colors.m_red));
+    button.setPreferredSize(new Dimension(32, 32));
+    button.setMaximumSize(new Dimension(32, 32));
+    button.setBackground(colors.m_bg_2);
+    button.setBorderColor(colors.m_bg_2);
+    button.setBorderRadius(32);
+    button.setClickBackgroundColor(colors.m_bg_dim);
+    button.addActionListener(actionListener);
+    return button;
   }
 }
