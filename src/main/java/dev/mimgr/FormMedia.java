@@ -127,12 +127,14 @@ public class FormMedia extends JPanel implements DocumentListener {
       cc.weightx = 1.0;
       cc.anchor = GridBagConstraints.FIRST_LINE_START;
       cc.fill = GridBagConstraints.BOTH;
+      cc.gridwidth = 4;
       cc.insets = new Insets(5, 5, 0, 5);
       contentContainer.add(filterOptionPanel, cc);
 
       // End Row 0 ------------------------------------
       cc.gridx = 0;
       cc.gridy = 1;
+      cc.gridwidth = 1;
       // Row 1 ----------------------------------------
 
       cc.weightx = 1.0;

@@ -142,6 +142,7 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     this.btnExport.setClickBackgroundColor(colors.m_bg_dim);
     this.btnExport.setForeground(colors.m_fg_0);
     this.btnExport.setFont(nunito_extrabold_14);
+    this.btnExport.addActionListener(this);
 
     this.btnAddProduct.setBackground(colors.m_bg_2);
     this.btnAddProduct.setBorderColor(colors.m_bg_2);
@@ -185,6 +186,11 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
       productTableView.setButtonRefreshOnClick(
         jFrameAddProduct.getAddProductSubmitButton()
       );
+    }
+
+    if (e.getSource() == this.btnExport) {
+      FormExport jFrameExport = new FormExport();
+      jFrameExport.setVisible(true);
     }
 
     if (e.getSource() == this.btnApplyBulkAction) {

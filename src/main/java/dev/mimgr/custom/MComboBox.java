@@ -28,6 +28,7 @@ import javax.swing.plaf.basic.ComboPopup;
 
 import dev.mimgr.FontManager;
 import dev.mimgr.db.CategoryRecord;
+import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -116,7 +117,12 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
         // Trim leading/trailing whitespace from the category name for the text field
         cr.m_name = cr.m_name.trim();
         super.setItem(cr);
-      } else {
+      }
+      else if (item instanceof ProductRecord pr) {
+        pr.m_name = pr.m_name.trim();
+        super.setItem(pr.m_name);
+      }
+      else {
         super.setItem(item);
       }
     }
@@ -150,7 +156,18 @@ public class MComboBox<T> extends JComboBox<T> implements FocusListener {
         setBackground(colors.m_bg_dim);
         setForeground(colors.m_grey_0);
       }
-      setText(value != null ? value.toString() : ""); // Display item text
+      // if (value instanceof CategoryRecord cr) {
+      //   // Trim leading/trailing whitespace from the category name for the text field
+      //   cr.m_name = cr.m_name.trim();
+      //   setText(cr.m_name != null ? cr.m_name : ""); // Display item text
+      // }
+      if (value instanceof ProductRecord pr) {
+        pr.m_name = pr.m_name.trim();
+        setText(pr.m_name != null ? pr.m_name : ""); // Display item text
+      }
+      else {
+        setText(value != null ? value.toString() : ""); // Display item text
+      }
       return this;
     }
   }

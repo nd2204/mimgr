@@ -43,10 +43,12 @@ public class ResourceManager {
 
     projectPath = Paths.get("").toAbsolutePath();
     uploadPath = Paths.get("uploads").toAbsolutePath();
+    exportPath = Paths.get("exports").toAbsolutePath();
     tempPath = Path.of(System.getProperty("java.io.tmpdir")).toAbsolutePath().resolve(APP_NAME);
 
     createDirIfNotExists(appDataPath.toFile());
     createDirIfNotExists(uploadPath.toFile());
+    createDirIfNotExists(exportPath.toFile());
     createDirIfNotExists(tempPath.toFile());
   }
 
@@ -70,6 +72,10 @@ public class ResourceManager {
 
   public Path getUploadPath() {
     return this.uploadPath;
+  }
+
+  public Path getExportPath() {
+    return this.exportPath;
   }
 
   public Path getTempPath() {
@@ -229,5 +235,6 @@ public class ResourceManager {
   private Path appDataPath;
   private Path tempPath;
   private Path uploadPath;
+  private Path exportPath;
   private Path projectPath;
 }

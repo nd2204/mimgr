@@ -15,7 +15,7 @@ public class CategoryRecord {
   public static final String FIELD_PARENT_ID  = "parent_id";
   public static final String FIELD_NAME       = "category_name";
 
-  public static final String QUERY_SELECT_ALL = String.format("SELECT * FROM %s", TABLE);
+  public static final String QUERY_SELECT_ALL = String.format("SELECT * FROM %s WHERE %s IS NOT NULL", TABLE, FIELD_NAME);
   public static final String QUERY_SELECT_BY_KEY = String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_ID);
   public static final String QUERY_SELECT_BY_NAME = String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_NAME);
 
