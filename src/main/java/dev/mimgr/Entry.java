@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import dev.mimgr.custom.MFrame;
 import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.UserRecord;
 import dev.mimgr.theme.ColorTheme;
@@ -17,35 +18,14 @@ import dev.mimgr.utils.ResourceManager;
 
 public class Entry extends JFrame {
   Entry() {
-    FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
-    FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
-    FontManager.loadFont("RobotoMonoBold", "RobotoMono-Bold.ttf");
-    FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
-    FontManager.loadFont("Nunito", "Nunito-Regular.ttf");
-    FontManager.loadFont("NunitoBold", "Nunito-Bold.ttf");
-    FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
-    FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
-
-    theme.setColorScheme(ColorTheme.THEME_DARK_GRUVBOX);
-
-    // Register startup panel
-    UserRecord ur = SessionManager.loadSession();
-    if (ur == null) {
-      registerLoginSignup();
-    } else {
-      registerDashBoard();
-    }
-
-    for (JPanel panel : PanelManager.getAllPanels()) {
-      System.out.println(panel);
-    }
+    theme.setColorScheme(ColorTheme.THEME_DARK_EVERFOREST);
 
     // Main window
-    this.setLayout(new BorderLayout());
+    // this.setLayout(new BorderLayout());
     this.setMinimumSize(new Dimension(854, 480));
     this.setTitle("Mimgr");
     this.setSize(m_width, m_height);
-    this.add(PanelManager.get_main_panel());
+    this.add(PanelManager.get_main_panel(), BorderLayout.CENTER);
     this.setLocationRelativeTo(null);
     this.setVisible(true);
     this.requestFocus();
@@ -81,7 +61,28 @@ public class Entry extends JFrame {
   }
 
   public static void main(String arg[]) {
+    FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
+    FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
+    FontManager.loadFont("RobotoMonoBold", "RobotoMono-Bold.ttf");
+    FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
+    FontManager.loadFont("Nunito", "Nunito-Regular.ttf");
+    FontManager.loadFont("NunitoBold", "Nunito-Bold.ttf");
+    FontManager.loadFont("NunitoSemiBold", "Nunito-SemiBold.ttf");
+    FontManager.loadFont("NunitoExtraBold", "Nunito-ExtraBold.ttf");
+
     SwingUtilities.invokeLater(() -> {
+      // Register startup panel
+      UserRecord ur = SessionManager.loadSession();
+      if (ur == null) {
+        registerLoginSignup();
+      } else {
+        registerDashBoard();
+      }
+
+      for (JPanel panel : PanelManager.getAllPanels()) {
+        System.out.println(panel);
+      }
+
       new Entry();
     });
   }
