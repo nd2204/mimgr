@@ -84,9 +84,6 @@ public class SidebarPanel extends RoundedPanel implements ActionListener {
     // Skip if the pressed menu is the current menu
 
     if (e.getSource() instanceof MButton sourceButton) {
-      if (sourceButton == pButton) {
-        return;
-      }
       JPanel formPanel = buttonToPanel.get(sourceButton);
       if (formPanel == null) {
         System.err.println("No panel associated with " + sourceButton.getName());

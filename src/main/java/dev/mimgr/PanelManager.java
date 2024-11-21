@@ -2,17 +2,23 @@ package dev.mimgr;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Panel;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.swing.*;
 
 import dev.mimgr.component.PopupPanel.IPopup;
+import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.component.NotificationPopup;
 
 public class PanelManager {
@@ -25,7 +31,9 @@ public class PanelManager {
 
   // Maps to store panels and popups
   private static Map<String, JPanel> panelMap = new HashMap<>();
+  private static Map<String, JPanel> floatingPanelMap = new HashMap<>();
   private static Map<String, JPanel> popupMap = new LinkedHashMap<>();
+  // private static Map<String, Map<String,IPopup>> popupMap;
 
   private static String currentPanelId;
 
@@ -46,6 +54,7 @@ public class PanelManager {
         Dimension size = m_main_panel.getSize();
         m_base_panel.setBounds(0, 0, size.width, size.height);
         repositionPopups();
+        repositionFloatingPanel();
         m_base_panel.revalidate();
       }
     });
@@ -108,6 +117,27 @@ public class PanelManager {
     repositionPopups();
   }
 
+  public static void registerFloatingPanel(JPanel panel, String id) {
+    m_main_panel.add(panel, JLayeredPane.MODAL_LAYER);
+    panel.setName(id);
+    floatingPanelMap.put(id, panel);
+    panel.setOpaque(false); // Ensure the popup background is visible
+    SwingUtilities.invokeLater(() -> panel.setVisible(false));
+    repositionFloatingPanel();
+  }
+
+  public static JPanel getFloatingPanel(String id) {
+    return floatingPanelMap.get(id);
+  }
+
+  public static void unregisterFloatingPanel(String id) {
+    JPanel popupPanel = floatingPanelMap.remove(id);
+    if (popupPanel != null) {
+      m_main_panel.remove(popupPanel);
+      repositionPopups();
+    }
+  }
+
   /**
      * Removes a popup panel by ID.
      *
@@ -118,8 +148,6 @@ public class PanelManager {
     if (popupPanel != null) {
       m_main_panel.remove(popupPanel);
       repositionPopups();
-      m_main_panel.revalidate();
-      m_main_panel.repaint();
     }
   }
 
@@ -138,6 +166,19 @@ public class PanelManager {
       popupPanel.setBounds(x, y, popupSize.width, popupSize.height);
 
       yOffset += popupSize.height + POPUP_PADDING;
+    }
+
+    m_main_panel.revalidate();
+    m_main_panel.repaint();
+  }
+
+  private static void repositionFloatingPanel() {
+    for (JPanel floatingPanel : floatingPanelMap.values()) {
+      Dimension size = floatingPanel.getPreferredSize();
+      int x = POPUP_PADDING;
+      int y = POPUP_PADDING;
+
+      floatingPanel.setBounds(x, y, size.width - POPUP_PADDING, size.height - POPUP_PADDING);
     }
 
     m_main_panel.revalidate();
@@ -198,20 +239,23 @@ public class PanelManager {
 
     // Add a button to show popups
     JButton popupButton = new JButton("Show Popup");
+    boolean modalVisible = false;
     popupButton.addActionListener(e -> {
-      PanelManager.createPopup(new NotificationPopup(
-        """
-        THIS IS A VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
-        VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
-        VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
-        VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
-        VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
-        VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
-        VERY VERY VERY VERY VERY VERY VERY VERY LONG TEXT
-        """,
-        NotificationPopup.NOTIFY_LEVEL_WARNING,
-        5000
-      ));
+      popupButton.setEnabled(false);
+      showOverlayModal(frame);
+      // PanelManager.createPopup(new NotificationPopup(
+      //   """
+      //   THIS IS A VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
+      //   VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
+      //   VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
+      //   VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
+      //   VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
+      //   VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY VERY
+      //   VERY VERY VERY VERY VERY VERY VERY VERY LONG TEXT
+      //   """,
+      //   NotificationPopup.NOTIFY_LEVEL_WARNING,
+      //   5000
+      // ));
     });
     panel1.add(popupButton);
 
@@ -220,5 +264,40 @@ public class PanelManager {
     frame.add(PanelManager.get_main_panel(), BorderLayout.CENTER);
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
+  }
+
+  private static void showOverlayModal(JFrame parent) {
+    // Create a glass pane for dimming the background
+    JPanel glassPane = new JPanel();
+    glassPane.setBackground(new Color(0, 0, 0, 150)); // Semi-transparent black
+    glassPane.setBounds(0, 0, parent.getWidth(), parent.getHeight());
+    glassPane.setLayout(null);
+
+    // Create the modal popup
+    JDialog dialog = new JDialog(parent, "Overlay Modal", Dialog.ModalityType.APPLICATION_MODAL);
+    dialog.setSize(300, 200);
+    dialog.setUndecorated(true); // Remove title bar for cleaner look
+    dialog.setLayout(new FlowLayout());
+
+    // Position the dialog in the center of the parent frame
+    dialog.setLocationRelativeTo(parent);
+
+    // Add components to the dialog
+    JLabel label = new JLabel("This is an overlay modal popup!");
+    JButton closeButton = new JButton("Close");
+    closeButton.addActionListener(e -> {
+      parent.remove(glassPane);
+      dialog.dispose();
+    });
+
+    dialog.add(label);
+    dialog.add(closeButton);
+
+    // Add the glass pane and repaint
+    parent.setGlassPane(glassPane);
+    glassPane.setVisible(true);
+
+    // Show the dialog
+    dialog.setVisible(true);
   }
 }
