@@ -79,7 +79,7 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
           JOptionPane.YES_NO_OPTION);
 
         if (response == JOptionPane.YES_OPTION) {
-          deleteSelectedImages();
+          deleteImages(list);
           PanelManager.createPopup(new NotificationPopup("Deleted " + selectedImagesCount + " image(s)", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
         }
       } else {
@@ -175,7 +175,11 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
 
   @Override
   public void deleteSelectedImages() {
-    for (ImageRecord ir : selectedImages.values()) {
+    deleteImages(selectedImages.values());
+  }
+
+  private void deleteImages(Iterable<ImageRecord> images) {
+    for (ImageRecord ir : images) {
       deleteImage(ir);
     }
     selectedImages.clear();

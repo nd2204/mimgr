@@ -78,8 +78,8 @@ public class ProductTableView extends JPanel implements TableModelListener {
           JOptionPane.YES_NO_OPTION);
 
         if (response == JOptionPane.YES_OPTION) {
-          deleteSelectedProducts();
-          PanelManager.createPopup(new NotificationPopup("Deleted " + selectedImagesCount + " image(s)", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
+          deleteProducts(list);
+          PanelManager.createPopup(new NotificationPopup("Deleted " + selectedImagesCount + " product(s)", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
         }
       } else {
         JOptionPane.showMessageDialog(null, "Nothing to delete");
@@ -183,7 +183,11 @@ public class ProductTableView extends JPanel implements TableModelListener {
   }
 
   public void deleteSelectedProducts() {
-    for (ProductRecord pr : selectedProducts.values()) {
+    deleteProducts(selectedProducts.values());
+  }
+
+  private void deleteProducts(Iterable<ProductRecord> products) {
+    for (ProductRecord pr : products) {
       deleteProduct(pr);
     }
     selectedProducts.clear();

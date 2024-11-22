@@ -259,7 +259,6 @@ public class UploadPanel extends JPanel {
       this.setBorderRadius(15);
 
       dropContainerPanel = new DropContainerPanel(colors);
-      selectFromMediaLayout = new SelectFromMediaLayout();
       dropContainerPanel.addActionListener(this);
 
       btnClearImages = dropContainerPanel.getConfirmButton();
@@ -346,11 +345,6 @@ public class UploadPanel extends JPanel {
       gbc.fill = GridBagConstraints.HORIZONTAL;
       gbc.gridwidth = 2;
       this.add(dropArea, gbc);
-      selectFromMediaLayout.setVisible(false);
-      selectFromMediaLayout.setMaximumSize(new Dimension(680, Integer.MAX_VALUE));
-      selectFromMediaLayout.setMinimumSize(new Dimension(680, 300));
-      selectFromMediaLayout.setPreferredSize(new Dimension(680, 330));
-      this.add(selectFromMediaLayout, gbc);
 
       gbc.insets = new Insets(0, 20, 20, 20);
       gbc.gridx = 0;
@@ -406,6 +400,24 @@ public class UploadPanel extends JPanel {
       }
 
       if (e.getSource() == btnSelectFromMedia) {
+        // Create new SelectFromMedia panel if not present
+        // Lazy load MediaSelection
+        if (selectFromMediaLayout == null) {
+          selectFromMediaLayout = new SelectFromMediaLayout();
+          GridBagConstraints gbc = new GridBagConstraints();
+          gbc.insets = new Insets(5, 20, 20, 20);
+          gbc.gridx = 0;
+          gbc.gridy = 1;
+          gbc.weightx = 1.0;
+          gbc.fill = GridBagConstraints.HORIZONTAL;
+          gbc.gridwidth = 2;
+          selectFromMediaLayout.setVisible(false);
+          selectFromMediaLayout.setMaximumSize(new Dimension(680, Integer.MAX_VALUE));
+          selectFromMediaLayout.setMinimumSize(new Dimension(680, 300));
+          selectFromMediaLayout.setPreferredSize(new Dimension(680, 330));
+          this.add(selectFromMediaLayout, gbc);
+        }
+
         dropArea.setVisible(!dropArea.isVisible());
         selectFromMediaLayout.setVisible(!selectFromMediaLayout.isVisible());
       }
@@ -436,7 +448,7 @@ public class UploadPanel extends JPanel {
     private JLabel lblMedia = new JLabel("Media");
     private MButton btnSelectFiles = new MButton("Select Files");
     private MButton btnSelectFromMedia = new MButton("Select Files");
-    private SelectFromMediaLayout selectFromMediaLayout;
+    private SelectFromMediaLayout selectFromMediaLayout = null;
     private DropPanel dropArea;
   }
 

@@ -31,11 +31,12 @@ public class NotificationPopup implements PopupPanel.IPopup {
   private RoundedPanel panel;
   private long timeout;
 
-  public static final int NOTIFY_LEVEL_NORMAL    = 0;
-  public static final int NOTIFY_LEVEL_INFO      = 1;
-  public static final int NOTIFY_LEVEL_WARNING   = 2;
-  public static final int NOTIFY_LEVEL_ERROR     = 3;
-  public static final int NOTIFY_LEVEL_MAX_LEVEL = 4;
+  public static final int NOTIFY_LEVEL_DEBUG     = 0;
+  public static final int NOTIFY_LEVEL_NORMAL    = 1;
+  public static final int NOTIFY_LEVEL_INFO      = 2;
+  public static final int NOTIFY_LEVEL_WARNING   = 3;
+  public static final int NOTIFY_LEVEL_ERROR     = 4;
+  public static final int NOTIFY_LEVEL_MAX_LEVEL = 5;
 
   static {
     FontManager.loadFont("NunitoBold", "Nunito-Bold.ttf");
@@ -44,13 +45,15 @@ public class NotificationPopup implements PopupPanel.IPopup {
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
 
   private static String[] notify_str = {
+    "DEBUG",
     "NORMAL",
     "INFO",
     "WARNING",
-    "ERROR",
+    "ERROR"
   };
 
   private static Color[] notify_color = {
+    colors.m_blue,
     colors.m_fg_0,
     colors.m_green,
     colors.m_yellow,
@@ -58,10 +61,11 @@ public class NotificationPopup implements PopupPanel.IPopup {
   };
 
   private static Icon[] notify_icon = {
-    IconManager.getIcon("info.png", 18, 16, notify_color[0]),
-    IconManager.getIcon("info.png", 18, 16, notify_color[1]),
-    IconManager.getIcon("info.png", 18, 16, notify_color[2]),
-    IconManager.getIcon("error.png", 18, 16, notify_color[3])
+    IconManager.getIcon("info.png"    , 18, 16, notify_color[0]),
+    IconManager.getIcon("info.png"    , 18, 16, notify_color[1]),
+    IconManager.getIcon("info.png"    , 18, 16, notify_color[2]),
+    IconManager.getIcon("warning.png" , 18, 16, notify_color[3]),
+    IconManager.getIcon("error.png"   , 18, 16, notify_color[4])
   };
 
   public NotificationPopup(String message, final int notifyLevel, long timeout) {

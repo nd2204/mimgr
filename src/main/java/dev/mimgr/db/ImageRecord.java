@@ -23,7 +23,6 @@ public class ImageRecord {
 
   public static final String QUERY_SELECT_ALL = String.format("SELECT * FROM %s", TABLE);
   public static final String QUERY_SELECT_BY_ID = String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_ID);
-  public static final String QUERY_SELECT_BY_FIELD = "SELECT * FROM %s WHERE %s = ?";
   public static final String QUERY_SELECT_LIKE_NAME = String.format("SELECT * FROM %s WHERE %s LIKE ?", TABLE, FIELD_NAME);
   public static final String QUERY_INSERT = String.format(
     "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)",
@@ -74,10 +73,16 @@ public class ImageRecord {
 
   public static ImageRecord selectByName(String name) {
     name = name.substring(0, name.indexOf("."));
-    try (ResultSet rs = DBQueries.select(
-      String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_NAME),
-      name)
-    ) {
+    try (ResultSet rs = selectByField(FIELD_NAME, name)) {
+      if (rs == null || !rs.next()) return null;
+      return new ImageRecord(rs);
+    } catch (SQLException ex) {
+      return null;
+    }
+  }
+
+  public static ImageRecord selectByURL(String url) {
+    try (ResultSet rs = selectByField(FIELD_URL, url)) {
       if (rs == null || !rs.next()) return null;
       return new ImageRecord(rs);
     } catch (SQLException ex) {
@@ -86,7 +91,7 @@ public class ImageRecord {
   }
 
   public static ResultSet selectByField(String field, String value) {
-    return DBQueries.select(String.format(QUERY_SELECT_BY_FIELD, TABLE, field), value);
+    return DBQueries.selectAllFromTableByField(TABLE, field, value);
   }
 
   public static ImageRecord selectById(int id) {

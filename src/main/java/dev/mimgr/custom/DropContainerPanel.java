@@ -90,7 +90,6 @@ public class DropContainerPanel extends JPanel implements ActionListener {
       thisPanel.add(button);
     }
 
-    System.out.println(stagedData);
     revalidate();
     repaint();
   }

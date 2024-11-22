@@ -228,7 +228,7 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
   @Override
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == this.btnCreateOrder) {
-      FormAddOrder jFrameAddOrder = new FormAddOrder();
+      FormCreateOrder jFrameAddOrder = new FormCreateOrder();
       jFrameAddOrder.setVisible(true);
       // OrderTableView.setButtonRefreshOnClick(
       //   jFrameAddOrder.getAddOrderSubmitButton()

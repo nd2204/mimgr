@@ -188,6 +188,10 @@ public class ResourceManager {
     return destinationPath;
   }
 
+  public String getRelativePathFromProjectToPath(Path path) {
+    return String.valueOf(getProjectPath().relativize(path)).replace("\\", "/");
+  }
+
   public static Path getUniquePath(Path destinationPath) {
     int copyNumber = 1;
     Path newPath = destinationPath;

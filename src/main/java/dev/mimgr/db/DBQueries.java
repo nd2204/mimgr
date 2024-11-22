@@ -11,6 +11,17 @@ public class DBQueries {
   public static final String sqlPath = "mimgrdb/init.sql";
   private static Connection dbcon = DBConnection.getInstance().getConection();
 
+  public static final String QUERY_SELECT_BY_FIELD = "SELECT * FROM %s WHERE %s = ?";
+  public static final String QUERY_SELECT_LIKE_FIELD = "SELECT * FROM %s WHERE %s LIKE ?";
+
+  public static ResultSet selectAllFromTableByField(String table, String field, String value) {
+    return DBQueries.select(String.format(DBQueries.QUERY_SELECT_BY_FIELD, table, field), value);
+  }
+
+  public static ResultSet selectAllFromTableLikeField(String table, String field, String value) {
+    return DBQueries.select(String.format(DBQueries.QUERY_SELECT_BY_FIELD, table, field), value);
+  }
+
   /*
    * General db insert function
    * @param con Database connection

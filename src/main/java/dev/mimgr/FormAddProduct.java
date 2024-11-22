@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
+import java.sql.ResultSet;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -88,13 +89,13 @@ public class FormAddProduct extends JFrame {
         if (!file.toPath().equals(rm.getUploadPath().resolve(file.getName()))) {
           Path newFilePath = rm.moveStagedFileToUploadDir(file);
           ImageRecord.insert(
-            String.valueOf(rm.getProjectPath().relativize(newFilePath)).replace("\\", "/"),
+            rm.getRelativePathFromProjectToPath(newFilePath),
             file.getName(),
             "",
             SessionManager.getCurrentUser().m_id
           );
         }
-        image_id = getImageIdByFileName(file.getName());
+        image_id = getImageIdByPath(rm.getRelativePathFromProjectToPath(file.toPath()));
         break;
       }
     }
@@ -103,8 +104,9 @@ public class FormAddProduct extends JFrame {
     return image_id;
   }
 
-  private int getImageIdByFileName(String filename) {
-    ImageRecord ir = ImageRecord.selectByName(filename);
+  private int getImageIdByPath(String path) {
+    ImageRecord ir = ImageRecord.selectByURL(path);
+    PanelManager.createPopup(new NotificationPopup(path, NotificationPopup.NOTIFY_LEVEL_DEBUG, 5000));
     return (ir == null) ? 0 : ir.m_id;
   }
 
