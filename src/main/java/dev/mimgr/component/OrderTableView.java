@@ -10,9 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.TableModelEvent;
@@ -24,6 +27,7 @@ import java.awt.Color;
 
 import dev.mimgr.db.OrderRecord;
 import dev.mimgr.db.DBQueries;
+import dev.mimgr.PanelManager;
 import dev.mimgr.TableView;
 import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.MTable;
@@ -48,9 +52,28 @@ public class OrderTableView extends JPanel implements TableModelListener {
 
       @Override
       public boolean isCellEditable(int row, int column) {
-        return column == 0;
+        return column == 0 || column == 7;
       }
     };
+
+    this.deleteOperation = (list) -> {
+      if (!list.isEmpty()) {
+        int selectedImagesCount = list.size();
+        int response = JOptionPane.showConfirmDialog(
+          this,
+          "Delete " + selectedImagesCount + " items?",
+          "Confirm Delete",
+          JOptionPane.YES_NO_OPTION);
+
+        if (response == JOptionPane.YES_OPTION) {
+          deleteOrders(list);
+          PanelManager.createPopup(new NotificationPopup("Deleted " + selectedImagesCount + " order(s)", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
+        }
+      } else {
+        PanelManager.createPopup(new NotificationPopup("Nothing to delete", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
+      }
+    };
+
 
     this.table.setFillsViewportHeight(true);
     this.table.setRowHeight(40);
@@ -70,6 +93,7 @@ public class OrderTableView extends JPanel implements TableModelListener {
     tv.add_column(table, "Order status", TableView.setup_status_column(colors));
     tv.add_column(table, "Payment status", TableView.setup_status_column(colors));
     tv.add_column(table, "Items", TableView.setup_default_column());
+    tv.add_column(table, "Actions", TableView.setup_action_button_column());
     tv.load_column(table, model);
 
     model.addTableModelListener(this);
@@ -80,24 +104,6 @@ public class OrderTableView extends JPanel implements TableModelListener {
     tableScrollPane.setViewportView(table);
     this.setVisible(true);
 
-//     table.addMouseListener(new MouseAdapter() {
-//       @Override
-//       public void mouseClicked(MouseEvent e) {
-//         // Check if it's a double-click
-//         if (e.getClickCount() == 2) {
-//           int row = table.getSelectedRow();
-//           if (row != -1) {
-//             FormEditProduct frame = new FormEditProduct(orderList.get(row));
-//             List<UploadPanel> uploadPanels = frame.getUploadPanels();
-//             frame.setVisible(true);
-//             for (UploadPanel panel : uploadPanels) {
-//               setButtonRefreshOnClick(panel.getDeleteComponent());
-//               setButtonRefreshOnClick(panel.getSubmitComponent());
-//             }
-//           }
-//         }
-//       }
-//     });
   }
 
   public void updateView(Supplier<ResultSet> queryInvoker) {
@@ -108,11 +114,14 @@ public class OrderTableView extends JPanel implements TableModelListener {
     currentQueryInvoker = queryInvoker;
 
     try {
-      OrderRecord or;
       while (queryResult.next()) {
-        or = new OrderRecord(queryResult);
+        OrderRecord or = new OrderRecord(queryResult);
         orderList.add(or);
         SimpleEntry<Integer, Double> pair = getOrderItemCountAndTotal(or.m_id);
+        List<JButton> buttons = new ArrayList<>();
+        buttons.add(TableView.createDeleteActionButton(
+          (e) -> {deleteOperation.accept(List.of(or));}
+        ));
         model.addRow(new Object[] {
           Boolean.FALSE,
           "#" + or.m_id,
@@ -120,7 +129,8 @@ public class OrderTableView extends JPanel implements TableModelListener {
           "€ " + pair.getValue(),
           new SimpleEntry<String, Color>(or.m_order_status, getStatusColor(or.m_order_status)),
           new SimpleEntry<String, Color>(or.m_payment_status, getStatusColor(or.m_payment_status)),
-          getItemPlural(pair.getKey())
+          getItemPlural(pair.getKey()),
+          buttons
         });
       }
     } catch (SQLException e) {
@@ -134,7 +144,11 @@ public class OrderTableView extends JPanel implements TableModelListener {
   }
 
   public void deleteSelected() {
-    for (OrderRecord pr : selectedOrders.values()) {
+    deleteOrders(selectedOrders.values());
+  }
+
+  private void deleteOrders(Iterable<OrderRecord> orders) {
+    for (OrderRecord pr : orders) {
       deleteOrder(pr);
     }
     selectedOrders.clear();
@@ -224,6 +238,7 @@ public class OrderTableView extends JPanel implements TableModelListener {
   //   });
   // }
 
+  private Consumer<List<OrderRecord>> deleteOperation;
   private Supplier<ResultSet> currentQueryInvoker;
   private Supplier<ResultSet> defaultQueryInvoker;
   private HashMap<Integer, OrderRecord> selectedOrders = new HashMap<>();

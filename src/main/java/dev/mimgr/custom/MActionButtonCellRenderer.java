@@ -52,7 +52,7 @@ public class MActionButtonCellRenderer extends JPanel implements TableCellRender
       this.setLayout(new GridBagLayout());
       c.gridx = 0;
       c.gridy = 0;
-      c.insets = new Insets(0, 0, 0, 5);
+      c.insets = new Insets(0, 0, 0, 10);
     }
 
     public void addButton(JButton button) {

@@ -7,6 +7,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+import javax.swing.Timer;
+
 public class Helpers {
   public static String formatRelativeDatetime(Instant instant) {
     if (instant == null) return "N/A";
@@ -31,6 +33,54 @@ public class Helpers {
       return "Last year";
     } else {
       return yearDifferencce + " years ago";
+    }
+  }
+
+  public static class MultiClickHandler {
+    private Timer clickTimer;
+    private int delay; // in milliseconds
+    private int clickCount;
+    private int baseClickCount;
+
+    public MultiClickHandler(int count, int delay_ms) {
+      if (count <= 1) {
+        count = 1;
+      }
+      this.baseClickCount = count - 1;
+      this.clickCount = count - 1;
+      this.delay = delay_ms;
+    }
+
+    public MultiClickHandler(int count) {
+      if (count <= 1) {
+        count = 1;
+      }
+      this.baseClickCount = count - 1;
+      this.clickCount = count - 1;
+      this.delay = 200;
+    }
+
+    public boolean isValidClickCount() {
+      if (clickCount == baseClickCount) {
+        // Start a new timer only for first click
+        clickTimer = new Timer(delay, actionEvent -> {
+          clickTimer.stop(); // Stop the timer when the delay expires
+          clickCount = baseClickCount; // reset the click count back to base
+        });
+        clickTimer.setRepeats(false);
+        clickTimer.start();
+      }
+
+      if (clickCount == 0) {
+        clickCount = baseClickCount; // reset the click count back to base
+        if (clickTimer != null && clickTimer.isRunning()) {
+          clickTimer.stop();
+          return true;
+        }
+      }
+
+      clickCount--;
+      return false;
     }
   }
 }

@@ -40,30 +40,6 @@ public class TotalOrderPanel extends RoundedPanel {
 
     InitComponents();
 
-    LineChart chart = new LineChart();
-    chart.setMaxXDivision(4);
-    JPanel legendsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-    legendsPanel.setOpaque(false);
-    double thisMonthSum;
-    double lastMonthSum;
-    {
-      DataPoint dataPoint = getDataPointByMonth(1);
-      dataPoint.lineColor = colors.m_bg_5;
-      dataPoint.lineStroke = DataPoint.createDashedStroke(2, 4 ,4);
-      lastMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
-      chart.addDataPoint(dataPoint);
-      legendsPanel.add(new DataPointLegend(dataPoint));
-    }
-    {
-      DataPoint dataPoint = getDataPointByMonth(0);
-      thisMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
-      lblTotalOrder.setText(String.format("%d", Double.valueOf(thisMonthSum).intValue()));
-      chart.addDataPoint(dataPoint);
-      legendsPanel.add(new DataPointLegend(dataPoint));
-    }
-
-    lblGrowthRate.setRate(thisMonthSum / lastMonthSum);
-
     JPanel detailPanel = new JPanel(new GridBagLayout());
     detailPanel.setBackground(colors.m_bg_0);
     {
@@ -109,6 +85,36 @@ public class TotalOrderPanel extends RoundedPanel {
     this.add(legendsPanel, BorderLayout.SOUTH);
   }
 
+  private void initChart() {
+    double thisMonthSum;
+    double lastMonthSum;
+    {
+      DataPoint dataPoint = getDataPointByMonth(1);
+      dataPoint.lineColor = colors.m_bg_5;
+      dataPoint.lineStroke = DataPoint.createDashedStroke(2, 4 ,4);
+      lastMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
+      chart.addDataPoint(dataPoint);
+      legendsPanel.add(new DataPointLegend(dataPoint));
+    }
+    {
+      DataPoint dataPoint = getDataPointByMonth(0);
+      thisMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
+      lblTotalOrder.setText(String.format("%d", Double.valueOf(thisMonthSum).intValue()));
+      chart.addDataPoint(dataPoint);
+      legendsPanel.add(new DataPointLegend(dataPoint));
+    }
+
+    lblGrowthRate.setRate(thisMonthSum / lastMonthSum);
+  }
+
+  public void refresh() {
+    chart.clear();
+    legendsPanel.removeAll();
+    initChart();
+    revalidate();
+    repaint();
+  }
+
   private void InitComponents() {
     lblTitle = new JLabel("Total orders");
     lblTitle.setForeground(colors.m_fg_0);
@@ -132,18 +138,26 @@ public class TotalOrderPanel extends RoundedPanel {
     lblChart.setForeground(colors.m_grey_2);
     lblChart.setHorizontalAlignment(SwingConstants.LEFT);
     lblChart.setVerticalAlignment(SwingConstants.CENTER);
+
+    chart = new LineChart();
+    chart.setMaxXDivision(4);
+
+    legendsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+    legendsPanel.setOpaque(false);
+
+    initChart();
   }
 
   private DataPoint getDataPointByMonth(int monthsBefore) {
     String query = """
-      SELECT
-        COUNT(*) AS count,
-        DATE(order_date) AS order_day
-      FROM orders
-      WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
-        AND order_date <= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
-      GROUP BY order_day
-      ORDER BY order_day ASC;
+    SELECT
+    COUNT(*) AS count,
+    DATE(order_date) AS order_day
+    FROM orders
+    WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
+    AND order_date <= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
+    GROUP BY order_day
+    ORDER BY order_day ASC;
     """;
     DataPoint dataPoint = new DataPoint();
     Instant start = null;
@@ -201,6 +215,8 @@ public class TotalOrderPanel extends RoundedPanel {
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
 
+  private JPanel legendsPanel;
+  private LineChart chart;
   private ColorScheme colors;
   private JLabel lblTitle;
   private JLabel lblTotalOrder;

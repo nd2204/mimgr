@@ -40,31 +40,6 @@ public class TotalSalePanel extends RoundedPanel {
 
     InitComponents();
 
-    LineChart chart = new LineChart();
-    chart.setMaxXDivision(4);
-    chart.setYLabelFormatter((str) -> formatToSuffix(str));
-    JPanel legendsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-    legendsPanel.setOpaque(false);
-    double thisMonthSum;
-    double lastMonthSum;
-    {
-      DataPoint dataPoint = getDataPointByMonth(1);
-      dataPoint.lineColor = colors.m_bg_5;
-      dataPoint.lineStroke = DataPoint.createDashedStroke(2, 4 ,4);
-      lastMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
-      chart.addDataPoint(dataPoint);
-      legendsPanel.add(new DataPointLegend(dataPoint));
-    }
-    {
-      DataPoint dataPoint = getDataPointByMonth(0);
-      thisMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
-      lblTotalSales.setText(String.format("€ %.2f", thisMonthSum));
-      chart.addDataPoint(dataPoint);
-      legendsPanel.add(new DataPointLegend(dataPoint));
-    }
-
-    lblGrowthRate.setRate(thisMonthSum / lastMonthSum);
-
     JPanel detailPanel = new JPanel(new GridBagLayout());
     detailPanel.setBackground(colors.m_bg_0);
     {
@@ -133,6 +108,15 @@ public class TotalSalePanel extends RoundedPanel {
     lblChart.setForeground(colors.m_grey_2);
     lblChart.setHorizontalAlignment(SwingConstants.LEFT);
     lblChart.setVerticalAlignment(SwingConstants.CENTER);
+
+    chart = new LineChart();
+    chart.setMaxXDivision(4);
+    chart.setYLabelFormatter((str) -> formatToSuffix(str));
+
+    legendsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+    legendsPanel.setOpaque(false);
+
+    initChart();
   }
   public static String formatToSuffix(String amountStr) {
     double amount = Double.valueOf(amountStr);
@@ -201,6 +185,39 @@ public class TotalSalePanel extends RoundedPanel {
     return zdt.format(dtf);
   }
 
+  private void initChart() {
+    double thisMonthSum;
+    double lastMonthSum;
+    {
+      DataPoint dataPoint = getDataPointByMonth(1);
+      dataPoint.lineColor = colors.m_bg_5;
+      dataPoint.lineStroke = DataPoint.createDashedStroke(2, 4 ,4);
+      lastMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
+      chart.addDataPoint(dataPoint);
+      legendsPanel.add(new DataPointLegend(dataPoint));
+    }
+    {
+      DataPoint dataPoint = getDataPointByMonth(0);
+      thisMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
+      lblTotalSales.setText(String.format("€ %.2f", thisMonthSum));
+      chart.addDataPoint(dataPoint);
+      legendsPanel.add(new DataPointLegend(dataPoint));
+    }
+    lblGrowthRate.setRate(thisMonthSum / lastMonthSum);
+  }
+
+  public void refresh() {
+    chart.clear();
+    legendsPanel.removeAll();
+    initChart();
+    legendsPanel.revalidate();
+    legendsPanel.repaint();
+    chart.revalidate();
+    chart.repaint();
+    revalidate();
+    repaint();
+  }
+
   public class GrowthRateLabel extends JLabel {
     public GrowthRateLabel() {
       this.setFont(nunito_bold_16);
@@ -225,6 +242,8 @@ public class TotalSalePanel extends RoundedPanel {
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
 
+  private JPanel legendsPanel;
+  private LineChart chart;
   private ColorScheme colors;
   private JLabel lblTitle;
   private JLabel lblTotalSales;

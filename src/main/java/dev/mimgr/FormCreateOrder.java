@@ -44,7 +44,6 @@ public class FormCreateOrder extends JFrame {
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
 
-
     // Get the screen size
     Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -54,7 +53,7 @@ public class FormCreateOrder extends JFrame {
     orderItemPanel = new OrderItemPanel();
     btnSubmit = orderItemPanel.getSubmitComponent();
     btnSubmit.addActionListener(uploadButtonListener);
-    btnSubmit.setText("Add Product");
+    btnSubmit.setText("Create Order");
     btnSubmit.setEnabled(false);
     btnDelete = orderItemPanel.getDeleteComponent();
     btnDelete.addActionListener(uploadButtonListener);
@@ -69,13 +68,10 @@ public class FormCreateOrder extends JFrame {
 
     this.setLayout(new BorderLayout());
     this.setMinimumSize(new Dimension(854, 600));
-    this.setTitle("Add Product");
+    this.setTitle("Create New Order");
     this.setSize(854, m_height);
     this.add(orderItemPanel);
-    this.setLocation(
-      (screen_size.width - this.getWidth()) / 2,
-      (screen_size.height - this.getHeight()) / 2
-    );
+    this.setLocationRelativeTo(null);
     this.setVisible(true);
     this.requestFocus();
   }

@@ -117,24 +117,24 @@ public class TableView {
   }
 
   public static JButton createEditActionButton(ActionListener actionListener) {
-    MButton button = new MButton(IconManager.getIcon("edit.png", 14, 14, colors.m_grey_0));
-    button.setPreferredSize(new Dimension(32, 32));
-    button.setMaximumSize(new Dimension(32, 32));
+    MButton button = new MButton(IconManager.getIcon("edit.png", 12, 12, colors.m_grey_0));
+    button.setPreferredSize(new Dimension(28, 28));
+    button.setMaximumSize(new Dimension(28, 28));
     button.setBackground(colors.m_bg_2);
     button.setBorderColor(colors.m_bg_2);
     button.setClickBackgroundColor(colors.m_bg_dim);
-    button.setBorderRadius(32);
+    button.setBorderRadius(28);
     button.addActionListener(actionListener);
     return button;
   }
 
   public static JButton createDeleteActionButton(ActionListener actionListener) {
-    MButton button = new MButton(IconManager.getIcon("trash_bin.png", 14, 14, colors.m_red));
-    button.setPreferredSize(new Dimension(32, 32));
-    button.setMaximumSize(new Dimension(32, 32));
+    MButton button = new MButton(IconManager.getIcon("trash_bin.png", 12, 12, colors.m_red));
+    button.setPreferredSize(new Dimension(28, 28));
+    button.setMaximumSize(new Dimension(28, 28));
     button.setBackground(colors.m_bg_2);
     button.setBorderColor(colors.m_bg_2);
-    button.setBorderRadius(32);
+    button.setBorderRadius(28);
     button.setClickBackgroundColor(colors.m_bg_dim);
     button.addActionListener(actionListener);
     return button;

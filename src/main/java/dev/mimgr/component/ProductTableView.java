@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -36,6 +37,7 @@ import dev.mimgr.custom.MTable;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers.MultiClickHandler;
 import dev.mimgr.theme.ColorTheme;
 
 public class ProductTableView extends JPanel implements TableModelListener {
@@ -120,19 +122,14 @@ public class ProductTableView extends JPanel implements TableModelListener {
     this.setVisible(true);
 
     table.addMouseListener(new MouseAdapter() {
+      private MultiClickHandler multiClickHandler = new MultiClickHandler(2, 200);
       @Override
-      public void mouseClicked(MouseEvent e) {
+      public void mousePressed(MouseEvent e) {
         // Check if it's a double-click
-        if (e.getClickCount() == 2) {
+        if (multiClickHandler.isValidClickCount()) {
           int row = table.getSelectedRow();
           if (row != -1) {
-            FormEditProduct frame = new FormEditProduct(productList.get(row));
-            List<UploadPanel> uploadPanels = frame.getUploadPanels();
-            frame.setVisible(true);
-            for (UploadPanel panel : uploadPanels) {
-              setButtonRefreshOnClick(panel.getDeleteComponent());
-              setButtonRefreshOnClick(panel.getSubmitComponent());
-            }
+            doubleClickOperation.accept(row);
           }
         }
       }
@@ -160,21 +157,21 @@ public class ProductTableView extends JPanel implements TableModelListener {
 
         List<JButton> buttons = new ArrayList<>();
         buttons.add(TableView.createEditActionButton(
-          (e) -> {editOperation.accept(List.of(pr));}
+        (e) -> {editOperation.accept(List.of(pr));}
         ));
         buttons.add(TableView.createDeleteActionButton(
-          (e) -> {deleteOperation.accept(List.of(pr));}
+        (e) -> {deleteOperation.accept(List.of(pr));}
         ));
 
         productList.add(pr);
         model.addRow(new Object[] {
-            Boolean.FALSE,
-            icon,
-            pr.m_name,
-            "€ " + pr.m_price,
-            pr.m_stock_quantity,
-            pr.m_description,
-            buttons,
+          Boolean.FALSE,
+          icon,
+          pr.m_name,
+          "€ " + pr.m_price,
+          pr.m_stock_quantity,
+          pr.m_description,
+          buttons,
         });
       }
     } catch (SQLException e) {
@@ -216,17 +213,17 @@ public class ProductTableView extends JPanel implements TableModelListener {
     int column = e.getColumn();
     switch (e.getType()) {
       case TableModelEvent.UPDATE:
-        Object newValue = model.getValueAt(row, column);
-        if (column == 0) {
-          if (newValue instanceof Boolean) {
-            if ((Boolean) newValue) {
-              selectedProducts.put(row, productList.get(row));
-            } else {
-              selectedProducts.remove(row);
-            }
+      Object newValue = model.getValueAt(row, column);
+      if (column == 0) {
+        if (newValue instanceof Boolean) {
+          if ((Boolean) newValue) {
+            selectedProducts.put(row, productList.get(row));
+          } else {
+            selectedProducts.remove(row);
           }
         }
-        break;
+      }
+      break;
     }
   }
 
