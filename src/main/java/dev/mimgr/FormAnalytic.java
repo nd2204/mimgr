@@ -7,8 +7,10 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import dev.mimgr.component.NotificationPopup;
 import dev.mimgr.component.TotalOrderPanel;
@@ -52,12 +54,20 @@ public class FormAnalytic extends JPanel implements ActionListener {
     c.gridy++;
     // ---------
 
-    c.insets = new Insets(0, padding, 25, padding);
+    c.insets = new Insets(25, padding, 25, padding);
     c.weightx = 1.0;
-    c.weighty = 1.0;
     c.gridwidth = GridBagConstraints.REMAINDER;
     c.fill = GridBagConstraints.BOTH;
     this.add(analyticView, c);
+    c.gridx++;
+
+    // ---------
+    c.gridx = 0;
+    c.gridy++;
+    // ---------
+
+    c.weighty = 1.0;
+    this.add(Box.createVerticalGlue(), c);
   }
 
   public class AnalyticView extends JPanel {
@@ -74,13 +84,13 @@ public class FormAnalytic extends JPanel implements ActionListener {
 
       gc.anchor = GridBagConstraints.CENTER;
       gc.fill = GridBagConstraints.HORIZONTAL;
-      gc.insets = new Insets(0, 25, 25, 25);
+      gc.insets = new Insets(0, 0, 25, 25);
       gc.weightx = 1.0;
       gc.gridwidth = 1;
       this.add(totalSalePanel, gc);
       gc.gridx++;
 
-      gc.insets = new Insets(0, 0, 25, 25);
+      gc.insets = new Insets(0, 0, 25, 0);
       this.add(totalOrderPanel, gc);
       gc.gridx++;
     }
@@ -129,15 +139,20 @@ public class FormAnalytic extends JPanel implements ActionListener {
   public void actionPerformed(ActionEvent ev) {
     if (ev.getSource() == btnRefresh) {
       analyticView.refresh();
-      revalidate();
-      repaint();
     }
 
     if (ev.getSource() == btnGenerateRandom) {
-      RandomOrderGenerator.createRandomOrder(30, () -> RandomOrderGenerator.getRandomThis30DayInstant());
-      PanelManager.createPopup(new NotificationPopup("Generated 30 orders of this month", NotificationPopup.NOTIFY_LEVEL_DEBUG, 5000));
-      RandomOrderGenerator.createRandomOrder(30, () -> RandomOrderGenerator.getRandomPrevious30DayInstant());
-      PanelManager.createPopup(new NotificationPopup("Generated 30 orders of previous month", NotificationPopup.NOTIFY_LEVEL_DEBUG, 5000));
+      Thread thread = new Thread(() -> {
+        RandomOrderGenerator.createRandomOrder(30, () -> RandomOrderGenerator.getRandomThis30DayInstant());
+        PanelManager.createPopup(new NotificationPopup("Generated 30 orders of this month", NotificationPopup.NOTIFY_LEVEL_DEBUG, 5000));
+        RandomOrderGenerator.createRandomOrder(30, () -> RandomOrderGenerator.getRandomPrevious30DayInstant());
+        PanelManager.createPopup(new NotificationPopup("Generated 30 orders of previous month", NotificationPopup.NOTIFY_LEVEL_DEBUG, 5000));
+        SwingUtilities.invokeLater(() -> {
+          analyticView.refresh();
+        });
+      });
+      thread.setDaemon(true);
+      thread.start();
     }
   }
 

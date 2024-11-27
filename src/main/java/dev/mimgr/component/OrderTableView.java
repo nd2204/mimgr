@@ -103,7 +103,6 @@ public class OrderTableView extends JPanel implements TableModelListener {
     this.add(tableScrollPane);
     tableScrollPane.setViewportView(table);
     this.setVisible(true);
-
   }
 
   public void updateView(Supplier<ResultSet> queryInvoker) {
@@ -144,14 +143,12 @@ public class OrderTableView extends JPanel implements TableModelListener {
   }
 
   public void deleteSelected() {
-    deleteOrders(selectedOrders.values());
+    deleteOrders(new ArrayList<>(selectedOrders.values()));
+    selectedOrders.clear();
   }
 
   private void deleteOrders(Iterable<OrderRecord> orders) {
-    for (OrderRecord pr : orders) {
-      deleteOrder(pr);
-    }
-    selectedOrders.clear();
+    OrderRecord.delete(orders);
     refresh();
   }
 
@@ -159,16 +156,12 @@ public class OrderTableView extends JPanel implements TableModelListener {
     return new ArrayList<>(this.selectedOrders.values());
   }
 
-  public void refresh() {
+  public synchronized void refresh() {
     updateView(currentQueryInvoker);
   }
 
   public void reset() {
     updateView(defaultQueryInvoker);
-  }
-
-  private void deleteOrder(OrderRecord pr) {
-    OrderRecord.delete(pr);
   }
 
   @Override

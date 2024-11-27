@@ -3,7 +3,6 @@ package dev.mimgr;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -43,9 +42,6 @@ public class FormCreateOrder extends JFrame {
     m_aspect_ratio = 16.0f / 10.0f;
     m_width = 1280;
     m_height = (int) ((float) m_width / m_aspect_ratio);
-
-    // Get the screen size
-    Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
 
     UploadButtonListener uploadButtonListener = new UploadButtonListener();
     TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();

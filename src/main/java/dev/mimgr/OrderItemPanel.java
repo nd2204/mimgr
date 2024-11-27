@@ -313,18 +313,18 @@ public class OrderItemPanel extends JPanel {
       gc.gridy = 1;
       gc.insets = new Insets(20, 25, 5, 20);
       this.add(lblProduct, gc);
-      
+
       gc.gridx = 0;
       gc.gridy = 2;
       gc.insets = new Insets(0, 20, 10, 20);
       this.add(cbProduct, gc);
-      
+
       gc.anchor = GridBagConstraints.FIRST_LINE_START;
       gc.gridx = 1;
       gc.gridy = 1;
       gc.insets = new Insets(20, 25, 5, 20);
       this.add(lblTitle, gc);
-      
+
       gc.anchor = GridBagConstraints.FIRST_LINE_START;
       gc.gridx = 1;
       gc.gridy = 2;
