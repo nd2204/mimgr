@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
@@ -22,17 +23,23 @@ public class RandomOrderGenerator {
 
   public static void createRandomOrder(int count, Supplier<Instant> timestampGen) {
     Random random = new Random();
+    ArrayList<OrderRecord> ors = new ArrayList<>();
+    ArrayList<OrderItemRecord> oirs = new ArrayList<>();
     for (int i = 0; i < count; ++i) {
-      OrderRecord or = new OrderRecord(0, timestampGen.get(), 0, getRandomPaymentStatus(), getRandomOrderStatus());
-      OrderRecord.insert(or);
-      System.out.println("[Created Order] " + or);
+      ors.add(new OrderRecord(0, timestampGen.get(), 0, getRandomPaymentStatus(), getRandomOrderStatus()));
+    }
+    OrderRecord.insert(ors);
 
+    for (OrderRecord or : ors) {
+      System.out.println("[Created Order] " + or);
       int itemCount = random.nextInt(1, 5);
-      OrderRecord ordb = OrderRecord.selectByFields(or);
       for (int j = 0; j < itemCount; ++j) {
-        createRandomOrderItem(ordb.m_id);
+        OrderItemRecord oir = createRandomOrderItem(OrderRecord.selectByFields(or).m_id);
+        System.out.println(oir);
+        oirs.add(oir);
       }
     }
+    OrderItemRecord.insert(oirs);
   }
 
   public static Instant getRandomPrevious30DayInstant() {
@@ -61,11 +68,11 @@ public class RandomOrderGenerator {
     return OrderRecord.orderStatuses[Math.abs(random.nextInt()) % OrderRecord.PAYMENT_STATUS_MAX];
   }
 
-  public static void createRandomOrderItem(int orderId) {
+  public static OrderItemRecord createRandomOrderItem(int orderId) {
     Random random = new Random();
     ProductRecord randomProduct = getRandomProduct();
     int randomQuantity = random.nextInt(1, 5);
-    OrderItemRecord orderItemRecord = new OrderItemRecord(
+    return new OrderItemRecord(
       0,
       orderId,
       randomProduct.m_id,
@@ -73,13 +80,6 @@ public class RandomOrderGenerator {
       randomProduct.m_price,
       randomProduct.m_price * randomQuantity
     );
-    OrderItemRecord.insert(orderItemRecord);
-    System.out.println(
-        "   OrderId:" + orderItemRecord.m_order_id + 
-        ", ProductId: " + orderItemRecord.m_product_id + 
-        ", Quantity: " + orderItemRecord.m_quantity +
-        ", Unit Price: " + orderItemRecord.m_unit_price +
-        ", Total: " + orderItemRecord.m_total_price);
   }
 
   private static ProductRecord getRandomProduct() {

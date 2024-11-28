@@ -17,12 +17,15 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import dev.mimgr.component.FilterOptionPanel;
+import dev.mimgr.component.NotificationPopup;
 import dev.mimgr.component.OrderTableView;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.custom.MTextField;
 import dev.mimgr.custom.RoundedPanel;
+import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.OrderRecord;
+import dev.mimgr.db.QueryAdapter;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -72,6 +75,12 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
     c.gridwidth = 4;
     setupContentContainer();
     this.add(contentContainer, c);
+//    DBQueries.addQueryListener(new QueryAdapter() {
+//      @Override
+//      public void updateExecuted() {
+//        orderTableView.refresh();
+//      }
+//    });
   }
 
   private void setupContentContainer() {
@@ -82,7 +91,6 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
     String[] items = {
       "Bulk actions",
       "Delete Permanently",
-      "Edit"
     };
 
     this.cbBulkAction = new MComboBox<>(items, colors);
@@ -236,19 +244,17 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
     }
 
     if (e.getSource() == this.btnApplyBulkAction) {
-      if (((String) this.cbBulkAction.getSelectedItem()).equals("Edit")) {
-
-      }
-
       if (((String) this.cbBulkAction.getSelectedItem()).equals("Delete Permanently")) {
+        int selectedCount = orderTableView.getSelected().size();
         int response = JOptionPane.showConfirmDialog(
           this,
-          "Delete " + orderTableView.getSelected().size() + " items?",
+          "Delete " + selectedCount + " items?",
           "Confirm Delete",
           JOptionPane.YES_NO_OPTION);
 
         if (response == JOptionPane.YES_OPTION) {
           orderTableView.deleteSelected();
+          PanelManager.createPopup(new NotificationPopup("Deleted " + selectedCount + " order(s)", NotificationPopup.NOTIFY_LEVEL_INFO, 5000));
         }
       }
     }
@@ -268,7 +274,6 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
   public void changedUpdate(DocumentEvent e) {
     filter(this.filterTextField.getText());
   }
-
 
   private void filter(String name) {
     if (name.equals(this.filterTextField.getPlaceholder())) {

@@ -55,25 +55,28 @@ public class FormMedia extends JPanel implements DocumentListener {
 
     int padding = 25;
 
-    // Top
     GridBagConstraints c = new GridBagConstraints();
-    c.insets = new Insets(25, padding, 25, padding);
     c.gridx = 0;
     c.gridy = 0;
+
+    // Top
+    c.insets = new Insets(25, padding, 25, padding);
     c.anchor = GridBagConstraints.FIRST_LINE_START;
     this.add(topLabel, c);
+    c.gridx++;
 
-    c.gridx = 1;
-    c.gridy = 0;
     c.weightx = 1.0;
     c.insets = new Insets(20, 5, 20, 5);
     this.add(this.addMediaButton, c);
+    c.gridx++;
+
+    c.gridx = 0;
+    c.gridy++;
 
     dropPanel = new JPanel();
     dropPanel.setOpaque(false);
     dropPanel.setVisible(false);
     dropPanel.setLayout(new GridBagLayout());
-
     {
       MediaDropPanel dropArea = new MediaDropPanel();
       dropArea.addTransferListener(new MediaTransferListener());
@@ -92,10 +95,7 @@ public class FormMedia extends JPanel implements DocumentListener {
       gc.insets = new Insets(0, 0, 0, 0);
       dropPanel.add(droppedItemsPanel, gc);
     }
-
     c.insets = new Insets(0, 25, 15, 25);
-    c.gridx = 0;
-    c.gridy = 1;
     c.weightx = 1.0;
     c.ipady = 245;
     c.weighty = 0.0;
@@ -186,6 +186,106 @@ public class FormMedia extends JPanel implements DocumentListener {
     c.gridwidth = GridBagConstraints.REMAINDER;
     this.add(contentContainer, c);
   }
+
+  private void InitializeComponent() {
+    // Post Content
+
+    // =======================================================
+    // Setup Appearance
+    // =======================================================
+    this.setBackground(colors.m_bg_dim);
+    this.topLabel = new JLabel("Media Library");
+    this.topLabel.setFont(nunito_bold_20);
+    this.topLabel.setForeground(colors.m_fg_0);
+
+    this.rm = ResourceManager.getInstance();
+
+    Function<String, Consumer<MButton>> buttonSetupGenerator = (text) -> {
+      return (button) -> {
+        button.setText(text);
+        button.setBackground(colors.m_bg_2);
+        button.setBorderColor(colors.m_bg_3);
+        button.setForeground(colors.m_grey_2);
+        button.setHoverBackgroundColor(colors.m_bg_3);
+        button.setHoverBorderColor(colors.m_bg_3);
+        button.setClickBackgroundColor(colors.m_bg_1);
+        button.setClickBorderColor(colors.m_bg_1);
+        button.setPreferredSize(new Dimension(100, button.getPreferredSize().height));
+      };
+    };
+
+    this.filterOptionPanel = new FilterOptionPanel();
+    this.filterOptionPanel.addFilterOption("All", buttonSetupGenerator.apply("All"), (e) -> {
+      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.updateView(() -> ImageRecord.selectAllNewest());
+    });
+    this.filterOptionPanel.addFilterOption("Oldest", buttonSetupGenerator.apply("Oldest"), (e) -> {
+      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.updateView(() -> ImageRecord.selectAllOldest());
+    });
+    this.filterOptionPanel.addFilterOption("Newest", buttonSetupGenerator.apply("Newest"), (e) -> {
+      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.updateView(() -> ImageRecord.selectAllNewest());
+    });
+    this.filterOptionPanel.addFilterOption("Mine", buttonSetupGenerator.apply("Mine"), (e) -> {
+      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
+      currentView.updateView(
+        () -> ImageRecord.selectByField(ImageRecord.FIELD_AUTHOR, String.valueOf(SessionManager.getCurrentUser().m_id))
+      );
+    });
+
+    this.mediaViewSwitcher = new MediaViewSwitcher();
+
+    this.droppedItemsPanel = new DropContainerPanel(this.colors);
+    this.droppedItemsPanel.addActionListener(mediaButtonActionListener);
+
+    this.addMediaButton = new MButton("Add New Media File");
+    this.addMediaButton.setBackground(colors.m_bg_0);
+    this.addMediaButton.setBorderColor(colors.m_bg_4);
+    this.addMediaButton.setHoverBackgroundColor(colors.m_bg_2);
+    this.addMediaButton.setHoverBorderColor(colors.m_bg_3);
+    this.addMediaButton.setClickBackgroundColor(colors.m_bg_1);
+    this.addMediaButton.setFont(nunito_extrabold_14);
+    this.addMediaButton.setIcon(IconManager.getIcon("upload.png", 16, 16, colors.m_grey_0));
+    this.addMediaButton.setForeground(colors.m_grey_0);
+    this.addMediaButton.setText(" " + this.addMediaButton.getText());
+    this.addMediaButton.addActionListener(mediaButtonActionListener);
+
+    this.filterTextField = new MTextField(30);
+    this.filterTextField.setIcon(IconManager.getIcon("search.png", 20, 20, colors.m_grey_0), MTextField.ICON_PREFIX);
+    this.filterTextField.setBackground(colors.m_bg_dim);
+    this.filterTextField.setForeground(colors.m_fg_0);
+    this.filterTextField.setPlaceholder("Filter Images");
+    this.filterTextField.setPlaceholderForeground(colors.m_grey_0);
+    this.filterTextField.setBorderWidth(1);
+    this.filterTextField.setBorderColor(colors.m_bg_5);
+    this.filterTextField.setInputForeground(colors.m_fg_0);
+    this.filterTextField.setFont(nunito_bold_14);
+    this.filterTextField.getDocument().addDocumentListener(this);
+
+    this.selectFilesButton = new MButton("Select Files");
+    this.selectFilesButton.setBackground(colors.m_bg_dim);
+    this.selectFilesButton.setBorderColor(colors.m_bg_3);
+    this.selectFilesButton.setHoverBorderColor(colors.m_accent);
+    this.selectFilesButton.setClickBackgroundColor(colors.m_bg_1);
+    this.selectFilesButton.setForeground(colors.m_accent);
+    this.selectFilesButton.setHorizontalAlignment(SwingConstants.CENTER);
+    this.selectFilesButton.addActionListener(mediaButtonActionListener);
+
+    this.applyBulkAction = new MButton("Apply");
+    this.applyBulkAction.setForeground(colors.m_grey_2);
+    this.applyBulkAction.setBackground(colors.m_bg_0);
+    this.applyBulkAction.setBorderColor(colors.m_bg_5);
+    this.applyBulkAction.setHoverBackgroundColor(colors.m_bg_1);
+    this.applyBulkAction.setClickBackgroundColor(colors.m_bg_dim);
+    this.applyBulkAction.setHoverForegroundColor(colors.m_blue);
+    this.applyBulkAction.setHoverBorderColor(colors.m_blue);
+    this.applyBulkAction.setBorderRadius(0);
+    this.applyBulkAction.addActionListener(mediaButtonActionListener);
+
+    this.layoutSelectorComponent = new LayoutSelectorComponent();
+  }
+
 
   private class MediaButtonActionListener implements ActionListener {
     @Override
@@ -363,105 +463,6 @@ public class FormMedia extends JPanel implements DocumentListener {
       gc.gridy = 2;
       this.add(selectFilesButton, gc);
     }
-  }
-
-  private void InitializeComponent() {
-    // Post Content
-
-    // =======================================================
-    // Setup Appearance
-    // =======================================================
-    this.setBackground(colors.m_bg_dim);
-    this.topLabel = new JLabel("Media Library");
-    this.topLabel.setFont(nunito_bold_20);
-    this.topLabel.setForeground(colors.m_fg_0);
-
-    this.rm = ResourceManager.getInstance();
-
-    Function<String, Consumer<MButton>> buttonSetupGenerator = (text) -> {
-      return (button) -> {
-        button.setText(text);
-        button.setBackground(colors.m_bg_2);
-        button.setBorderColor(colors.m_bg_3);
-        button.setForeground(colors.m_grey_2);
-        button.setHoverBackgroundColor(colors.m_bg_3);
-        button.setHoverBorderColor(colors.m_bg_3);
-        button.setClickBackgroundColor(colors.m_bg_1);
-        button.setClickBorderColor(colors.m_bg_1);
-        button.setPreferredSize(new Dimension(100, button.getPreferredSize().height));
-      };
-    };
-
-    this.filterOptionPanel = new FilterOptionPanel();
-    this.filterOptionPanel.addFilterOption("All", buttonSetupGenerator.apply("All"), (e) -> {
-      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
-      currentView.updateView(() -> ImageRecord.selectAllNewest());
-    });
-    this.filterOptionPanel.addFilterOption("Oldest", buttonSetupGenerator.apply("Oldest"), (e) -> {
-      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
-      currentView.updateView(() -> ImageRecord.selectAllOldest());
-    });
-    this.filterOptionPanel.addFilterOption("Newest", buttonSetupGenerator.apply("Newest"), (e) -> {
-      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
-      currentView.updateView(() -> ImageRecord.selectAllNewest());
-    });
-    this.filterOptionPanel.addFilterOption("Mine", buttonSetupGenerator.apply("Mine"), (e) -> {
-      IMediaView currentView = mediaViewSwitcher.getCurrentMediaInterface();
-      currentView.updateView(
-        () -> ImageRecord.selectByField(ImageRecord.FIELD_AUTHOR, String.valueOf(SessionManager.getCurrentUser().m_id))
-      );
-    });
-
-    this.mediaViewSwitcher = new MediaViewSwitcher();
-
-    this.droppedItemsPanel = new DropContainerPanel(this.colors);
-    this.droppedItemsPanel.addActionListener(mediaButtonActionListener);
-
-    this.addMediaButton = new MButton("Add New Media File");
-    this.addMediaButton.setBackground(colors.m_bg_0);
-    this.addMediaButton.setBorderColor(colors.m_bg_4);
-    this.addMediaButton.setHoverBackgroundColor(colors.m_bg_2);
-    this.addMediaButton.setHoverBorderColor(colors.m_bg_3);
-    this.addMediaButton.setClickBackgroundColor(colors.m_bg_1);
-    this.addMediaButton.setFont(nunito_extrabold_14);
-    this.addMediaButton.setIcon(IconManager.getIcon("upload.png", 16, 16, colors.m_grey_0));
-    this.addMediaButton.setForeground(colors.m_grey_0);
-    this.addMediaButton.setText(" " + this.addMediaButton.getText());
-    this.addMediaButton.addActionListener(mediaButtonActionListener);
-
-    this.filterTextField = new MTextField(30);
-    this.filterTextField.setIcon(IconManager.getIcon("search.png", 20, 20, colors.m_grey_0), MTextField.ICON_PREFIX);
-    this.filterTextField.setBackground(colors.m_bg_dim);
-    this.filterTextField.setForeground(colors.m_fg_0);
-    this.filterTextField.setPlaceholder("Filter Images");
-    this.filterTextField.setPlaceholderForeground(colors.m_grey_0);
-    this.filterTextField.setBorderWidth(1);
-    this.filterTextField.setBorderColor(colors.m_bg_5);
-    this.filterTextField.setInputForeground(colors.m_fg_0);
-    this.filterTextField.setFont(nunito_bold_14);
-    this.filterTextField.getDocument().addDocumentListener(this);
-
-    this.selectFilesButton = new MButton("Select Files");
-    this.selectFilesButton.setBackground(colors.m_bg_dim);
-    this.selectFilesButton.setBorderColor(colors.m_bg_3);
-    this.selectFilesButton.setHoverBorderColor(colors.m_accent);
-    this.selectFilesButton.setClickBackgroundColor(colors.m_bg_1);
-    this.selectFilesButton.setForeground(colors.m_accent);
-    this.selectFilesButton.setHorizontalAlignment(SwingConstants.CENTER);
-    this.selectFilesButton.addActionListener(mediaButtonActionListener);
-
-    this.applyBulkAction = new MButton("Apply");
-    this.applyBulkAction.setForeground(colors.m_grey_2);
-    this.applyBulkAction.setBackground(colors.m_bg_0);
-    this.applyBulkAction.setBorderColor(colors.m_bg_5);
-    this.applyBulkAction.setHoverBackgroundColor(colors.m_bg_1);
-    this.applyBulkAction.setClickBackgroundColor(colors.m_bg_dim);
-    this.applyBulkAction.setHoverForegroundColor(colors.m_blue);
-    this.applyBulkAction.setHoverBorderColor(colors.m_blue);
-    this.applyBulkAction.setBorderRadius(0);
-    this.applyBulkAction.addActionListener(mediaButtonActionListener);
-
-    this.layoutSelectorComponent = new LayoutSelectorComponent();
   }
 
   private class LayoutSelectorComponent extends RoundedPanel {

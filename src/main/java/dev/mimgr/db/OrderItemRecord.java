@@ -2,6 +2,8 @@ package dev.mimgr.db;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrderItemRecord {
   public int     m_id;
@@ -54,6 +56,15 @@ public class OrderItemRecord {
     m_total_price = totalPrice;
   }
 
+  @Override
+  public String toString() {
+    return 
+      "   OrderId:" + this.m_order_id + 
+      ", ProductId: " + this.m_product_id + 
+      ", Quantity: " + this.m_quantity +
+      ", Unit Price: " + this.m_unit_price +
+      ", Total: " + this.m_total_price;
+  }
 
   public static ResultSet selectAll() {
     return DBQueries.select(QUERY_SELECT_ALL);
@@ -82,6 +93,21 @@ public class OrderItemRecord {
   public static int insert(int orderId, int productId, int quantity, double unit, double total) {
     return DBQueries.update(QUERY_INSERT, orderId, productId, quantity, unit, total);
   }
+
+  public static int insert(Iterable<OrderItemRecord> oirs) {
+    List<Object[]> args = new ArrayList<>();
+    for (OrderItemRecord oir : oirs) {
+      args.add(new Object[]{
+        oir.m_order_id,
+        oir.m_product_id,
+        oir.m_quantity,
+        oir.m_unit_price,
+        oir.m_total_price,
+      });
+    }
+    return DBQueries.batchUpdate(QUERY_INSERT, args);
+  }
+
 
   public static int insert(OrderItemRecord oir) {
     return DBQueries.update(

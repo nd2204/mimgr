@@ -1,6 +1,7 @@
 package dev.mimgr;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -23,7 +24,7 @@ import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MPasswordField;
 import dev.mimgr.custom.MCheckBox;
 
-public class FormLogin extends AnimatedPanel implements ActionListener, DocumentListener {
+public class FormLogin extends AnimatedPanel implements ActionListener, DocumentListener, KeyListener {
   FormLogin() {
     super(new LoginShader(), Entry.m_width, Entry.m_height);
     // super(new Color(0x1379a9), ColorTheme.getInstance().getCurrentScheme().m_blue);
@@ -94,25 +95,25 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     // this.show_password_button.setBorderColor(null);
 
 
-    this.login_button = new MButton("Đăng nhập");
-    this.login_button.setFont(font_bold);
-    this.login_button.setBackground(colors.m_bg_4);
-    this.login_button.setBorderColor(colors.m_bg_4);
-    this.login_button.setForeground(colors.m_grey_1);
-    this.login_button.setDefaultForeground(colors.m_grey_1);
-    this.login_button.setBorderWidth(2);
-    this.login_button.setEnabled(false);
-    this.login_button.addActionListener(this);
+    this.btnLogin = new MButton("Đăng nhập");
+    this.btnLogin.setFont(font_bold);
+    this.btnLogin.setBackground(colors.m_bg_4);
+    this.btnLogin.setBorderColor(colors.m_bg_4);
+    this.btnLogin.setForeground(colors.m_grey_1);
+    this.btnLogin.setDefaultForeground(colors.m_grey_1);
+    this.btnLogin.setBorderWidth(2);
+    this.btnLogin.setEnabled(false);
+    this.btnLogin.addActionListener(this);
 
-    this.signup_button = new MButton("Đăng ký");
-    this.signup_button.setFont(font_bold);
-    this.signup_button.setBorderWidth(2);
-    this.signup_button.setBackground(colors.m_bg_0);
-    this.signup_button.setBorderColor(colors.m_bg_4);
-    this.signup_button.setForeground(colors.m_grey_0);
-    this.signup_button.setHoverBorderColor(colors.m_bg_5);
-    this.signup_button.setHoverBackgroundColor(colors.m_bg_3);
-    this.signup_button.addActionListener(this);
+    this.btnSignup = new MButton("Đăng ký");
+    this.btnSignup.setFont(font_bold);
+    this.btnSignup.setBorderWidth(2);
+    this.btnSignup.setBackground(colors.m_bg_0);
+    this.btnSignup.setBorderColor(colors.m_bg_4);
+    this.btnSignup.setForeground(colors.m_grey_0);
+    this.btnSignup.setHoverBorderColor(colors.m_bg_5);
+    this.btnSignup.setHoverBackgroundColor(colors.m_bg_3);
+    this.btnSignup.addActionListener(this);
 
     // =======================================================
     // Setup Layout
@@ -175,7 +176,7 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     c.gridy = 4;
     c.weightx = 1.0;
     c.gridwidth = 2;
-    input_container.add(login_button, c);
+    input_container.add(btnLogin, c);
 
     c.fill = GridBagConstraints.HORIZONTAL;
     c.insets = new Insets(10, padding, 10, padding);
@@ -191,7 +192,7 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     c.gridy = 6;
     c.gridx = 0;
     c.weightx = 1.0;
-    input_container.add(signup_button, c);
+    input_container.add(btnSignup, c);
 
     this.setLayout(new GridBagLayout());
     this.setBackground(null);
@@ -201,8 +202,13 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
     c.anchor = GridBagConstraints.CENTER;
     c.weighty = 1.0;
     this.add(input_container, c);
+
     this.start();
     this.setVisible(false);
+
+    for (Component comp : input_container.getComponents()) {
+      comp.addKeyListener(this);
+    }
   }
 
   @Override
@@ -223,11 +229,11 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
       pf_password.setShowingPassword(isShowingPassword);
     }
 
-    if (e.getSource() == login_button) {
+    if (e.getSource() == btnLogin) {
       tryLogin();
     }
 
-    if (e.getSource() == signup_button) {
+    if (e.getSource() == btnSignup) {
       this.stop();
       PanelManager.register_panel(new FormSignUp(), "FORM_SIGNUP");
       PanelManager.show("FORM_SIGNUP");
@@ -266,43 +272,52 @@ public class FormLogin extends AnimatedPanel implements ActionListener, Document
 
   private void checkFields() {
     if (!tf_username.getTextString().isEmpty() && !pf_password.getTextString().isEmpty()) {
-      this.login_button.setBackground(colors.m_blue);
-      this.login_button.setBorderColor(colors.m_blue);
-      this.login_button.setForeground(colors.m_fg_1);
-      this.login_button.setDefaultForeground(colors.m_fg_1);
-      this.login_button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-      this.login_button.setEnabled(true);
+      this.btnLogin.setBackground(colors.m_blue);
+      this.btnLogin.setBorderColor(colors.m_blue);
+      this.btnLogin.setForeground(colors.m_fg_1);
+      this.btnLogin.setDefaultForeground(colors.m_fg_1);
+      this.btnLogin.setCursor(new Cursor(Cursor.HAND_CURSOR));
+      this.btnLogin.setEnabled(true);
     } else {
-      this.login_button.setEnabled(false);
-      this.login_button.setBackground(colors.m_bg_4);
-      this.login_button.setBorderColor(colors.m_bg_4);
-      this.login_button.setForeground(colors.m_grey_1);
-      this.login_button.setDefaultForeground(colors.m_grey_1);
-      this.login_button.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+      this.btnLogin.setEnabled(false);
+      this.btnLogin.setBackground(colors.m_bg_4);
+      this.btnLogin.setBorderColor(colors.m_bg_4);
+      this.btnLogin.setForeground(colors.m_grey_1);
+      this.btnLogin.setDefaultForeground(colors.m_grey_1);
+      this.btnLogin.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
   }
 
   @Override
-  public void insertUpdate(DocumentEvent e) {
-    checkFields();
+  public void keyPressed(KeyEvent e) {
+    if (e.getKeyCode() == KeyEvent.VK_ENTER && btnLogin.isEnabled()) {
+      tryLogin();
+    }
   }
 
   @Override
-  public void removeUpdate(DocumentEvent e) {
-    checkFields();
+  public void keyReleased(KeyEvent e) {
   }
 
   @Override
-  public void changedUpdate(DocumentEvent e) {
-    checkFields();
+  public void keyTyped(KeyEvent e) {
   }
+
+  @Override
+  public void insertUpdate(DocumentEvent e) { checkFields(); }
+
+  @Override
+  public void removeUpdate(DocumentEvent e) { checkFields(); }
+
+  @Override
+  public void changedUpdate(DocumentEvent e) { checkFields(); }
 
   private MTextField     tf_username;
   private MPasswordField pf_password;
   private ColorScheme    colors;
   private JLabel         form_label;
-  private MButton        login_button;
-  private MButton        signup_button;
+  private MButton        btnLogin;
+  private MButton        btnSignup;
   private MButton        show_password_button;
   private boolean        isShowingPassword = false;
   private MCheckBox      remember;

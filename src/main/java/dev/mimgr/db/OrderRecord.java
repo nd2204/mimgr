@@ -4,6 +4,8 @@ package dev.mimgr.db;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrderRecord {
   public int     m_id;
@@ -67,7 +69,7 @@ public class OrderRecord {
   };
 
   public static final String QUERY_INSERT = String.format(
-    "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?)",
+    "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?);",
     TABLE, FIELD_DATE, FIELD_TOTAL, FIELD_ORDER_STATUS, FIELD_PAYMENT_STATUS
   );
   public static final String QUERY_DELETE_BY_KEY = String.format(
@@ -150,6 +152,14 @@ public class OrderRecord {
     return DBQueries.update(QUERY_DELETE_BY_KEY, or.m_id);
   }
 
+  public static int delete(Iterable<OrderRecord> ors) {
+    List<Object[]> args = new ArrayList<>();
+    for (OrderRecord or : ors) {
+      args.add(new Object[]{or.m_id});
+    }
+    return DBQueries.batchUpdate(QUERY_DELETE_BY_KEY, args);
+  }
+
   public static int delete(int id) {
     return DBQueries.update(QUERY_DELETE_BY_KEY, id);
   }
@@ -159,8 +169,16 @@ public class OrderRecord {
     return result;
   }
 
-  public static int insert(OrderRecord pr) {
-    int result = DBQueries.update(QUERY_INSERT, pr.m_date, pr.m_total, pr.m_order_status, pr.m_payment_status);
+  public static int insert(Iterable<OrderRecord> ors) {
+    List<Object[]> args = new ArrayList<>();
+    for (OrderRecord or : ors) {
+      args.add(new Object[]{or.m_date, or.m_total, or.m_order_status, or.m_payment_status});
+    }
+    return DBQueries.batchUpdate(QUERY_INSERT, args);
+  }
+
+  public static int insert(OrderRecord or) {
+    int result = DBQueries.update(QUERY_INSERT, or.m_date, or.m_total, or.m_order_status, or.m_payment_status);
     return result;
   }
 }

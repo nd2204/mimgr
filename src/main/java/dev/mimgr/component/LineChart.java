@@ -238,6 +238,12 @@ public class LineChart extends JPanel {
     repaint();
   }
 
+  public void clear() {
+    dataPointList.clear();
+    revalidate();
+    repaint();
+  }
+
   public void setYLabelFormatter(Function<String, String> format) {
     this.yLabelsFormatter = format; 
     repaint();

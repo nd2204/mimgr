@@ -38,6 +38,7 @@ import dev.mimgr.custom.MTable;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers.MultiClickHandler;
 
 public class MediaTableView extends JPanel implements TableModelListener, IMediaView {
   public MediaTableView() {
@@ -98,10 +99,11 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
     this.table.setModel(model);
 
     table.addMouseListener(new MouseAdapter() {
+      private MultiClickHandler multiClickHandler = new MultiClickHandler(2, 200);
       @Override
-      public void mouseClicked(MouseEvent e) {
+      public void mousePressed(MouseEvent e) {
         // Check if it's a double-click
-        if (e.getClickCount() == 2) {
+        if (multiClickHandler.isValidClickCount()) {
           int row = table.getSelectedRow();
           if (row != -1) {
             doubleClickOperation.accept(row);
