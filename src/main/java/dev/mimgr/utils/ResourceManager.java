@@ -188,6 +188,13 @@ public class ResourceManager {
     return destinationPath;
   }
 
+  public Path moveStagedFileToEpxortDir(File file) {
+    Path destinationPath = null;
+    destinationPath = ResourceManager.getUniquePath(this.getExportPath().resolve(file.getName()));
+    System.out.println("Exported to: " + destinationPath);
+    return destinationPath;
+  }
+
   public String getRelativePathFromProjectToPath(Path path) {
     return String.valueOf(getProjectPath().relativize(path)).replace("\\", "/");
   }

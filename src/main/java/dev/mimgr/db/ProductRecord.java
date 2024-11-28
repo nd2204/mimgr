@@ -79,6 +79,18 @@ public class ProductRecord {
     return DBQueries.select(QUERY_SELECT_LIKE_NAME, '%' + pr.m_name + '%');
   }
 
+  public static ResultSet selectColumnsName() {
+    ResultSet resultSet = null;
+    try {
+      resultSet = DBConnection.getInstance().getConection().getMetaData().getColumns(null, null, TABLE, null);
+      return resultSet;
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return resultSet;
+  }
+
   public static int delete(ProductRecord pr) {
     return DBQueries.update(QUERY_DELETE_BY_KEY, pr.m_id);
   }

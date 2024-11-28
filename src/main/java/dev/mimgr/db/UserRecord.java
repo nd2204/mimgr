@@ -10,6 +10,9 @@ public class UserRecord {
     m_salt     = rs.getString(FIELD_SALT);
     m_username = rs.getString(FIELD_USERNAME);
     m_role     = rs.getString(FIELD_ROLE);
+    m_email    = rs.getString(FIELD_EMAIL);
+    m_number   = rs.getString(FIELD_NUMBER);
+    m_bio      = rs.getString(FIELD_BIO);
   }
 
   public static ResultSet selectUserById(int id) {
@@ -51,6 +54,9 @@ public class UserRecord {
   public String m_hash;
   public String m_salt;
   public String m_role;
+  public String m_email;
+  public String m_number;
+  public String m_bio;
 
   public static String TABLE_NAME     = "users";
   public static String FIELD_ID       = "id";
@@ -58,6 +64,9 @@ public class UserRecord {
   public static String FIELD_SALT     = "salt";
   public static String FIELD_USERNAME = "username";
   public static String FIELD_ROLE     = "role";
+  public static String FIELD_EMAIL    = "email";
+  public static String FIELD_NUMBER   = "number";
+  public static String FIELD_BIO      = "bio";
 
   public static final String QUERY_INSERT = String.format(
     "INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?);",
@@ -80,13 +89,26 @@ public class UserRecord {
     TABLE_NAME, FIELD_HASH, FIELD_SALT, FIELD_ROLE, FIELD_ID
   );
 
+  public static final String QUERY_UPDATE_PROFILE = String.format(
+    "UPDATE %s SET %s = ?, %s = ?, %s = ?, %s = ?, %s = ? WHERE %s=?;",
+    TABLE_NAME, FIELD_USERNAME, FIELD_ROLE, FIELD_EMAIL, FIELD_NUMBER, FIELD_BIO, FIELD_ID
+  );
+
+  public static int update(String username, String role, String email, String number, String bio, int user_id) {
+    return DBQueries.update(QUERY_UPDATE_PROFILE, username, role, email, number, bio, user_id);
+  }
+
+  public static int update(UserRecord ur) {
+    return DBQueries.update(QUERY_UPDATE_PROFILE, ur.m_username, ur.m_role, ur.m_email, ur.m_number, ur.m_bio, ur.m_id);
+  }
+
   public static final int ROLE_ADMIN    = 0;
   public static final int ROLE_EMPLOYEE = 1;
   public static final int ROLE_MANAGER  = 2;
   public static final int ROLE_USER     = 3;
   public static final int ROLE_MAXSIZE  = 4;
 
-  private static final String[] roles = {
+  public static final String[] roles = {
     "admin", "employee", "manager", "user"
   };
 }
