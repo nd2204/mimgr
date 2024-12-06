@@ -151,11 +151,11 @@ public class TotalOrderPanel extends RoundedPanel {
   private DataPoint getDataPointByMonth(int monthsBefore) {
     String query = """
     SELECT
-    COUNT(*) AS count,
-    DATE(order_date) AS order_day
+      COUNT(*) AS count,
+      DATE(order_date) AS order_day
     FROM orders
-    WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
-    AND order_date <= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
+    WHERE order_date >= DATE_SUB((SELECT MAX(order_date) FROM orders), INTERVAL ? MONTH)
+      AND order_date <= DATE_SUB((SELECT MAX(order_date) FROM orders), INTERVAL ? MONTH)
     GROUP BY order_day
     ORDER BY order_day ASC;
     """;
