@@ -1,10 +1,5 @@
 package dev.mimgr;
 
-import javax.swing.Box;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
-
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -15,8 +10,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import javax.swing.Box;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MTextField;
@@ -25,6 +23,12 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class HeaderPanel extends JPanel {
+  public void refresh(String Name, String Role) {
+    this.name.setText(Name);
+    this.role.setText(Role);
+    this.avatarPanel.text = getShortenedName(Name);
+  }
+
   HeaderPanel() {
     this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.setBackground(colors.m_bg_0);
@@ -93,12 +97,12 @@ public class HeaderPanel extends JPanel {
       this.setBackground(null);
       this.setOpaque(false);
 
-      JLabel name = new JLabel(ur.m_username);
+      name = new JLabel(ur.m_username);
       name.setForeground(colors.m_grey_2);
       name.setHorizontalAlignment(SwingConstants.RIGHT);
       name.setVerticalAlignment(SwingConstants.CENTER);
       name.setFont(FontManager.getFont("NunitoBold", 14f));
-      JLabel role = new JLabel(ur.m_role);
+      role = new JLabel(ur.m_role);
       role.setForeground(colors.m_bg_5);
       role.setHorizontalAlignment(SwingConstants.RIGHT);
       role.setVerticalAlignment(SwingConstants.CENTER);
@@ -128,27 +132,28 @@ public class HeaderPanel extends JPanel {
       c.ipady = 30;
       c.weighty = 1.0;
       c.gridheight = 2;
-      this.add(new AvatarPanel(getShortenedName(ur.m_username), colors.m_aqua, colors.m_fg_1), c);
-    }
-
-    private String getShortenedName(String name) {
-      String[] strs = name.split(" ", 3);
-      String result = "";
-      if (strs.length < 2) {
-        for (int i = 0; i < 2; ++i) {
-          result += strs[0].charAt(i);
-        }
-      } else {
-        for (String s : strs) {
-          result += s.charAt(0);
-        }
-      }
-      return result.toUpperCase().trim();
+      avatarPanel = new AvatarPanel(getShortenedName(ur.m_username), colors.m_aqua, colors.m_fg_1);
+      this.add(avatarPanel, c);
     }
   }
 
+  public String getShortenedName(String name) {
+    String[] strs = name.split(" ", 3);
+    String result = "";
+    if (strs.length < 2) {
+      for (int i = 0; i < 2; ++i) {
+        result += strs[0].charAt(i);
+      }
+    } else {
+      for (String s : strs) {
+        result += s.charAt(0);
+      }
+    }
+    return result.toUpperCase().trim();
+  }
+
   private class AvatarPanel extends JPanel {
-    private String text;
+    public String text;
     private Color circleColor;
     private Color textColor;
 
@@ -205,4 +210,7 @@ public class HeaderPanel extends JPanel {
   MButton btnAccount;
   MTextField tfSearch;
   MButton btnToggleSidebar;
+  private AvatarPanel avatarPanel;
+  private JLabel name;
+  private JLabel role;
 }

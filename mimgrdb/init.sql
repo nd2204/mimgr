@@ -10,7 +10,10 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(50) NOT NULL UNIQUE,
   role     CHAR(64)    DEFAULT "user",
   hash     CHAR(64)    NOT NULL,
-  salt     CHAR(64)    NOT NULL
+  salt     CHAR(64)    NOT NULL,
+  email    VARCHAR(50),
+  number   CHAR(64),
+  bio      TEXT
 );
 
 CREATE TABLE IF NOT EXISTS categories (
@@ -403,3 +406,4 @@ INSERT INTO mimgrdb.images (image_url,image_name,image_caption,image_author,imag
 	 ('uploads/j-und-d-sh-40-nt-natural-incl-case_1_GIT0016578-000_1.jpg','j-und-d-sh-40-nt-natural-incl-case_1_GIT0016578-000','',1,'2024-11-11 03:25:44'),
 	 ('uploads/squier-affinity-series-starcaster-mn-3-color-sunburst_1_GIT0050680-000_1.jpg','squier-affinity-series-starcaster-mn-3-color-sunburst_1_GIT0050680-000','',1,'2024-11-11 03:26:40'),
 	 ('uploads/ibanez-artcore-as53-srf-sunburst-red-flat_1_GIT0057757-000_1.jpg','ibanez-artcore-as53-srf-sunburst-red-flat_1_GIT0057757-000','',1,'2024-11-11 03:27:14');
+INSERT INTO users (username, hash, salt) VALUES ('huyduong', 'f961e0fa814ca173092d4a66e0bea06cc58e3715bcbdc8893712404783d2926c', 'j/kI9IRcDZOdyjSWRlv0uA==');

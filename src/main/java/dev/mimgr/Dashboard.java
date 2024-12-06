@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import javax.swing.Icon;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
 
 import dev.mimgr.custom.MButton;
 import dev.mimgr.theme.ColorTheme;
@@ -24,7 +25,7 @@ public class Dashboard extends JPanel {
     this.setBackground(colors.m_bg_dim);
 
     // Header
-    HeaderPanel headerPanel = new HeaderPanel();
+    headerPanel = new HeaderPanel();
     headerPanel.setPreferredSize(new Dimension(this.getWidth(), 65));
     btnToggleSidebar = headerPanel.getToggleSidebarComponent();
     btnToggleSidebar.addActionListener(new HeaderBarListener());
@@ -78,13 +79,15 @@ public class Dashboard extends JPanel {
       // Bottom section
       c.weighty = 1.0;
       c.anchor = GridBagConstraints.PAGE_END;
-      sidebarPanel.addMenuButton("Account", accounts_icon, new FormAccount(), c);
+      formAccount = new FormAccount();
+      sidebarPanel.addMenuButton("Account", accounts_icon, formAccount, c);
+      setButtonRefreshOnClick(formAccount.getUpdateProfileButton());
 
       c.weighty = 0.0;
       sep = new JSeparator();
       sep.setForeground(colors.m_bg_4);
       sep.setBackground(null);
-      sidebarPanel.addMenuButton("Settings", settings_icon, null, c);
+      // sidebarPanel.addMenuButton("Settings", settings_icon, null, c);
       sidebarPanel.addComponent(sep, c);
 
       c.insets = new Insets(padding_vertical, padding_horizontal, 20, padding_horizontal);
@@ -121,8 +124,20 @@ public class Dashboard extends JPanel {
     }
   }
 
+  public void setButtonRefreshOnClick(MButton btn) {
+    btn.addActionListener((actionEvent) -> {
+      new Thread(() -> {
+        SwingUtilities.invokeLater(() -> {
+          headerPanel.refresh(formAccount.getUsername(), formAccount.getRole());
+        });
+      }).start();
+    });
+  }
+
   private SidebarPanel sidebarPanel;
   private ColorScheme colors; 
   private MButton btnToggleSidebar;
   private MButton btnLogOut;
+  private FormAccount formAccount;
+  private HeaderPanel headerPanel;
 }
