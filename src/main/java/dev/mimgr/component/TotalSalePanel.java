@@ -145,8 +145,8 @@ public class TotalSalePanel extends RoundedPanel {
         GROUP BY order_id
       ) AS oi
     ON o.order_id = oi.order_id
-    WHERE o.order_date >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
-      AND o.order_date <= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
+    WHERE o.order_date >= DATE_SUB((SELECT MAX(order_date) FROM orders), INTERVAL ? MONTH)
+      AND o.order_date <= DATE_SUB((SELECT MAX(order_date) FROM orders), INTERVAL ? MONTH)
     ORDER BY o.order_date ASC;
     """, OrderRecord.FIELD_PAYMENT_STATUS);
     DataPoint dataPoint = new DataPoint();

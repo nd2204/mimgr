@@ -10,11 +10,6 @@ import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import dev.mimgr.custom.MButton;
-import dev.mimgr.custom.MComboBox;
-import dev.mimgr.custom.MTextArea;
-import dev.mimgr.custom.MTextField;
-import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -22,10 +17,6 @@ public class FormCreateOrder extends JFrame {
   private double m_aspect_ratio;
   private int    m_width;
   private int    m_height;
-
-  public MButton getAddProductSubmitButton() {
-    return this.btnSubmit;
-  }
 
   static {
     FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
@@ -47,20 +38,8 @@ public class FormCreateOrder extends JFrame {
     TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();
     // Main window
     orderItemPanel = new OrderItemPanel();
-    btnSubmit = orderItemPanel.getSubmitComponent();
-    btnSubmit.addActionListener(uploadButtonListener);
-    btnSubmit.setText("Create Order");
-    btnSubmit.setEnabled(false);
-    btnDelete = orderItemPanel.getDeleteComponent();
-    btnDelete.addActionListener(uploadButtonListener);
-    tfPrice = orderItemPanel.getPriceComponent();
-    tfPrice.getDocument().addDocumentListener(textFieldListener);
-    tfTitle = orderItemPanel.getTitleComponent();
-    tfTitle.getDocument().addDocumentListener(textFieldListener);
-    tfStock = orderItemPanel.getStockComponent();
-    tfStock.getDocument().addDocumentListener(textFieldListener);
-    taDescription = orderItemPanel.getDescriptionComponent();
-    cbProduct = orderItemPanel.getProductComponent();
+    orderItemPanel.btnSubmit.addActionListener(uploadButtonListener);
+    orderItemPanel.btnDelete.addActionListener(uploadButtonListener);
 
     this.setLayout(new BorderLayout());
     this.setMinimumSize(new Dimension(854, 600));
@@ -75,12 +54,12 @@ public class FormCreateOrder extends JFrame {
   private class UploadButtonListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (e.getSource() == btnDelete) {
+      if (e.getSource() == orderItemPanel.btnDelete) {
         FormCreateOrder.this.dispose();
         return;
       }
 
-      if (e.getSource() == btnSubmit) {
+      if (e.getSource() == orderItemPanel.btnSubmit) {
       }
     }
   }
@@ -102,19 +81,7 @@ public class FormCreateOrder extends JFrame {
     }
 
     private void checkFields() {
-      if (!tfTitle.getText().isEmpty() && !tfPrice.getText().isEmpty() && !tfStock.getText().isEmpty()) {
-        btnSubmit.setBackground(colors.m_blue);
-        btnSubmit.setBorderColor(colors.m_blue);
-        btnSubmit.setForeground(colors.m_fg_1);
-        btnSubmit.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btnSubmit.setEnabled(true);
-      } else {
-        btnSubmit.setEnabled(false);
-        btnSubmit.setBackground(colors.m_bg_1);
-        btnSubmit.setBorderColor(colors.m_bg_1);
-        btnSubmit.setForeground(colors.m_grey_1);
-        btnSubmit.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-      }
+
     }
   }
 
@@ -123,12 +90,5 @@ public class FormCreateOrder extends JFrame {
   }
 
   private OrderItemPanel orderItemPanel;
-  private MTextArea taDescription;
-  private MTextField tfTitle;
-  private MTextField tfPrice;
-  private MTextField tfStock;
-  private MComboBox<ProductRecord> cbProduct;
-  private MButton btnDelete;
-  private MButton btnSubmit;
   private ColorScheme colors;
 }

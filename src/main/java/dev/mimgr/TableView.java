@@ -116,6 +116,18 @@ public class TableView {
     public BiConsumer<MTable, Integer> colSetupFunction;
   }
 
+  public static JButton createAddActionButton(ActionListener actionListener) {
+    MButton button = new MButton(IconManager.getIcon("add.png", 20, 20, colors.m_green));
+    button.setPreferredSize(new Dimension(28, 28));
+    button.setMaximumSize(new Dimension(28, 28));
+    button.setBackground(colors.m_bg_2);
+    button.setBorderColor(colors.m_bg_2);
+    button.setClickBackgroundColor(colors.m_bg_dim);
+    button.setBorderRadius(28);
+    button.addActionListener(actionListener);
+    return button;
+  }
+
   public static JButton createEditActionButton(ActionListener actionListener) {
     MButton button = new MButton(IconManager.getIcon("edit.png", 12, 12, colors.m_grey_0));
     button.setPreferredSize(new Dimension(28, 28));
