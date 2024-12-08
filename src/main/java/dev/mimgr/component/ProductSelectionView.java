@@ -31,9 +31,10 @@ import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.Helpers.MultiClickHandler;
 import dev.mimgr.theme.ColorTheme;
 
-public class ProductSelectionView extends JPanel implements TableModelListener {
-  public ProductSelectionView() {
+public class ProductSelectionView extends JPanel {
+  public ProductSelectionView(OrderItemTableView tableView) {
     this.colors = ColorTheme.getInstance().getCurrentScheme();
+    this.orderItemTableView = tableView;
 
     // Initialization
     this.table = new MTable();
@@ -41,20 +42,14 @@ public class ProductSelectionView extends JPanel implements TableModelListener {
     this.tableScrollPane = new MScrollPane();
     this.model = new DefaultTableModel() {
       @Override
-      public Class<?> getColumnClass(int columnIndex) {
-        return columnIndex == 0 ? Boolean.class : String.class;
-      }
-
-      @Override
       public boolean isCellEditable(int row, int column) {
-        return column == 0 || column == 6;
+        return column == 4;
       }
     };
 
     this.doubleClickOperation = (row) -> {
-      table.setValueAt(!(Boolean) table.getValueAt(row, 0), row, 0);
+      orderItemTableView.addProduct(productList.get(row), 1);
     };
-
 
     this.table.setFillsViewportHeight(true);
     this.table.setRowHeight(100);
@@ -67,14 +62,13 @@ public class ProductSelectionView extends JPanel implements TableModelListener {
     this.tableScrollPane.setOpaque(true);
     this.tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-    tv.add_column(table, "", TableView.setup_image_column(colors));
+    tv.add_column(table, "", TableView.setup_image_column());
     tv.add_column(table, "Name", TableView.setup_custom_column(150, 150, Integer.MAX_VALUE));
     tv.add_column(table, "Price", TableView.setup_custom_column(80, 80, 120));
     tv.add_column(table, "Stock", TableView.setup_custom_column(50, 50, 100));
     tv.add_column(table, "Action", TableView.setup_action_button_column());
     tv.load_column(table, model);
 
-    model.addTableModelListener(this);
     updateView(() -> ProductRecord.selectAll());
 
     this.setLayout(new BorderLayout());
@@ -117,7 +111,9 @@ public class ProductSelectionView extends JPanel implements TableModelListener {
 
         List<JButton> buttons = new ArrayList<>();
         buttons.add(TableView.createAddActionButton(
-          (e) -> {System.out.println("Test");}
+          (e) -> {
+            orderItemTableView.addProduct(pr, 1);
+          }
         ));
 
         productList.add(pr);
@@ -142,17 +138,14 @@ public class ProductSelectionView extends JPanel implements TableModelListener {
     updateView(() -> ProductRecord.selectAll());
   }
 
-  @Override
-  public void tableChanged(TableModelEvent e) {
-  }
-
-  public void setDoubleClickOperation() {
-
+  public void setDoubleClickOperation(Consumer<Integer> op) {
+    doubleClickOperation = op;
   }
 
   private Consumer<Integer> doubleClickOperation;
   private Supplier<ResultSet> currentQueryInvoker;
   private ArrayList<ProductRecord> productList = new ArrayList<>();
+  private OrderItemTableView orderItemTableView;
   private JScrollPane       tableScrollPane;
   private MTable            table;
   private DefaultTableModel model;

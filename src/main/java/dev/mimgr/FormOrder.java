@@ -13,6 +13,7 @@ import java.util.function.Function;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -237,6 +238,9 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
   public void actionPerformed(ActionEvent e) {
     if (e.getSource() == this.btnCreateOrder) {
       FormCreateOrder jFrameAddOrder = new FormCreateOrder();
+      jFrameAddOrder.orderItemPanel.btnSubmit.addActionListener(
+        (ev) -> SwingUtilities.invokeLater(() -> orderTableView.refresh())
+      );
       jFrameAddOrder.setVisible(true);
       // OrderTableView.setButtonRefreshOnClick(
       //   jFrameAddOrder.getAddOrderSubmitButton()

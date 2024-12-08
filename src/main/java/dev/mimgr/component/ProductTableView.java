@@ -2,8 +2,7 @@ package dev.mimgr.component;
 
 import java.nio.file.Paths;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import java.sql.SQLException; import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
@@ -16,7 +15,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -104,8 +102,8 @@ public class ProductTableView extends JPanel implements TableModelListener {
     this.tableScrollPane.setOpaque(true);
     this.tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-    tv.add_column(table, "", TableView.setup_checkbox_column(colors));
-    tv.add_column(table, "", TableView.setup_image_column(colors));
+    tv.add_column(table, "", TableView.setup_checkbox_column());
+    tv.add_column(table, "", TableView.setup_image_column());
     tv.add_column(table, "Name", TableView.setup_custom_column(150, 150, Integer.MAX_VALUE));
     tv.add_column(table, "Price", TableView.setup_custom_column(80, 80, 120));
     tv.add_column(table, "Stock", TableView.setup_custom_column(50, 50, 100));
@@ -157,10 +155,10 @@ public class ProductTableView extends JPanel implements TableModelListener {
 
         List<JButton> buttons = new ArrayList<>();
         buttons.add(TableView.createEditActionButton(
-        (e) -> {editOperation.accept(List.of(pr));}
+          (e) -> {editOperation.accept(List.of(pr));}
         ));
         buttons.add(TableView.createDeleteActionButton(
-        (e) -> {deleteOperation.accept(List.of(pr));}
+          (e) -> {deleteOperation.accept(List.of(pr));}
         ));
 
         productList.add(pr);
@@ -237,15 +235,10 @@ public class ProductTableView extends JPanel implements TableModelListener {
     });
   }
 
-  public void setDoubleClickOperation() {
-
-  }
-
   private Consumer<Integer> doubleClickOperation;
   private Consumer<Iterable<ProductRecord>> editOperation;
   private Consumer<List<ProductRecord>> deleteOperation;
   private Supplier<ResultSet> currentQueryInvoker;
-  private Supplier<ResultSet> defaultQueryInvoker;
   private HashMap<Integer, ProductRecord> selectedProducts = new HashMap<>();
   private ArrayList<ProductRecord> productList = new ArrayList<>();
   private JScrollPane       tableScrollPane;

@@ -203,7 +203,11 @@ public class TotalSalePanel extends RoundedPanel {
       chart.addDataPoint(dataPoint);
       legendsPanel.add(new DataPointLegend(dataPoint));
     }
-    lblGrowthRate.setRate(thisMonthSum / lastMonthSum);
+    if (lastMonthSum == 0) {
+      lblGrowthRate.setRate(1.0);
+    } else {
+      lblGrowthRate.setRate(thisMonthSum / lastMonthSum);
+    }
   }
 
   public void refresh() {

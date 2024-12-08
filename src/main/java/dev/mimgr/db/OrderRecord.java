@@ -4,6 +4,7 @@ package dev.mimgr.db;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +90,7 @@ public class OrderRecord {
     int id, Instant date, double total, String paymentStatus, String orderStatus
   ) {
     m_id             = id;
-    m_date           = date;
+    m_date           = date.truncatedTo(ChronoUnit.SECONDS);
     m_total          = total;
     m_order_status   = orderStatus;
     m_payment_status = paymentStatus;
@@ -165,7 +166,14 @@ public class OrderRecord {
   }
 
   public static int insert(Instant date, double total, String paymentStatus, String orderStatus) {
-    int result = DBQueries.update(QUERY_INSERT, date, total, orderStatus, paymentStatus);
+    date = date.truncatedTo(ChronoUnit.SECONDS);
+    int result = DBQueries.update(
+      QUERY_INSERT,
+      date,
+      total,
+      orderStatus,
+      paymentStatus
+    );
     return result;
   }
 

@@ -86,12 +86,12 @@ public class OrderTableView extends JPanel implements TableModelListener {
     this.tableScrollPane.setOpaque(true);
     this.tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-    tv.add_column(table, "", TableView.setup_checkbox_column(colors));
+    tv.add_column(table, "", TableView.setup_checkbox_column());
     tv.add_column(table, "Order", TableView.setup_custom_column(60, 60, 80));
     tv.add_column(table, "Date", TableView.setup_custom_column(180, 180, 200));
     tv.add_column(table, "Total", TableView.setup_custom_column(100, 100, 200));
-    tv.add_column(table, "Order status", TableView.setup_status_column(colors));
-    tv.add_column(table, "Payment status", TableView.setup_status_column(colors));
+    tv.add_column(table, "Order status", TableView.setup_status_column());
+    tv.add_column(table, "Payment status", TableView.setup_status_column());
     tv.add_column(table, "Items", TableView.setup_default_column());
     tv.add_column(table, "Actions", TableView.setup_action_button_column());
     tv.load_column(table, model);

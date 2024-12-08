@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import dev.mimgr.component.NotificationPopup;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
@@ -35,7 +36,6 @@ public class FormCreateOrder extends JFrame {
     m_height = (int) ((float) m_width / m_aspect_ratio);
 
     UploadButtonListener uploadButtonListener = new UploadButtonListener();
-    TextFieldDocumentListener textFieldListener = new TextFieldDocumentListener();
     // Main window
     orderItemPanel = new OrderItemPanel();
     orderItemPanel.btnSubmit.addActionListener(uploadButtonListener);
@@ -60,28 +60,14 @@ public class FormCreateOrder extends JFrame {
       }
 
       if (e.getSource() == orderItemPanel.btnSubmit) {
+        int count = orderItemPanel.commit_selected_order_items();
+        PanelManager.createPopup(new NotificationPopup(
+          "Created " + count + " order(s)",
+          NotificationPopup.NOTIFY_LEVEL_INFO,
+          5000
+        ));
+        FormCreateOrder.this.dispose();
       }
-    }
-  }
-
-  private class TextFieldDocumentListener implements DocumentListener {
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-      checkFields();
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-      checkFields();
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-      checkFields();
-    }
-
-    private void checkFields() {
-
     }
   }
 
@@ -89,6 +75,6 @@ public class FormCreateOrder extends JFrame {
     new FormCreateOrder();
   }
 
-  private OrderItemPanel orderItemPanel;
+  public OrderItemPanel orderItemPanel;
   private ColorScheme colors;
 }

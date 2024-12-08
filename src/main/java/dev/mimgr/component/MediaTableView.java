@@ -117,8 +117,8 @@ public class MediaTableView extends JPanel implements TableModelListener, IMedia
     this.tableScrollPane.setOpaque(true);
     this.tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-    this.tv.add_column(table, "", TableView.setup_checkbox_column(colors));
-    this.tv.add_column(table, "", TableView.setup_image_column(colors));
+    this.tv.add_column(table, "", TableView.setup_checkbox_column());
+    this.tv.add_column(table, "", TableView.setup_image_column());
     this.tv.add_column(table, "Image name", TableView.setup_default_column());
     this.tv.add_column(table, "Filename", TableView.setup_default_column());
     this.tv.add_column(table, "Date", TableView.setup_default_column());

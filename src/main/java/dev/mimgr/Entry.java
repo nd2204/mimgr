@@ -9,6 +9,7 @@ import java.awt.event.WindowListener;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.UserRecord;
@@ -60,6 +61,9 @@ public class Entry extends JFrame {
   }
 
   public static void main(String arg[]) {
+    try {
+      UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+    } catch (Exception ex) {}
     FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
     FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
     FontManager.loadFont("RobotoMonoBold", "RobotoMono-Bold.ttf");

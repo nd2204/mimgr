@@ -23,8 +23,10 @@ public class RandomOrderGenerator {
 
   public static void createRandomOrder(int count, Supplier<Instant> timestampGen) {
     Random random = new Random();
+
     ArrayList<OrderRecord> ors = new ArrayList<>();
     ArrayList<OrderItemRecord> oirs = new ArrayList<>();
+
     for (int i = 0; i < count; ++i) {
       ors.add(new OrderRecord(0, timestampGen.get(), 0, getRandomPaymentStatus(), getRandomOrderStatus()));
     }
@@ -39,6 +41,7 @@ public class RandomOrderGenerator {
         oirs.add(oir);
       }
     }
+
     OrderItemRecord.insert(oirs);
   }
 

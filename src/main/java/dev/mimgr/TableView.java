@@ -1,13 +1,13 @@
 package dev.mimgr;
 
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
 import javax.swing.JButton;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
@@ -16,9 +16,9 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class TableView {
-  private static ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
-  public static BiConsumer<MTable, Integer> setup_checkbox_column(ColorScheme colors) {
+  public static BiConsumer<MTable, Integer> setup_checkbox_column() {
     return (table, colIndex) -> {
+      ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
       TableColumn column = table.getColumnModel().getColumn(colIndex);
       MCheckBoxHeader checkBoxHeader = new MCheckBoxHeader(table, colIndex);
       checkBoxHeader.getCheckBoxComponent().setCheckColor(colors.m_green);
@@ -53,8 +53,9 @@ public class TableView {
     };
   }
 
-  public static BiConsumer<MTable, Integer> setup_image_column(ColorScheme colors) {
+  public static BiConsumer<MTable, Integer> setup_image_column() {
     return (table, colIndex) -> {
+      ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
       TableColumn column = table.getColumnModel().getColumn(colIndex);
       column.setMinWidth(80);
       column.setPreferredWidth(80);
@@ -63,7 +64,7 @@ public class TableView {
     };
   }
 
-  public static BiConsumer<MTable, Integer> setup_status_column(ColorScheme colors) {
+  public static BiConsumer<MTable, Integer> setup_status_column() {
     return (table, colIndex) -> {
       TableColumn column = table.getColumnModel().getColumn(colIndex);
       column.setMinWidth(150);
@@ -73,6 +74,17 @@ public class TableView {
     };
   }
 
+  public static BiConsumer<MTable, Integer> setup_number_input_column() {
+    return (table, colIndex) -> {
+      TableColumn column = table.getColumnModel().getColumn(colIndex);
+      column.setHeaderRenderer(new MTableHeaderRenderer(SwingConstants.CENTER));
+      column.setMinWidth(160);
+      column.setMaxWidth(200);
+      column.setPreferredWidth(160);
+      column.setCellRenderer(new MNumberInputCellRenderer());
+      column.setCellEditor(new MNumberInputCellEditor());
+    };
+  }
 
   public static BiConsumer<MTable, Integer> setup_default_column() {
     return (table, colIndex) -> {
@@ -117,6 +129,7 @@ public class TableView {
   }
 
   public static JButton createAddActionButton(ActionListener actionListener) {
+    ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
     MButton button = new MButton(IconManager.getIcon("add.png", 20, 20, colors.m_green));
     button.setPreferredSize(new Dimension(28, 28));
     button.setMaximumSize(new Dimension(28, 28));
@@ -129,6 +142,7 @@ public class TableView {
   }
 
   public static JButton createEditActionButton(ActionListener actionListener) {
+    ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
     MButton button = new MButton(IconManager.getIcon("edit.png", 12, 12, colors.m_grey_0));
     button.setPreferredSize(new Dimension(28, 28));
     button.setMaximumSize(new Dimension(28, 28));
@@ -141,7 +155,11 @@ public class TableView {
   }
 
   public static JButton createDeleteActionButton(ActionListener actionListener) {
-    MButton button = new MButton(IconManager.getIcon("trash_bin.png", 12, 12, colors.m_red));
+    ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
+    MButton button = new MButton("x");
+    button.setForeground(colors.m_red);
+    button.setFont(FontManager.getFont("NunitoBold", 14.0f));
+    button.setPadding(new Insets(0, 5, 0, 5));
     button.setPreferredSize(new Dimension(28, 28));
     button.setMaximumSize(new Dimension(28, 28));
     button.setBackground(colors.m_bg_2);
