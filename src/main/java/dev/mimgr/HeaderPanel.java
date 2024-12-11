@@ -1,6 +1,7 @@
 package dev.mimgr;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -10,6 +11,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
@@ -162,6 +165,19 @@ public class HeaderPanel extends JPanel {
       this.text = text;
       this.circleColor = circleColor;
       this.textColor = textColor;
+      this.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseEntered(MouseEvent ev) {
+          AvatarPanel.this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+        @Override
+        public void mouseClicked(MouseEvent ev) {
+          JPanel panel = PanelManager.get_panel("DASHBOARD");
+          if (panel instanceof Dashboard dashboard) {
+            dashboard.setCurrentMenu(dashboard.menuButtons.get(5));
+          }
+        }
+      });
       setOpaque(false); // Makes the panel background transparent
     }
 

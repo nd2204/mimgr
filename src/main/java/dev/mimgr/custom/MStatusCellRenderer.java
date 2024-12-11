@@ -74,7 +74,7 @@ public class MStatusCellRenderer extends JPanel implements TableCellRenderer {
       g2.drawString(statusString, textX, textY);
     }
 
-    g2.setColor(colors.m_bg_3);
+    g2.setColor(colors.m_bg_1);
     g2.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
 
     g2.dispose();

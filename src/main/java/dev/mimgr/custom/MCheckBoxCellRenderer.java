@@ -40,7 +40,7 @@ public class MCheckBoxCellRenderer extends MCheckBox implements TableCellRendere
 
     // Draw the border using the specified color
     Graphics2D g2 = (Graphics2D) g.create();
-    g2.setColor(colors.m_bg_3);
+    g2.setColor(colors.m_bg_1);
     g2.drawLine(0, getHeight(), getWidth(), getHeight()); // Bottom border
 
     g2.dispose();

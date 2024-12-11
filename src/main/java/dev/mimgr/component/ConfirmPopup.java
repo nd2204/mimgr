@@ -21,22 +21,17 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-public class NotificationPopup implements PopupPanel.IPopup {
+public class ConfirmPopup implements PopupPanel.IPopup {
   private static final ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
   private static final int POPUP_WIDTH = 300;
   private static final int POPUP_HEIGHT = 100;
   private static final int POPUP_PADDING = 10;
 
+  public MButton btnYes = new MButton("Yes");
+  public MButton btnNo = new MButton("No");
+
   private String id;
   private RoundedPanel panel;
-  private long timeout;
-
-  public static final int NOTIFY_LEVEL_DEBUG     = 0;
-  public static final int NOTIFY_LEVEL_NORMAL    = 1;
-  public static final int NOTIFY_LEVEL_INFO      = 2;
-  public static final int NOTIFY_LEVEL_WARNING   = 3;
-  public static final int NOTIFY_LEVEL_ERROR     = 4;
-  public static final int NOTIFY_LEVEL_MAX_LEVEL = 5;
 
   static {
     FontManager.loadFont("NunitoBold", "Nunito-Bold.ttf");
@@ -44,40 +39,10 @@ public class NotificationPopup implements PopupPanel.IPopup {
 
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
 
-  private static String[] notify_str = {
-    "DEBUG",
-    "NORMAL",
-    "INFO",
-    "WARNING",
-    "ERROR"
-  };
-
-  private static Color[] notify_color = {
-    colors.m_blue,
-    colors.m_fg_0,
-    colors.m_green,
-    colors.m_yellow,
-    colors.m_red
-  };
-
-  private static Icon[] notify_icon = {
-    IconManager.getIcon("info.png"    , 18, 16, notify_color[0]),
-    IconManager.getIcon("info.png"    , 18, 16, notify_color[1]),
-    IconManager.getIcon("info.png"    , 18, 16, notify_color[2]),
-    IconManager.getIcon("warning.png" , 18, 16, notify_color[3]),
-    IconManager.getIcon("error.png"   , 18, 16, notify_color[4])
-  };
-
-  public NotificationPopup(String message, final int notifyLevel, long timeout) {
-    if (notifyLevel >= NOTIFY_LEVEL_MAX_LEVEL || notifyLevel < 0) {
-      throw new IllegalArgumentException("Invalid Notify Level: '" + notifyLevel + "'");
-    }
-
-    this.timeout = timeout;
+  public ConfirmPopup(String title, String message) {
     this.id = UUID.randomUUID().toString();
-    // set timeout
     this.panel = new RoundedPanel();
-    this.panel.setBorderColor(notify_color[notifyLevel]);
+    this.panel.setBorderColor(colors.m_bg_5);
     this.panel.setBorderWidth(2);
     this.panel.setBorderRadius(15);
     this.panel.setOpaque(false); // Ensure the popup background is visible
@@ -94,15 +59,14 @@ public class NotificationPopup implements PopupPanel.IPopup {
     closeButton.setBorderPainted(false);
 
     JSeparator sep = new JSeparator(JSeparator.HORIZONTAL);
-    sep.setBackground(notify_color[notifyLevel]);
-    sep.setForeground(notify_color[notifyLevel]);
+    sep.setBackground(colors.m_bg_5);
+    sep.setForeground(colors.m_bg_5);
 
-    JLabel messageTitle = new JLabel(notify_str[notifyLevel]);
+    JLabel messageTitle = new JLabel(title);
     messageTitle.setFont(nunito_bold_14);
-    messageTitle.setForeground(notify_color[notifyLevel]);
+    messageTitle.setForeground(colors.m_fg_0);
     messageTitle.setHorizontalAlignment(SwingConstants.LEFT);
     messageTitle.setVerticalAlignment(SwingConstants.CENTER);
-    messageTitle.setIcon(notify_icon[notifyLevel]);
 
     MTextArea messageLabel = new MTextArea();
     messageLabel.setFont(nunito_bold_14);
@@ -158,9 +122,21 @@ public class NotificationPopup implements PopupPanel.IPopup {
 
     c.fill = GridBagConstraints.BOTH;
     c.weightx = 1.0;
+    c.weighty = 1.0;
     c.gridwidth = 2;
     c.insets = new Insets(10, 15, 10, 10);
     panel.add(messageLabel, c);
+
+    c.gridwidth = 1;
+    c.gridx = 0;
+    c.gridy++;
+    c.weighty = 1.0;
+
+    panel.add(btnYes, c);
+    c.gridx++;
+
+    panel.add(btnNo, c);
+
 
     panel.setMinimumSize(new Dimension(POPUP_WIDTH, POPUP_HEIGHT));
     panel.setMaximumSize(new Dimension(600, Integer.MAX_VALUE));
@@ -200,11 +176,6 @@ public class NotificationPopup implements PopupPanel.IPopup {
   @Override
   public void onShow() {
     SwingUtilities.invokeLater(() -> panel.setVisible(true));
-    if (this.timeout > 0) {
-      Timer timer = new Timer(5000, ev -> PanelManager.removePopup(this.id));
-      timer.setRepeats(false);
-      timer.start();
-    }
   }
 
   @Override

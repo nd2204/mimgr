@@ -359,19 +359,21 @@ public class EditImagePanel extends JPanel {
         dropContainerPanel.clearData();
         dropContainerPanel.addData(fp.toFile());
       }
-      return;
     }
 
     @Override
     public void onImageImported(Image image) {
-      return;
+      Path p = rm.saveImageToTempFile(image);
+      if (p != null) {
+        dropContainerPanel.clearData();
+        dropContainerPanel.addData(p.toFile());
+      }
     }
 
     @Override
     public void onFileListImported(List<File> files) {
       dropContainerPanel.clearData();
       dropContainerPanel.addData(files.getFirst());
-      return;
     }
 
     private JLabel lblMedia = new JLabel("Media");
@@ -428,10 +430,11 @@ public class EditImagePanel extends JPanel {
     private JLabel lblCategory = new JLabel("Category");
   }
 
-  // Declare form components
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
   private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 22f);
+
+  // Declare form components
 
   private ResourceManager rm = ResourceManager.getInstance();
   private JPanel thisPanel = new JPanel();

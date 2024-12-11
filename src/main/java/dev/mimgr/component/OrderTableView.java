@@ -125,7 +125,7 @@ public class OrderTableView extends JPanel implements TableModelListener {
           Boolean.FALSE,
           "#" + or.m_id,
           Helpers.formatRelativeDatetime(or.m_date),
-          "€ " + pair.getValue(),
+          Helpers.CURRENCY_SYMBOL + " " + pair.getValue(),
           new SimpleEntry<String, Color>(or.m_order_status, getStatusColor(or.m_order_status)),
           new SimpleEntry<String, Color>(or.m_payment_status, getStatusColor(or.m_payment_status)),
           getItemPlural(pair.getKey()),

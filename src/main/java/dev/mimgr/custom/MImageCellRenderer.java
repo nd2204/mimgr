@@ -50,7 +50,7 @@ public class MImageCellRenderer extends JLabel implements TableCellRenderer {
     super.paintComponent(g);
 
     Graphics2D g2 = (Graphics2D) g.create();
-    g2.setColor(colors.m_bg_3);
+    g2.setColor(colors.m_bg_1);
     g2.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
 
     g2.dispose();

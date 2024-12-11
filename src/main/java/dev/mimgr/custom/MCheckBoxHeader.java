@@ -34,18 +34,20 @@ public class MCheckBoxHeader extends JPanel implements TableCellRenderer {
       }
     });
     // Add mouse listener to the header so that the checkbox is clickable
-    table.getTableHeader().addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        // Get the column at the mouse click position
-        int column = table.columnAtPoint(e.getPoint());
-        if (column == checkBoxColumnIdx) {
-          selectAllCheckBox.setSelected(!selectAllCheckBox.isSelected());
-          selectAllCheckBox.getActionListeners()[0].actionPerformed(null);
-          table.getTableHeader().repaint();
+    if (table.getTableHeader() != null) {
+      table.getTableHeader().addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+          // Get the column at the mouse click position
+          int column = table.columnAtPoint(e.getPoint());
+          if (column == checkBoxColumnIdx) {
+            selectAllCheckBox.setSelected(!selectAllCheckBox.isSelected());
+            selectAllCheckBox.getActionListeners()[0].actionPerformed(null);
+            table.getTableHeader().repaint();
+          }
         }
-      }
-    });
+      });
+    }
     this.add(selectAllCheckBox);
   }
 

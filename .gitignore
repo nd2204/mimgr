@@ -38,3 +38,4 @@ build
 .nvim
 .vscode
 .DS_Store
+exports

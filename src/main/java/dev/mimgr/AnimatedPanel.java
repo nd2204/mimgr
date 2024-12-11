@@ -3,8 +3,7 @@ package dev.mimgr;
 import javax.swing.*;
 
 import dev.mimgr.custom.RoundedPanel;
-import dev.mimgr.theme.ColorTheme;
-import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.theme.ColorTheme; import dev.mimgr.theme.builtin.ColorScheme;
 import dev.shader.ShaderInputs;
 import dev.shader.BuiltinShaders.*;
 import dev.shader.ShaderFunctions.IShaderEntry; import dev.shader.ShaderTypes.vec2;
@@ -32,6 +31,10 @@ public class AnimatedPanel extends JPanel {
   private final ExecutorService executorService;
   private final int NUM_THREADS = Runtime.getRuntime().availableProcessors(); private volatile boolean running = false;
   private ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
+
+  private volatile boolean paused = false; // Pause control
+  private final Object pauseLock = new Object(); // Lock for pause/resume synchronization
+
 
   // Variables to track panel size changes
   private int panelWidth;
@@ -138,6 +141,16 @@ public class AnimatedPanel extends JPanel {
       while (running) {
         long startTime = System.currentTimeMillis();
 
+        synchronized (pauseLock) {
+          while (paused) {
+            try {
+              pauseLock.wait(); // Wait until resumed
+            } catch (InterruptedException e) {
+              Thread.currentThread().interrupt();
+            }
+          }
+        }
+
         updateFrame();
         // Schedule repaint safely
         SwingUtilities.invokeLater(this::repaint);
@@ -191,4 +204,17 @@ public class AnimatedPanel extends JPanel {
     repaint();
   }
 
+  public void pause() {
+    synchronized (pauseLock) {
+      paused = true;
+      pauseLock.notify();
+    }
+  }
+
+  public void resume() {
+    synchronized (pauseLock) {
+      paused = false;
+      pauseLock.notify();
+    }
+  }
 }

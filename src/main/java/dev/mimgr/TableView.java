@@ -41,15 +41,21 @@ public class TableView {
     };
   }
 
-  public static BiConsumer<MTable, Integer> setup_action_button_column() {
+  public static BiConsumer<MTable, Integer> setup_action_button_column(int min, int prefered, int max, int orientation) {
     return (table, colIndex) -> {
       TableColumn column = table.getColumnModel().getColumn(colIndex);
       column.setHeaderRenderer(new MTableHeaderRenderer(SwingConstants.CENTER));
-      column.setMinWidth(80);
-      column.setPreferredWidth(80);
-      column.setCellEditor(new MActionButtonCellEditor());
-      column.setCellRenderer(new MActionButtonCellRenderer());
+      column.setMinWidth(min);
+      column.setMaxWidth(max);
+      column.setPreferredWidth(prefered);
+      column.setCellEditor(new MActionButtonCellEditor(orientation));
+      column.setCellRenderer(new MActionButtonCellRenderer(orientation));
     };
+  }
+
+
+  public static BiConsumer<MTable, Integer> setup_action_button_column() {
+    return setup_action_button_column(80, 80, Integer.MAX_VALUE, SwingConstants.CENTER);
   }
 
   public static BiConsumer<MTable, Integer> setup_image_column() {

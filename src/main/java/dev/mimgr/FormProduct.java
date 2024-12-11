@@ -38,22 +38,22 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     int padding = 25;
     // Top
     GridBagConstraints c = new GridBagConstraints();
+
     c.insets = new Insets(25, padding, 25, padding);
     c.gridx = 0;
     c.gridy = 0;
+
     c.weightx = 1.0;
     c.anchor = GridBagConstraints.FIRST_LINE_START;
     this.add(topLabel, c);
-    c.gridx = 1;
-    c.gridy = 0;
-    c.weightx = 1.0;
+    c.gridx++;
+
+    c.weightx = 0.0;
     c.anchor = GridBagConstraints.FIRST_LINE_END;
     c.insets = new Insets(20, 5, 20, 5);
-    this.add(this.btnImport, c);
-    c.weightx = 0.0;
-    c.gridx = 2;
     this.add(this.btnExport, c);
-    c.gridx = 3;
+    c.gridx++;
+
     c.insets = new Insets(20, 5, 20, padding);
     this.add(btnAddProduct, c);
     // Content
@@ -105,13 +105,14 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
       contentContainer.add(productTableView, cc);
     }
 
-    c.insets = new Insets(0, padding, 20, padding);
-    c.fill = GridBagConstraints.BOTH;
     c.gridx = 0;
     c.gridy = 1;
+    c.insets = new Insets(0, padding, 20, padding);
+    c.fill = GridBagConstraints.BOTH;
+
     c.weightx = 1.0;
     c.weighty = 1.0;
-    c.gridwidth = 4;
+    c.gridwidth = GridBagConstraints.REMAINDER;
     this.add(contentContainer, c);
   }
 

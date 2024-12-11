@@ -10,9 +10,6 @@ import java.awt.Insets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 import javax.swing.Box;
 import javax.swing.JLabel;
@@ -27,13 +24,14 @@ import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.OrderRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers;
 
 public class TotalSalePanel extends RoundedPanel {
   public TotalSalePanel() {
     this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.setLayout(new BorderLayout());
     this.setBackground(colors.m_bg_0);
-    this.setMinimumSize(new Dimension(400, 200));
+    this.setMinimumSize(new Dimension(400, 300));
     this.setPreferredSize(new Dimension(400, 500));
     this.setBorder(new EmptyBorder(15, 15, 15, 15));
 
@@ -43,36 +41,35 @@ public class TotalSalePanel extends RoundedPanel {
     detailPanel.setBackground(colors.m_bg_0);
     {
       GridBagConstraints c = new GridBagConstraints();
-      c.insets = new Insets(0, 5, 5, 10);
       c.gridx = 0;
       c.gridy = 0;
+      c.weightx = 1.0;
+
+      c.insets = new Insets(0, 5, 5, 10);
       c.anchor = GridBagConstraints.FIRST_LINE_START;
       c.fill = GridBagConstraints.BOTH;
-      c.weightx = 1.0;
       detailPanel.add(lblTitle, c);
 
-      c.insets = new Insets(0, 5, 15, 10);
       c.gridx = 0;
-      c.gridy = 1;
+      c.gridy++;
       c.weightx = 1.0;
+
+      c.insets = new Insets(0, 5, 5, 10);
       c.anchor = GridBagConstraints.FIRST_LINE_START;
       detailPanel.add(lblTotalSales, c);
+      c.gridx++;
 
-      c.gridx = 1;
-      c.weightx = 1.0;
       detailPanel.add(Box.createHorizontalGlue(), c);
+      c.gridx++;
 
-      c.insets = new Insets(0, 5, 25, 10);
-      c.gridx = 2;
-      c.gridy = 1;
-      c.weightx = 1.0;
-      c.weighty = 1.0;
+      c.insets = new Insets(0, 5, 15, 10);
       c.anchor = GridBagConstraints.FIRST_LINE_END;
       detailPanel.add(lblGrowthRate, c);
 
-      c.insets = new Insets(0, 5, 0, 10);
       c.gridx = 0;
-      c.gridy = 2;
+      c.gridy++;
+
+      c.insets = new Insets(0, 5, 0, 10);
       c.anchor = GridBagConstraints.FIRST_LINE_START;
       c.fill = GridBagConstraints.BOTH;
       c.weightx = 1.0;
@@ -110,25 +107,13 @@ public class TotalSalePanel extends RoundedPanel {
 
     chart = new LineChart();
     chart.setMaxXDivision(4);
-    chart.setYLabelFormatter((str) -> formatToSuffix(str));
+    chart.setYLabelFormatter((str) -> Helpers.formatToSuffix(str));
     chart.setDrawFlags(LineChart.FLAG_DRAW_DATAPOINT_POINT);
 
     legendsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
     legendsPanel.setOpaque(false);
 
     initChart();
-  }
-  public static String formatToSuffix(String amountStr) {
-    double amount = Double.valueOf(amountStr);
-    if (amount >= 1_000_000_000) {
-        return String.format("€%.0fB", amount / 1_000_000_000).replaceAll("\\.0B", "B");
-    } else if (amount >= 1_000_000) {
-        return String.format("€%.0fM", amount / 1_000_000).replaceAll("\\.0M", "M");
-    } else if (amount >= 1_000) {
-        return String.format("€%.0fK", amount / 1_000).replaceAll("\\.0K", "K");
-    } else {
-        return String.format("€%.0f", amount);
-    }
   }
 
   private DataPoint getDataPointByMonth(int monthsBefore) {
@@ -149,6 +134,7 @@ public class TotalSalePanel extends RoundedPanel {
       AND o.order_date <= DATE_SUB((SELECT MAX(order_date) FROM orders), INTERVAL ? MONTH)
     ORDER BY o.order_date ASC;
     """, OrderRecord.FIELD_PAYMENT_STATUS);
+
     DataPoint dataPoint = new DataPoint();
     Instant start = null;
     Instant end = null;
@@ -165,24 +151,18 @@ public class TotalSalePanel extends RoundedPanel {
                 .equals(OrderRecord.paymentStatuses[OrderRecord.PAYMENT_STATUS_PAID])
         ) continue;
         dataPoint.data.add(rs.getDouble("total_price"));
-        dataPoint.xLabels.add(formatInstant(rs.getTimestamp("order_day").toInstant(), "MMM d"));
+        dataPoint.xLabels.add(Helpers.formatInstant(rs.getTimestamp("order_day").toInstant(), "MMM d"));
       }
       // Setup the dataPoint
       dataPoint.lineColor = colors.m_blue;
       dataPoint.lineStroke = new BasicStroke(2);
       if (start == null || end == null) return dataPoint;
-      dataPoint.dataLegend = formatInstant(start, "MMM d - ") + formatInstant(end, "MMM d, yyyy");
+      dataPoint.dataLegend = Helpers.formatInstant(start, "MMM d - ") + Helpers.formatInstant(end, "MMM d, yyyy");
     } catch (SQLException ex) {
       ex.printStackTrace();
     }
 
     return dataPoint;
-  }
-
-  private String formatInstant(Instant instant, String format) {
-    ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
-    return zdt.format(dtf);
   }
 
   private void initChart() {
@@ -192,13 +172,13 @@ public class TotalSalePanel extends RoundedPanel {
       DataPoint dataPoint = getDataPointByMonth(1);
       dataPoint.lineColor = colors.m_bg_5;
       dataPoint.lineStroke = DataPoint.createDashedStroke(2, 4 ,4);
-      lastMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
+      lastMonthSum = Helpers.calculateTotalSales(dataPoint);
       chart.addDataPoint(dataPoint);
       legendsPanel.add(new DataPointLegend(dataPoint));
     }
     {
       DataPoint dataPoint = getDataPointByMonth(0);
-      thisMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
+      thisMonthSum = Helpers.calculateTotalSales(dataPoint);
       lblTotalSales.setText(String.format("€ %.2f", thisMonthSum));
       chart.addDataPoint(dataPoint);
       legendsPanel.add(new DataPointLegend(dataPoint));
@@ -246,11 +226,11 @@ public class TotalSalePanel extends RoundedPanel {
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
 
-  private JPanel legendsPanel;
-  private LineChart chart;
+  public JPanel legendsPanel;
+  public LineChart chart;
+  public JLabel lblTitle;
+  public JLabel lblTotalSales;
+  public GrowthRateLabel lblGrowthRate;
+  public JLabel lblChart;
   private ColorScheme colors;
-  private JLabel lblTitle;
-  private JLabel lblTotalSales;
-  private GrowthRateLabel lblGrowthRate;
-  private JLabel lblChart;
 }

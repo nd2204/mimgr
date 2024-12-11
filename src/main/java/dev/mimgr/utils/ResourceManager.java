@@ -1,5 +1,7 @@
 package dev.mimgr.utils;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -91,6 +94,26 @@ public class ResourceManager {
     tempFiles.add(path.toFile());
     return path;
   }
+
+  public Path saveImageToTempFile(Image image) {
+    try {
+      BufferedImage bufferedImage = toBufferedImage(image);
+      Path outputFile = Files.createTempFile(
+        this.tempPath,
+        "image_",
+        ".jpg"
+      );
+      ImageIO.write(bufferedImage, "jpg", outputFile.toFile());
+      if (tempFiles == null) {
+        tempFiles = new ArrayList<File>();
+      }
+      tempFiles.add(outputFile.toFile());
+      return outputFile;
+    } catch(IOException ex) {
+      return null;
+    }
+  }
+
 
   public void cleanTempFiles() {
     if (tempFiles == null || tempFiles.isEmpty()) return;
@@ -240,6 +263,22 @@ public class ResourceManager {
 
   private static class ResourceManagerHolder {
     private static final ResourceManager INSTANCE = new ResourceManager();
+  }
+
+  private BufferedImage toBufferedImage(Image img) {
+    if (img instanceof BufferedImage) {
+      return (BufferedImage) img;
+    }
+
+    // Create a buffered image with transparency
+    BufferedImage bufferedImage = new BufferedImage(
+      img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_RGB);
+
+    // Draw the image onto the buffered image
+    bufferedImage.getGraphics().drawImage(img, 0, 0, null);
+    bufferedImage.getGraphics().dispose();
+
+    return bufferedImage;
   }
 
   private ArrayList<File> tempFiles = null;

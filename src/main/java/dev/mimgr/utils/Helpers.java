@@ -1,16 +1,49 @@
 package dev.mimgr.utils;
 
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.ResultSet; import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.ZoneId; import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 import javax.swing.Timer;
 
+import dev.mimgr.component.DataPoint;
+import dev.mimgr.db.DBQueries;
+import dev.mimgr.db.OrderRecord;
+import dev.mimgr.db.QueryBuilder;
+
 public class Helpers {
+  public static char CURRENCY_SYMBOL = '€';
+
+  public static void runProcess(String...commands) {
+    try {
+      ProcessBuilder processBuilder = new ProcessBuilder(commands);
+      processBuilder.directory(new java.io.File(System.getProperty("user.home")));
+      processBuilder.start();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void openFileExplorer(Path path) {
+    String osName = System.getProperty("os.name").toLowerCase();
+    if (osName.contains("win")) {
+      runProcess("explorer", "/select," + path.getParent().toString());
+    } else if (osName.contains("mac")) {
+      runProcess("open -R", path.toString());
+    } else if (osName.contains("nix")) {
+      runProcess("xdg-open", path.getParent().toString());
+    }
+  }
+
   public static String formatRelativeDatetime(Instant instant) {
     if (instant == null) return "N/A";
     LocalDateTime now = LocalDateTime.now();
@@ -98,5 +131,181 @@ public class Helpers {
   public static String getLocalTimesOfDayString() {
     int hour = LocalTime.now().getHour();
     return getTimesOfDayString(hour);
+  }
+
+  /* 
+   * @param dayBefore the day offset from today
+   * @param offset the offset from the daybefore
+   *        result in range [offset -> dayBefore] if negative offset
+   *        result in range [dayBefore -> offset] if positive offset
+   */
+  public static DataPoint getOrdersDataPoint(int dayBefore, int offset) {
+    String query = """
+    SELECT
+    COUNT(*) AS count,
+    DATE(order_date) AS order_day
+    FROM orders
+    WHERE order_date >= DATE_SUB((SELECT MAX(order_date) FROM orders), INTERVAL ? DAY)
+    AND order_date <= DATE_SUB((SELECT MAX(order_date) FROM orders), INTERVAL ? DAY)
+    GROUP BY order_day
+    ORDER BY order_day ASC;
+    """;
+    DataPoint dataPoint = new DataPoint();
+    Instant start = null;
+    Instant end = null;
+    try (ResultSet rs = DBQueries.select(query, dayBefore + offset, dayBefore)) {
+
+      while (rs.next()) {
+        if (rs.isFirst()) {
+          start = rs.getTimestamp("order_day").toInstant();
+        }
+        if (rs.isLast()) {
+          end = rs.getTimestamp("order_day").toInstant();
+        }
+        dataPoint.data.add(rs.getDouble("count"));
+        dataPoint.xLabels.add(Helpers.formatInstant(rs.getTimestamp("order_day").toInstant(), "MMM d"));
+      }
+      if (start == null || end == null) return dataPoint;
+      dataPoint.dataLegend = Helpers.formatInstant(start, "MMM d - ") + Helpers.formatInstant(end, "MMM d, yyyy");
+    } catch (SQLException ex) {
+      ex.printStackTrace();
+    }
+
+    return dataPoint;
+  }
+
+  /* 
+   * @param dayBefore the day offset from today
+   * @param offset the offset from the daybefore
+   *        result in range [offset -> dayBefore] if negative offset
+   *        result in range [dayBefore -> offset] if positive offset
+   */
+  public static DataPoint getSalesDataPoint(int dayBefore, int offset) {
+
+    String query = String.format("""
+      SELECT DATE(order_date) AS order_day, oi.total_price, %s
+      FROM orders o
+      JOIN
+      (
+      SELECT
+      order_id,
+      COUNT(order_item_id) AS total_item,
+      SUM(total_price) AS total_price
+      FROM order_items
+      GROUP BY order_id
+      ) AS oi
+      ON o.order_id = oi.order_id
+      WHERE o.order_date >= DATE_SUB((SELECT MAX(order_date) FROM orders), INTERVAL ? DAY)
+      AND o.order_date <= DATE_SUB((SELECT MAX(order_date) FROM orders), INTERVAL ? DAY)
+      ORDER BY o.order_date ASC;
+      """, OrderRecord.FIELD_PAYMENT_STATUS);
+
+    DataPoint dataPoint = new DataPoint();
+    Instant start = null;
+    Instant end = null;
+    try (ResultSet rs = DBQueries.select(query, dayBefore + offset, dayBefore)) {
+      while (rs.next()) {
+        if (rs.isFirst()) {
+          start = rs.getTimestamp("order_day").toInstant();
+        }
+        if (rs.isLast()) {
+          end = rs.getTimestamp("order_day").toInstant();
+        }
+        // Skip the row if the order haven't been paid
+        if (!rs.getString(OrderRecord.FIELD_PAYMENT_STATUS)
+        .equals(OrderRecord.paymentStatuses[OrderRecord.PAYMENT_STATUS_PAID])
+      ) continue;
+        dataPoint.data.add(rs.getDouble("total_price"));
+        dataPoint.xLabels.add(formatInstant(rs.getTimestamp("order_day").toInstant(), "MMM d"));
+      }
+      // Setup the dataPoint
+      if (start == null || end == null) return dataPoint;
+      dataPoint.dataLegend = formatInstant(start, "MMM d - ") + formatInstant(end, "MMM d, yyyy");
+    } catch (SQLException ex) {
+      ex.printStackTrace();
+    }
+
+    return dataPoint;
+  }
+
+  public static String formatToSuffix(String amountStr) {
+    double amount = Double.valueOf(amountStr);
+    if (amount >= 1_000_000_000) {
+      return String.format("€%.0fB", amount / 1_000_000_000).replaceAll("\\.0B", "B");
+    } else if (amount >= 1_000_000) {
+      return String.format("€%.0fM", amount / 1_000_000).replaceAll("\\.0M", "M");
+    } else if (amount >= 1_000) {
+      return String.format("€%.0fK", amount / 1_000).replaceAll("\\.0K", "K");
+    } else {
+      return String.format("€%.0f", amount);
+    }
+  }
+
+  public static int getUnpaidOrderCount() {
+    QueryBuilder qb = new QueryBuilder();
+    String query = qb.select("COUNT(*)")
+    .from(OrderRecord.TABLE)
+    .groupby(OrderRecord.FIELD_PAYMENT_STATUS)
+    .where(OrderRecord.FIELD_PAYMENT_STATUS + "=?")
+    .build();
+
+    ResultSet rs = DBQueries.select(
+      query,
+      OrderRecord.paymentStatuses[OrderRecord.PAYMENT_STATUS_UNPAID]
+    );
+
+    try {
+      if (rs == null || !rs.next()) return -1;
+      return rs.getInt(1);
+    } catch (SQLException e) {
+      System.err.println(e);
+      return -1;
+    }
+  }
+
+  public static int getOpenOrderCount() {
+    QueryBuilder qb = new QueryBuilder();
+    String query = qb.select("COUNT(*)")
+    .from(OrderRecord.TABLE)
+    .groupby(OrderRecord.FIELD_ORDER_STATUS)
+    .where(OrderRecord.FIELD_ORDER_STATUS + "=?")
+    .build();
+
+    ResultSet rs = DBQueries.select(
+      query,
+      OrderRecord.orderStatuses[OrderRecord.ORDER_STATUS_OPEN]
+    );
+
+    try {
+      if (rs == null || !rs.next()) return -1;
+      return rs.getInt(1);
+    } catch (SQLException e) {
+      System.err.println(e);
+      return -1;
+    }
+  }
+
+  public static String getCurrentTimestamp() {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+    System.out.println(LocalDateTime.now().format(formatter));
+    return LocalDateTime.now().format(formatter); 
+  }
+
+  public static double calculateTotalData(DataPoint dp) {
+    return dp.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
+  }
+
+  public static double calculateTotalSales(DataPoint dp) {
+    return calculateTotalData(dp);
+  }
+
+  public static double calculateTotalOrders(DataPoint dp) {
+    return calculateTotalData(dp);
+  }
+
+  public static String formatInstant(Instant instant, String format) {
+    ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
+    DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
+    return zdt.format(dtf);
   }
 }

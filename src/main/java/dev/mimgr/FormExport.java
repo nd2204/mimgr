@@ -2,8 +2,7 @@ package dev.mimgr;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
+import java.awt.Toolkit; import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
@@ -18,18 +17,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import dev.mimgr.component.ConfirmPopup;
+import dev.mimgr.component.NotificationPopup;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.custom.MComboBox;
 import dev.mimgr.db.CategoryRecord;
 import dev.mimgr.db.DBConnection;
 import dev.mimgr.db.ProductRecord;
+import dev.mimgr.db.QueryBuilder;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers;
 import dev.mimgr.utils.ResourceManager;
 
 public class FormExport extends JFrame {
@@ -158,22 +162,22 @@ public class FormExport extends JFrame {
       }
 
       if (e.getSource() == btnSubmit) {
-        ArrayList<Integer> cr_id = new ArrayList<>();
-        ArrayList<String> pr_column = new ArrayList<>();
+        ArrayList<Integer> cr_ids = new ArrayList<>();
+        ArrayList<String> pr_columns = new ArrayList<>();
         // retrieve data
         if (!ProductExportPanel.getOptionsCategorySelectedPanel().isEmpty()) {
           ArrayList<Object> datalist = new ArrayList<>();
           datalist = ProductExportPanel.getOptionsCategorySelectedPanel().getAllData();
           for (Object data : datalist) {
             if (data instanceof CategoryRecord cr) {
-              cr_id.add(cr.m_id);
+              cr_ids.add(cr.m_id);
             }
           }
 
         } else {
           try (ResultSet rs = CategoryRecord.selectAll()) {
             while (rs.next()) {
-              cr_id.add(rs.getInt("category_id"));
+              cr_ids.add(rs.getInt("category_id"));
             }
           } catch (SQLException ex) {
             ex.printStackTrace();
@@ -185,13 +189,13 @@ public class FormExport extends JFrame {
           columnlist = ProductExportPanel.getOptionsProductSelectedPanel().getAllData();
           for (Object column : columnlist) {
             if (column instanceof String pr) {
-              pr_column.add(pr);
+              pr_columns.add(pr);
             }
           }
         } else {
           try (ResultSet rs = ProductRecord.selectColumnsName()) {
             while (rs.next()) {
-              pr_column.add(rs.getString("COLUMN_NAME"));
+              pr_columns.add(rs.getString("COLUMN_NAME"));
             }
           } catch (SQLException ex) {
             ex.printStackTrace();
@@ -199,24 +203,21 @@ public class FormExport extends JFrame {
         }
 
         // Build the query with placeholders
+        QueryBuilder queryBuilder = new QueryBuilder();
         StringBuilder query = new StringBuilder(
-            "SELECT products.* FROM products INNER JOIN categories ON products.category_id = categories.category_id WHERE products.category_id IN (");
-        for (int i = 0; i < cr_id.size(); i++) {
-          query.append(cr_id.get(i));
-          if (i < cr_id.size() - 1) {
-            query.append(", ");
-          }
-        }
-        query.append(") OR categories.parent_id IN (");
-        for (int i = 0; i < cr_id.size(); i++) {
-          query.append(cr_id.get(i));
-          if (i < cr_id.size() - 1) {
-            query.append(", ");
-          }
-        }
-        query.append(")");
+          queryBuilder
+            .select("*")
+            .from(ProductRecord.TABLE)
+            .join("INNER JOIN categories ON products.category_id = categories.category_id")
+            .where("products.category_id IN ")
+            .build()
+        );
 
-        File csvFile = new File("export.csv");
+        query.append(QueryBuilder.buildList(cr_ids));
+        query.append(" OR categories.parent_id IN ");
+        query.append(QueryBuilder.buildList(cr_ids));
+
+        File csvFile = new File("export_" + Helpers.getCurrentTimestamp() + ".csv");
         Path csvFilePath = ResourceManager.getInstance().moveStagedFileToEpxortDir(csvFile);
 
         // Prepare the statement
@@ -226,29 +227,38 @@ public class FormExport extends JFrame {
                 new FileWriter(csvFilePath.toString()))) {
           // Execute the query
           ResultSet resultSet = statement.executeQuery();
-          for (int i = 0; i < pr_column.size(); i++) {
-            writer.write(pr_column.get(i));
-            if (i < pr_column.size() - 1) {
+          for (int i = 0; i < pr_columns.size(); i++) {
+            writer.write(pr_columns.get(i));
+            if (i < pr_columns.size() - 1) {
               writer.write(",");
             }
           }
           writer.newLine();
           while (resultSet.next()) {
-            for (int i = 0; i < pr_column.size(); i++) {
-              String value = resultSet.getString(pr_column.get(i));
+            for (String s : pr_columns) {
+              String value = resultSet.getString(s);
               value = "\"" + value.replace("\"", "\"\"") + "\"";
               writer.write(value);
-              if (i < pr_column.size() - 1) {
+              if (s != pr_columns.getLast()) {
                 writer.write(",");
               }
             }
             writer.newLine();
           }
+          int response = JOptionPane.showConfirmDialog(FormExport.this, "Open folder?", "Confirm", JOptionPane.YES_NO_OPTION);
+          if (response == JOptionPane.YES_OPTION) {
+            Helpers.openFileExplorer(csvFilePath);
+          }
+          PanelManager.createPopup(new ConfirmPopup(
+            "Saved",
+            "Saved to: " + csvFilePath + "\nDo you want to open the folder"
+          ));
+          FormExport.this.dispose();
         } catch (SQLException ex) {
           System.err.println(query);
+          System.err.println(ex);
         } catch (IOException ex) {
         }
-
       }
     }
   }

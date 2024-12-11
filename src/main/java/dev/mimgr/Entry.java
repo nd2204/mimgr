@@ -61,9 +61,14 @@ public class Entry extends JFrame {
   }
 
   public static void main(String arg[]) {
-    try {
-      UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-    } catch (Exception ex) {}
+    String osName = System.getProperty("os.name").toLowerCase();
+    String osVersion = System.getProperty("os.version");
+    String osArch = System.getProperty("os.arch");
+
+    System.out.println("Operating System: " + osName);
+    System.out.println("Version: " + osVersion);
+    System.out.println("Architecture: " + osArch);
+
     FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
     FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
     FontManager.loadFont("RobotoMonoBold", "RobotoMono-Bold.ttf");
@@ -93,7 +98,7 @@ public class Entry extends JFrame {
   ColorTheme theme = ColorTheme.getInstance();
   ResourceManager resman = ResourceManager.getInstance();
 
-  public static double m_aspect_ratio = 16.0f / 10.0f;
+  public static double m_aspect_ratio = 16.0f / 11.0f;
   public static int m_width = 1280;
   public static int m_height = (int) ((float) m_width / m_aspect_ratio);
 }

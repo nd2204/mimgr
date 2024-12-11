@@ -11,12 +11,8 @@ import java.awt.Insets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 import javax.swing.Box;
-import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -28,13 +24,14 @@ import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.DBQueries;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers;
 
 public class TotalOrderPanel extends RoundedPanel {
   public TotalOrderPanel() {
     this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.setLayout(new BorderLayout());
     this.setBackground(colors.m_bg_0);
-    this.setMinimumSize(new Dimension(400, 500));
+    this.setMinimumSize(new Dimension(400, 300));
     this.setPreferredSize(new Dimension(400, 500));
     this.setBorder(new EmptyBorder(15, 15, 15, 15));
 
@@ -52,7 +49,7 @@ public class TotalOrderPanel extends RoundedPanel {
       c.weightx = 1.0;
       detailPanel.add(lblTitle, c);
 
-      c.insets = new Insets(0, 5, 15, 10);
+      c.insets = new Insets(0, 5, 5, 10);
       c.gridx = 0;
       c.gridy = 1;
       c.weightx = 1.0;
@@ -63,7 +60,7 @@ public class TotalOrderPanel extends RoundedPanel {
       c.weightx = 1.0;
       detailPanel.add(Box.createHorizontalGlue(), c);
 
-      c.insets = new Insets(0, 5, 25, 10);
+      c.insets = new Insets(0, 5, 15, 10);
       c.gridx = 2;
       c.gridy = 1;
       c.weightx = 1.0;
@@ -92,13 +89,13 @@ public class TotalOrderPanel extends RoundedPanel {
       DataPoint dataPoint = getDataPointByMonth(1);
       dataPoint.lineColor = colors.m_bg_5;
       dataPoint.lineStroke = DataPoint.createDashedStroke(2, 4 ,4);
-      lastMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
+      lastMonthSum = Helpers.calculateTotalOrders(dataPoint);
       chart.addDataPoint(dataPoint);
       legendsPanel.add(new DataPointLegend(dataPoint));
     }
     {
       DataPoint dataPoint = getDataPointByMonth(0);
-      thisMonthSum = dataPoint.data.stream().reduce(0.0, (d1, d2) -> d1 + d2);
+      thisMonthSum = Helpers.calculateTotalOrders(dataPoint);
       lblTotalOrder.setText(String.format("%d", Double.valueOf(thisMonthSum).intValue()));
       chart.addDataPoint(dataPoint);
       legendsPanel.add(new DataPointLegend(dataPoint));
@@ -176,10 +173,10 @@ public class TotalOrderPanel extends RoundedPanel {
           end = rs.getTimestamp("order_day").toInstant();
         }
         dataPoint.data.add(rs.getDouble("count"));
-        dataPoint.xLabels.add(formatInstant(rs.getTimestamp("order_day").toInstant(), "MMM d"));
+        dataPoint.xLabels.add(Helpers.formatInstant(rs.getTimestamp("order_day").toInstant(), "MMM d"));
       }
       if (start == null || end == null) return dataPoint;
-      dataPoint.dataLegend = formatInstant(start, "MMM d - ") + formatInstant(end, "MMM d, yyyy");
+      dataPoint.dataLegend = Helpers.formatInstant(start, "MMM d - ") + Helpers.formatInstant(end, "MMM d, yyyy");
       dataPoint.lineColor = colors.m_blue;
       dataPoint.lineStroke = new BasicStroke(2);
     } catch (SQLException ex) {
@@ -187,12 +184,6 @@ public class TotalOrderPanel extends RoundedPanel {
     }
 
     return dataPoint;
-  }
-
-  private String formatInstant(Instant instant, String format) {
-    ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
-    DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
-    return zdt.format(dtf);
   }
 
   public class GrowthRateLabel extends JLabel {
@@ -219,11 +210,11 @@ public class TotalOrderPanel extends RoundedPanel {
   private Font nunito_bold_14 = FontManager.getFont("NunitoBold", 14f);
   private Font nunito_bold_16 = FontManager.getFont("NunitoBold", 16f);
 
-  private JPanel legendsPanel;
-  private LineChart chart;
+  public JPanel legendsPanel;
+  public LineChart chart;
+  public JLabel lblTitle;
+  public JLabel lblTotalOrder;
+  public GrowthRateLabel lblGrowthRate;
+  public JLabel lblChart;
   private ColorScheme colors;
-  private JLabel lblTitle;
-  private JLabel lblTotalOrder;
-  private GrowthRateLabel lblGrowthRate;
-  private JLabel lblChart;
 }

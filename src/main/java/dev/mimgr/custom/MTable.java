@@ -25,7 +25,7 @@ public class MTable extends JTable {
   public MTable() {
     super();
     this.colors = ColorTheme.getInstance().getCurrentScheme();
-    this.borderColor = colors.m_bg_3;
+    this.borderColor = colors.m_bg_1;
     this.headerCellColor = colors.m_bg_dim;
     this.headerCellTextColor = colors.m_grey_0;
     this.tableColor = colors.m_bg_0;

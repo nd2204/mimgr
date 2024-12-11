@@ -1,8 +1,7 @@
 package dev.mimgr.component;
 
 import java.nio.file.Paths;
-import java.sql.ResultSet;
-import java.sql.SQLException; import java.util.ArrayList;
+import java.sql.ResultSet; import java.sql.SQLException; import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
@@ -47,7 +46,6 @@ public class ProductTableView extends JPanel implements TableModelListener {
     this.tv = new TableView();
     this.tableScrollPane = new MScrollPane();
     this.model = new DefaultTableModel() {
-
       @Override
       public Class<?> getColumnClass(int columnIndex) {
         return columnIndex == 0 ? Boolean.class : String.class;

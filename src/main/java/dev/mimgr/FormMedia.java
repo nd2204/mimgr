@@ -413,8 +413,11 @@ public class FormMedia extends JPanel implements DocumentListener {
 
     @Override
     public void onImageImported(Image image) {
-      System.out.println("Dropped Image data");
       System.out.println(image);
+      Path p = rm.saveImageToTempFile(image);
+      if (p != null) {
+        droppedItemsPanel.addData(p.toFile());
+      }
       return;
     }
 

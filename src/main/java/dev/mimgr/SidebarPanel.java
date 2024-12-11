@@ -22,8 +22,7 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 /**
- *
- * @author dn200
+ * @author nd2204
  */
 public class SidebarPanel extends RoundedPanel implements ActionListener {
   SidebarPanel(JPanel contentPanel) {

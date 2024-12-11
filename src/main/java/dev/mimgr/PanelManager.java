@@ -5,21 +5,16 @@ import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Panel;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.swing.*;
 
 import dev.mimgr.component.PopupPanel.IPopup;
-import dev.mimgr.custom.RoundedPanel;
-import dev.mimgr.component.NotificationPopup;
 
 public class PanelManager {
   // Main layered pane

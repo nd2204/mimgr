@@ -3,8 +3,7 @@ package dev.mimgr;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
+import java.awt.FlowLayout; import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -40,11 +39,11 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 public class ProductExportPanel extends JPanel {
-  public optionsSelectedPanel getOptionsCategorySelectedPanel() {
+  public SelectedOptionsPanel getOptionsCategorySelectedPanel() {
     return this.OptionsCategorySelectedPanel;
   }
 
-  public optionsSelectedPanel getOptionsProductSelectedPanel() {
+  public SelectedOptionsPanel getOptionsProductSelectedPanel() {
     return this.OptionsProductSelectedPanel;
   }
 
@@ -138,16 +137,6 @@ public class ProductExportPanel extends JPanel {
 
   public void setup_form_style() {
     // ========================= Fields =========================
-    Consumer<MTextField> setup_common_textfield = (tf) -> {
-      tf.setInputForeground(colors.m_fg_0);
-      tf.setBackground(colors.m_bg_dim);
-      tf.setBorderColor(colors.m_bg_4);
-      tf.setFocusBorderColor(colors.m_blue);
-      tf.setForeground(colors.m_fg_0);
-      tf.setBorderWidth(2);
-      tf.setFont(nunito_bold_14);
-    };
-
     cbCategory = new MComboBox<>(colors);
     CategoryTree.populateComboBox(cbCategory);
     cbCategory.getEditor().getEditorComponent().setFont(nunito_bold_14);
@@ -183,8 +172,8 @@ public class ProductExportPanel extends JPanel {
     this.btnDelete.setHoverBackgroundColor(colors.m_red);
     this.btnDelete.setBorderWidth(2);
 
-    this.OptionsCategorySelectedPanel = new optionsSelectedPanel(this.colors);
-    this.OptionsProductSelectedPanel = new optionsSelectedPanel(this.colors);
+    this.OptionsCategorySelectedPanel = new SelectedOptionsPanel(this.colors);
+    this.OptionsProductSelectedPanel = new SelectedOptionsPanel(this.colors);
   }
 
   private class exportOptionPanel extends RoundedPanel {
@@ -212,7 +201,7 @@ public class ProductExportPanel extends JPanel {
 
       gc.gridx = 0;
       gc.gridy = 1;
-      gc.insets = new Insets(0, 20, 10, 20);
+      gc.insets = new Insets(0, 20, 5, 20);
       gc.ipadx = 30;
       gc.ipady = 30;
       this.add(cbCategory, gc);
@@ -221,11 +210,11 @@ public class ProductExportPanel extends JPanel {
       gc.gridy = 2;
       gc.fill = GridBagConstraints.BOTH;
       gc.anchor = GridBagConstraints.FIRST_LINE_START;
-      gc.insets = new Insets(0, 0, 0, 0);
+      gc.insets = new Insets(0, 20, 0, 20);
       JScrollPane sp = OptionsCategorySelectedPanel.getScrollPaneComponent();
       sp.setMaximumSize(new Dimension(660, Integer.MAX_VALUE));
       sp.setMinimumSize(new Dimension(660, sp.getPreferredSize().height));
-      sp.setPreferredSize(new Dimension(660, 80));
+      sp.setPreferredSize(new Dimension(660, 40));
       this.add(OptionsCategorySelectedPanel, gc);
 
       gc.gridx = 0;
@@ -246,11 +235,11 @@ public class ProductExportPanel extends JPanel {
       gc.gridy = 5;
       gc.fill = GridBagConstraints.BOTH;
       gc.anchor = GridBagConstraints.FIRST_LINE_START;
-      gc.insets = new Insets(0, 0, 0, 0);
+      gc.insets = new Insets(0, 20, 20, 20);
       JScrollPane sp2 = OptionsProductSelectedPanel.getScrollPaneComponent();
       sp2.setMaximumSize(new Dimension(660, Integer.MAX_VALUE));
       sp2.setMinimumSize(new Dimension(660, sp.getPreferredSize().height));
-      sp2.setPreferredSize(new Dimension(660, 80));
+      sp2.setPreferredSize(new Dimension(660, 40));
       this.add(OptionsProductSelectedPanel, gc);
     }
 
@@ -270,7 +259,7 @@ public class ProductExportPanel extends JPanel {
       ta.setBorderRadius(15);
       ta.setFont(nunito_bold_14);
       ta.setLineWrap(true);
-    }
+   }
 
     private JLabel lblTitle = new JLabel("Title");
     private JLabel lblProduct = new JLabel("Product");
@@ -280,77 +269,72 @@ public class ProductExportPanel extends JPanel {
 
   }
 
-  public class optionsSelectedPanel extends JPanel implements ActionListener {
-    public optionsSelectedPanel(ColorScheme colors) {
+  public class SelectedOptionsPanel extends JPanel implements ActionListener {
+    public SelectedOptionsPanel(ColorScheme colors) {
       thisPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
       thisPanel.setBackground(colors.m_bg_0);
       thisPanel.setSize(0, 140);
       thisPanel.setBorder(new EmptyBorder(5, 0, 5, 0));
-  
+
       scrollPane = new JScrollPane(
         thisPanel,
         JScrollPane.VERTICAL_SCROLLBAR_NEVER,
         JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
       );
-  
+
       MScrollBar hsb = new MScrollBar();
       hsb.setOrientation(MScrollBarUI.HORIZONTAL);
       scrollPane.setHorizontalScrollBar(hsb);
-  
+
       scrollPane.setBorder(BorderFactory.createEmptyBorder());
       scrollPane.setOpaque(false);
-  
+
       this.colors = colors;
       this.setLayout(new BorderLayout());
       this.setBackground(colors.m_bg_0);
-      this.setVisible(true);
+      this.setVisible(false);
       this.add(scrollPane, BorderLayout.CENTER);
     }
-  
+
     public void addData(Object data) {
       MButton button = null;
-      if (data instanceof File file) {
-        button = createButton(IconManager.loadIcon(file));
-      }
-      else if (data instanceof String s) {
+      if (data instanceof CategoryRecord cr) {
+        if (!stagedData.containsValue(data)) {
+          button = createButton(null);
+          button.setText(cr.toString());
+        }
+      } else if (data instanceof String s) {
         if (!s.isBlank() && !stagedData.containsValue(data)) {
           button = createButton(null);
           button.setText(s);
         }
       }
-      else if (data instanceof ImageIcon icon) {
-        button = createButton(icon);
-      }
-      else if (data instanceof CategoryRecord cr) {
-        if (!stagedData.containsValue(data)) {
-          button = createButton(null);
-          button.setText(cr.m_name);
-        }
-      }
-  
+
       if (button != null) {
+        this.setVisible(true);
         setup_button(button);
         stagedData.put(button, data);
         thisPanel.add(button);
       }
-  
+
       revalidate();
       repaint();
     }
-  
+
     public void clearData() {
       for (MButton button : this.stagedData.keySet()) {
         thisPanel.remove(button);
       }
       this.stagedData.clear();
+      this.setVisible(false);
       revalidate();
       repaint();
     }
-  
+
     public boolean isEmpty() {
       return stagedData.isEmpty();
     }
-  
+
     public ArrayList<Object> getAllData() {
       ArrayList<Object> dataList = new ArrayList<>();
       for (Object obj : stagedData.values()) {
@@ -358,36 +342,41 @@ public class ProductExportPanel extends JPanel {
       }
       return dataList;
     }
-  
+
     public void addActionListener(ActionListener al) {
       allist.add(al);
     }
-  
+
     public JScrollPane getScrollPaneComponent() {
       return this.scrollPane;
     }
-  
+
     @Override
     public void actionPerformed(ActionEvent e) {
-      if (stagedData.isEmpty()) {
-        thisPanel.removeAll();
-      }
       MButton key = (MButton) e.getSource();
-      Object data = stagedData.get(key);
-      if (data != null) {
-        stagedData.remove(key);
-        thisPanel.remove(key);
-      }
+      removeData(key);
       for (ActionListener al : allist) {
         al.actionPerformed(e);
+      }
+    }
+
+    public void removeData(MButton button) {
+      Object data = stagedData.get(button);
+      if (data != null) {
+        stagedData.remove(button);
+        thisPanel.remove(button);
+      }
+      if (stagedData.isEmpty()) {
+        thisPanel.removeAll();
+        this.setVisible(false);
       }
       revalidate();
       repaint();
     }
-  
+
     public static MButton createButton(Icon icon) {
       MButton button = new MButton();
-      button.setBorderWidth(3);
+      button.setBorderWidth(2);
       if (icon != null) {
         int size = 100 - button.getBorderWidth() * 2;
         button.setIcon(
@@ -399,12 +388,10 @@ public class ProductExportPanel extends JPanel {
       }
       button.setBorderRadius(16);
       button.setFont(FontManager.getFont("NunitoBold", 14f));
-      button.setPreferredSize(new Dimension(150, 80));
-      button.setMaximumSize(new Dimension(150, 80));
-      button.setMaximumSize(new Dimension(150, 80));
+      button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
       return button;
     }
-  
+
     private void setup_button(MButton button) {
       button.addActionListener(this);
       button.setBackground(colors.m_bg_dim);
@@ -412,7 +399,7 @@ public class ProductExportPanel extends JPanel {
       button.setHoverBorderColor(colors.m_red);
       button.setBorderColor(colors.m_bg_5);
     }
-  
+
     private JScrollPane scrollPane;
     private ArrayList<ActionListener> allist = new ArrayList<>();
     private JPanel thisPanel = new JPanel();
@@ -431,6 +418,6 @@ public class ProductExportPanel extends JPanel {
   private MComboBox<String> cbProduct;
   private MButton btnSubmit, btnDelete;
   private ColorScheme colors;
-  private optionsSelectedPanel OptionsCategorySelectedPanel;
-  private optionsSelectedPanel OptionsProductSelectedPanel;
+  private SelectedOptionsPanel OptionsCategorySelectedPanel;
+  private SelectedOptionsPanel OptionsProductSelectedPanel;
 }

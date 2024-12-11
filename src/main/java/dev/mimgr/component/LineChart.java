@@ -21,8 +21,7 @@ import dev.mimgr.theme.builtin.ColorScheme;
 public class LineChart extends JPanel {
   public LineChart(DataPoint dataPoint) {
     InitComponents();
-    this.setMinimumSize(new Dimension(400, 250));
-    this.setPreferredSize(new Dimension(400, 250));
+    this.setPreferredSize(new Dimension(400, this.getPreferredSize().height));
     this.addDataPoint(dataPoint);
   }
 

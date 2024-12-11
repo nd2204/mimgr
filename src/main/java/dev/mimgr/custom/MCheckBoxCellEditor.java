@@ -51,7 +51,7 @@ public class MCheckBoxCellEditor extends DefaultCellEditor{
     public void paintComponent(Graphics g) {
       super.paintComponent(g);
       Graphics2D g2 = (Graphics2D) g.create();
-      g2.setColor(CustomCheckBox.this.colors.m_bg_3);
+      g2.setColor(CustomCheckBox.this.colors.m_bg_1);
       g2.drawLine(0, getHeight(), getWidth(), getHeight());
       g2.dispose();
     }

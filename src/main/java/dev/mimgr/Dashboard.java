@@ -7,8 +7,12 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
@@ -17,6 +21,9 @@ import dev.mimgr.custom.MButton;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
+/**
+ * @author nd2204
+ */
 public class Dashboard extends JPanel {
   Dashboard() {
     super();
@@ -66,21 +73,21 @@ public class Dashboard extends JPanel {
 
       // Top section here
       c.insets = new Insets(20, padding_horizontal, 5, padding_horizontal);
-      sidebarPanel.addMenuButton("Home", home_icon, new FormHome(), c);
+      menuButtons.add(sidebarPanel.addMenuButton("Home", home_icon, new FormHome(), c));
 
       // Menu Buttons
       c.insets = new Insets(padding_vertical, padding_horizontal, padding_vertical, padding_horizontal);
       sidebarPanel.addComponent(sep, c);
-      sidebarPanel.addMenuButton("Orders", orders_icon, new FormOrder(), c);
-      firstButton = sidebarPanel.addMenuButton("Products", products_icon, new FormProduct(), c);
-      sidebarPanel.addMenuButton("Analytics", analytics_icon, new FormAnalytic(), c);
-      sidebarPanel.addMenuButton("Media", media_icon, new FormMedia(), c);
+      menuButtons.add(sidebarPanel.addMenuButton("Orders", orders_icon, new FormOrder(), c));
+      menuButtons.add(sidebarPanel.addMenuButton("Products", products_icon, new FormProduct(), c));
+      menuButtons.add(sidebarPanel.addMenuButton("Analytics", analytics_icon, new FormAnalytic(), c));
+      menuButtons.add(sidebarPanel.addMenuButton("Media", media_icon, new FormMedia(), c));
 
       // Bottom section
       c.weighty = 1.0;
       c.anchor = GridBagConstraints.PAGE_END;
       formAccount = new FormAccount();
-      sidebarPanel.addMenuButton("Account", accounts_icon, formAccount, c);
+      menuButtons.add(sidebarPanel.addMenuButton("Account", accounts_icon, formAccount, c));
       setButtonRefreshOnClick(formAccount.getUpdateProfileButton());
 
       c.weighty = 0.0;
@@ -92,12 +99,13 @@ public class Dashboard extends JPanel {
 
       c.insets = new Insets(padding_vertical, padding_horizontal, 20, padding_horizontal);
       btnLogOut = sidebarPanel.setupMenuButton("Log out", logout_icon);
+      menuButtons.add(btnLogOut);
       sidebarPanel.add(btnLogOut, c);
 
       SidebarMenuListener sml = new SidebarMenuListener();
       btnLogOut.addActionListener(sml);
 
-      sidebarPanel.setCurrentMenu(firstButton);
+      sidebarPanel.setCurrentMenu(menuButtons.get(0));
     }
   }
 
@@ -124,6 +132,10 @@ public class Dashboard extends JPanel {
     }
   }
 
+  public JButton getSidebarButton(int idx) {
+    return menuButtons.get(idx);
+  }
+
   public void setButtonRefreshOnClick(MButton btn) {
     btn.addActionListener((actionEvent) -> {
       new Thread(() -> {
@@ -134,6 +146,11 @@ public class Dashboard extends JPanel {
     });
   }
 
+  public void setCurrentMenu(MButton button) {
+    sidebarPanel.setCurrentMenu(button);
+  }
+
+  public ArrayList<MButton> menuButtons = new ArrayList<>();
   private SidebarPanel sidebarPanel;
   private ColorScheme colors; 
   private MButton btnToggleSidebar;
