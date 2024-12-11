@@ -66,7 +66,7 @@ public class Dashboard extends JPanel {
 
       // Top section here
       c.insets = new Insets(20, padding_horizontal, 5, padding_horizontal);
-      sidebarPanel.addMenuButton("Home", home_icon, null, c);
+      sidebarPanel.addMenuButton("Home", home_icon, new FormHome(), c);
 
       // Menu Buttons
       c.insets = new Insets(padding_vertical, padding_horizontal, padding_vertical, padding_horizontal);

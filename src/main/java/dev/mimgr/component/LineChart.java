@@ -96,14 +96,15 @@ public class LineChart extends JPanel {
 
   private void drawVerticalDataPointAxisLine(Graphics2D g2, int width, int height, DataPoint dataPoint, List<String> xLabels) {
     int dataPointSize = dataPoint.data.size();
-    int dataPointPerSegment = dataPointSize / maxXDivision;
+    if (dataPointSize <= 1) return;
+
+    int dataPointPerSegment = Math.ceilDiv(dataPointSize, maxXDivision); // Handle 0 case for modulo
     for (int i = 0; i < dataPointSize; i++) {
-      if (dataPointSize <= 1) break;
       int x0 = i * (width - chartPadding * 2 - labelPadding) / (dataPointSize - 1) + chartPadding + labelPadding;
       int x1 = x0;
       int y0 = height - chartPadding - labelPadding;
       // Draw Label and line only in subdivision range
-      if (i % dataPointPerSegment == 0) {
+      if ( (i % dataPointPerSegment) == 0) {
         if (flagIsOn(FLAG_DRAW_VERTICAL_DATAPOINT_LINE)) {
           g2.setColor(chartAxisColor);
           g2.drawLine(x0, height - chartPadding - labelPadding - 1, x1, chartPadding);
@@ -137,12 +138,7 @@ public class LineChart extends JPanel {
       }
     }
 
-    List<Point> points;
-    if (flagIsOn(FLAG_DRAW_SMOOTH_DATAPOINT)) {
-      points = calculateSpline(dp, 1000);
-    } else {
-      points = dp;
-    }
+    List<Point> points = dp;
 
     for (int i = 0; i < points.size() - 1; i++) {
       Point p1 = points.get(i);
@@ -155,37 +151,6 @@ public class LineChart extends JPanel {
         g2.drawLine(p1.x, p1.y, p2.x, p2.y);
       }
     }
-  }
-
-  // Cubic spline interpolation calculation
-  private List<Point> calculateSpline(List<Point> points, int numSamplesPerSegment) {
-    List<Point> splinePoints = new ArrayList<>();
-
-    for (int i = 0; i < points.size() - 1; i++) {
-      Point p0 = (i == 0) ? points.get(i) : points.get(i - 1);
-      Point p1 = points.get(i);
-      Point p2 = points.get(i + 1);
-      Point p3 = (i + 2 < points.size()) ? points.get(i + 2) : points.get(i + 1);
-
-      for (int j = 0; j <= numSamplesPerSegment; j++) {
-        double t = j / (double) numSamplesPerSegment;
-        double tt = t * t;
-        double ttt = tt * t;
-
-        // Cubic Hermite spline formula for X and Y
-        double q1 = -0.5 * ttt + tt - 0.5 * t;
-        double q2 = 1.5 * ttt - 2.5 * tt + 1.0;
-        double q3 = -1.5 * ttt + 2.0 * tt + 0.5 * t;
-        double q4 = 0.5 * ttt - 0.5 * tt;
-
-        int x = (int) (p0.x * q1 + p1.x * q2 + p2.x * q3 + p3.x * q4);
-        int y = (int) (p0.y * q1 + p1.y * q2 + p2.y * q3 + p3.y * q4);
-
-        splinePoints.add(new Point(x, y));
-      }
-    }
-
-    return splinePoints;
   }
 
   private int getMaxDataPointValue(List<DataPoint> dataPoints) {
@@ -259,11 +224,11 @@ public class LineChart extends JPanel {
     repaint();
   }
 
-  public static final int FLAG_DRAW_VERTICAL_DATAPOINT_LINE = 1;
+  public static final int FLAG_DRAW_VERTICAL_DATAPOINT_LINE   = 1;
   public static final int FLAG_DRAW_HORIZONTAL_DATAPOINT_LINE = 1 << 1;
-  public static final int FLAG_DRAW_SMOOTH_DATAPOINT = 1 << 2;
-  public static final int FLAG_DRAW_DATAPOINT_POINT = 1 << 3;
-  public static final int FLAG_DRAW_DATAPOINT_LINE = 1 << 4;
+  public static final int FLAG_DRAW_DATAPOINT_POINT           = 1 << 2;
+  public static final int FLAG_DRAW_DATAPOINT_LINE            = 1 << 3;
+  public static final int FLAG_DRAW_BAR_CHART                 = 1 << 4;
 
   private int flags = FLAG_DRAW_HORIZONTAL_DATAPOINT_LINE 
     | FLAG_DRAW_VERTICAL_DATAPOINT_LINE

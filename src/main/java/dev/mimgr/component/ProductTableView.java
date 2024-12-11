@@ -47,6 +47,7 @@ public class ProductTableView extends JPanel implements TableModelListener {
     this.tv = new TableView();
     this.tableScrollPane = new MScrollPane();
     this.model = new DefaultTableModel() {
+
       @Override
       public Class<?> getColumnClass(int columnIndex) {
         return columnIndex == 0 ? Boolean.class : String.class;

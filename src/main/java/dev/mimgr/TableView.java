@@ -2,8 +2,7 @@ package dev.mimgr;
 
 import java.awt.Dimension;
 import java.awt.Insets;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.awt.event.ActionListener; import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
 import javax.swing.JButton;

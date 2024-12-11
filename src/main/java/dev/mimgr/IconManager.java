@@ -180,13 +180,11 @@ public class IconManager {
     return bufferedImage;
   }
 
-  public static ImageIcon getRoundedIcon(Icon icon, int cornerRadius) {
-    BufferedImage image = iconToBufferedImage(icon);
+  public static BufferedImage getRoundedImage(BufferedImage image, int cornerRadius) {
+    // Create a rounded rectangle mask
     int w = image.getWidth();
     int h = image.getHeight();
-
-    // Create a rounded rectangle mask
-    BufferedImage mask = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+    BufferedImage mask = new BufferedImage( w, h, BufferedImage.TYPE_INT_ARGB );
     Graphics2D g2 = mask.createGraphics();
     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     g2.fill(new RoundRectangle2D.Float(0, 0, w, h, cornerRadius, cornerRadius));
@@ -200,7 +198,12 @@ public class IconManager {
     g.drawImage(mask, 0, 0, null);
     g.dispose();
 
-    return new ImageIcon(output); 
+    return output;
+  }
+
+  public static ImageIcon getRoundedIcon(Icon icon, int cornerRadius) {
+    BufferedImage image = iconToBufferedImage(icon);
+    return new ImageIcon(getRoundedImage(image, cornerRadius)); 
   }
 
   /**

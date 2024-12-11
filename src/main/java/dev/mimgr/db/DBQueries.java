@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DBQueries {
-  public static final String sqlPath = "mimgrdb/init.sql";
   private static Connection dbcon = DBConnection.getInstance().getConection();
 
   public static final String QUERY_SELECT_BY_FIELD = "SELECT * FROM %s WHERE %s = ?";
@@ -81,13 +80,5 @@ public class DBQueries {
       e.printStackTrace();
     }
     return resultSet;
-  }
-
-  public static void writeSQLToFile(String filePath, String sql) {
-    try (FileWriter fileWriter = new FileWriter(filePath, true)) { // Mở tệp ở chế độ ghi nối tiếp (append)
-      fileWriter.write(sql + "\n"); // Thêm câu lệnh SQL vào tệp
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
   }
 }

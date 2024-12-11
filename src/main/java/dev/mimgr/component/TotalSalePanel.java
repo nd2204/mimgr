@@ -5,8 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints; import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -112,6 +111,7 @@ public class TotalSalePanel extends RoundedPanel {
     chart = new LineChart();
     chart.setMaxXDivision(4);
     chart.setYLabelFormatter((str) -> formatToSuffix(str));
+    chart.setDrawFlags(LineChart.FLAG_DRAW_DATAPOINT_POINT);
 
     legendsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
     legendsPanel.setOpaque(false);
@@ -203,7 +203,7 @@ public class TotalSalePanel extends RoundedPanel {
       chart.addDataPoint(dataPoint);
       legendsPanel.add(new DataPointLegend(dataPoint));
     }
-    if (lastMonthSum == 0) {
+    if (lastMonthSum <= 0.0) {
       lblGrowthRate.setRate(1.0);
     } else {
       lblGrowthRate.setRate(thisMonthSum / lastMonthSum);

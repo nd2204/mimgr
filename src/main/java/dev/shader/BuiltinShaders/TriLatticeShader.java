@@ -14,6 +14,7 @@ public class TriLatticeShader implements IShaderEntry {
   private static final vec2 rt = new vec2(-1.0f, 0.5f);
   public static final vec3 col = new vec3(0.0f);
   public static final vec3 lineCol = new vec3(1.0f);
+  public float mult = 32.0f;
 
   private float rand(vec2 uv) {
     return ShaderFunctions.fract((float) Math.sin(ShaderFunctions.dot(uv, co)));
@@ -27,7 +28,7 @@ public class TriLatticeShader implements IShaderEntry {
 
   @Override
   public void mainImage(final ShaderInputs si, vec4 fragColor, final vec2 fragCoord) {
-    vec2 uv = (si.iResolution.div(2.0f).sub(fragCoord)).div(si.iResolution.y).mult(32.0f);
+    vec2 uv = (si.iResolution.div(2.0f).sub(fragCoord)).div(si.iResolution.y).mult(mult);
 
     vec3 p = new vec3(ShaderFunctions.dot(uv, lt), ShaderFunctions.dot(uv, rt), uv.y);
     vec3 p1 = ShaderFunctions.fract(p);

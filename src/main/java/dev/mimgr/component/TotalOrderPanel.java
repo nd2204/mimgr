@@ -104,7 +104,11 @@ public class TotalOrderPanel extends RoundedPanel {
       legendsPanel.add(new DataPointLegend(dataPoint));
     }
 
-    lblGrowthRate.setRate(thisMonthSum / lastMonthSum);
+    if (lastMonthSum <= 0.0) {
+      lblGrowthRate.setRate(1.0);
+    } else {
+      lblGrowthRate.setRate(thisMonthSum / lastMonthSum);
+    }
   }
 
   public void refresh() {

@@ -35,13 +35,6 @@ public class UserRecord {
       role = roles[ROLE_EMPLOYEE];
     }
     int result = DBQueries.update(QUERY_INSERT, username, hash, salt, role);
-    // Ghi câu lệnh SQL vào file init.sql
-    if (result > 0) {
-      DBQueries.writeSQLToFile(DBQueries.sqlPath, String.format(
-        "INSERT INTO users (username, hash, salt) VALUES ('%s', '%s', '%s');",
-        username, hash, salt)
-      );
-    }
     return result;
   }
 

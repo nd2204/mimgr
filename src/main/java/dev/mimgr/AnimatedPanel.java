@@ -2,17 +2,21 @@ package dev.mimgr;
 
 import javax.swing.*;
 
+import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 import dev.shader.ShaderInputs;
 import dev.shader.BuiltinShaders.*;
-import dev.shader.ShaderFunctions.IShaderEntry;
-import dev.shader.ShaderTypes.vec2;
+import dev.shader.ShaderFunctions.IShaderEntry; import dev.shader.ShaderTypes.vec2;
 import dev.shader.ShaderTypes.vec4;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.concurrent.*;
@@ -26,13 +30,16 @@ public class AnimatedPanel extends JPanel {
   private boolean useBuffer0 = true;
 
   private final ExecutorService executorService;
-  private final int NUM_THREADS = Runtime.getRuntime().availableProcessors();
-  private volatile boolean running = false;
+  private final int NUM_THREADS = Runtime.getRuntime().availableProcessors(); private volatile boolean running = false;
   private ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
 
   // Variables to track panel size changes
   private int panelWidth;
   private int panelHeight;
+
+  private Color borderColor;
+  private int borderRadius = 0;
+  private int borderWidth = 0;
 
   public AnimatedPanel(IShaderEntry entry, int width, int height) {
     this.setMinimumSize(new Dimension(854, 480));
@@ -46,12 +53,19 @@ public class AnimatedPanel extends JPanel {
 
   @Override
   public void paintComponent(Graphics g) {
+    Graphics2D g2d = (Graphics2D) g;
     super.paintComponent(g);
-    g.setColor(colors.m_bg_dim);
+    g.setColor(this.getBackground());
     g.fillRect(0, 0, getWidth(), getHeight());
     if (currentBuffer != null) {
       g.drawImage(currentBuffer, 0, 0, this);
     }
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    if (borderColor != null) {
+      g2d.setColor(borderColor);
+    }
+    g2d.setStroke(new BasicStroke(borderWidth));
+    g2d.drawRoundRect(borderWidth / 2, borderWidth / 2, getWidth() - borderWidth, getHeight() - borderWidth, this.borderRadius, this.borderRadius);
   }
 
   public void updateFrame() {
@@ -91,7 +105,7 @@ public class AnimatedPanel extends JPanel {
     shaderInputs.iTime = (System.currentTimeMillis() - shaderInputs.startTime) * 0.001f;
     shaderInputs.iFrame++;
 
-    currentBuffer = renderingBuffer;
+    currentBuffer = IconManager.getRoundedImage(renderingBuffer, borderRadius);
     useBuffer0 = !useBuffer0;
   }
 
@@ -161,4 +175,20 @@ public class AnimatedPanel extends JPanel {
       shaderPanel.start();
     });
   }
+
+  public void setBorderRadius(int radius) {
+    this.borderRadius = radius;
+    repaint();
+  }
+
+  public void setBorderWidth(int width) {
+    this.borderWidth = width;
+    repaint();
+  }
+
+  public void setBorderColor(Color color) {
+    this.borderColor = color;
+    repaint();
+  }
+
 }

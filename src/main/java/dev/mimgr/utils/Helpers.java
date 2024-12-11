@@ -2,6 +2,7 @@ package dev.mimgr.utils;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -82,5 +83,20 @@ public class Helpers {
       clickCount--;
       return false;
     }
+  }
+
+  public static String getTimesOfDayString(int hour) {
+    if (hour < 12) {
+      return "morning";
+    } else if (hour < 18) {
+      return "afternoon";
+    } else {
+      return "evening";
+    }
+  }
+
+  public static String getLocalTimesOfDayString() {
+    int hour = LocalTime.now().getHour();
+    return getTimesOfDayString(hour);
   }
 }
