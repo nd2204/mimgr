@@ -245,14 +245,14 @@ public class FormExport extends JFrame {
             }
             writer.newLine();
           }
-          int response = JOptionPane.showConfirmDialog(FormExport.this, "Open folder?", "Confirm", JOptionPane.YES_NO_OPTION);
-          if (response == JOptionPane.YES_OPTION) {
+          ConfirmPopup confirmPopup = new ConfirmPopup(
+            "Saved ",
+            "Saved to: " + csvFilePath + "\n\nDo you want to open the folder?"
+          );
+          confirmPopup.btnYes.addActionListener((ev) -> {
             Helpers.openFileExplorer(csvFilePath);
-          }
-          PanelManager.createPopup(new ConfirmPopup(
-            "Saved",
-            "Saved to: " + csvFilePath + "\nDo you want to open the folder"
-          ));
+          });
+          PanelManager.createPopup(confirmPopup);
           FormExport.this.dispose();
         } catch (SQLException ex) {
           System.err.println(query);

@@ -11,8 +11,14 @@ import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -76,13 +82,23 @@ public class ConfirmPopup implements PopupPanel.IPopup {
     messageLabel.setOpaque(false);
     messageLabel.setLineWrap(true);
     messageLabel.setWrapStyleWord(true);
+    messageLabel.setBorderWidth(0);
+    messageLabel.setBorderColor(null);
+    messageLabel.setPadding(new Insets(0, 0, 0, 0));
     // messageLabel.setHorizontalAlignment(SwingConstants.LEFT);
     // messageLabel.setVerticalAlignment(SwingConstants.CENTER);
+    Pattern pattern = Pattern.compile("(\r\n|\n|\r)");
+    Matcher matcher = pattern.matcher(message);
+    int newlineCount = 0;
+    // Find all newline characters and store their indexes
+    while (matcher.find()) {
+      newlineCount++;
+    }
     int messageLenWithNoSpace = message.replaceAll(" ", "").length();
     messageLabel.setForeground(colors.m_grey_2); // Ensure text color is visible
     if (message != null && !message.isEmpty()) {
       messageLabel.setColumns(Math.min(messageLenWithNoSpace, 30));
-      messageLabel.setRows(messageLenWithNoSpace / 30);
+      messageLabel.setRows(messageLenWithNoSpace / 30 + newlineCount);
       messageLabel.setText(message);
     } else {
       messageLabel.setText("Empty Message");
@@ -97,24 +113,27 @@ public class ConfirmPopup implements PopupPanel.IPopup {
     c.gridy = 0;
 
     panel.setLayout(new GridBagLayout());
-    c.weightx = 1.0;
-    c.weighty = 0.0;
     c.insets = new Insets(10, 15, 7, 15);
-    c.anchor = GridBagConstraints. FIRST_LINE_START;
+    c.anchor = GridBagConstraints.FIRST_LINE_START;
     panel.add(messageTitle, c);
+    c.gridx++;
 
-    c.gridx = 1;
+    c.weightx = 1.0;
+    panel.add(Box.createHorizontalGlue(), c);
+    c.gridx++;
+
     c.weightx = 0.0;
-    c.anchor = GridBagConstraints. FIRST_LINE_END;
+    c.anchor = GridBagConstraints.FIRST_LINE_END;
     closeButton.addActionListener(ev -> PanelManager.removePopup(id));
     panel.add(closeButton, c);
 
+    c.anchor = GridBagConstraints.FIRST_LINE_START;
     c.gridx = 0;
     c.gridy++;
 
     c.weightx = 1.0;
     c.insets = new Insets(0, 0, 0, 0);
-    c.gridwidth = 2;
+    c.gridwidth = 3;
     panel.add(sep, c);
 
     c.gridx = 0;
@@ -123,20 +142,34 @@ public class ConfirmPopup implements PopupPanel.IPopup {
     c.fill = GridBagConstraints.BOTH;
     c.weightx = 1.0;
     c.weighty = 1.0;
-    c.gridwidth = 2;
-    c.insets = new Insets(10, 15, 10, 10);
+    c.gridwidth = GridBagConstraints.REMAINDER;
+    c.insets = new Insets(5, 15, 5, 10);
     panel.add(messageLabel, c);
 
-    c.gridwidth = 1;
     c.gridx = 0;
     c.gridy++;
     c.weighty = 1.0;
+    c.weightx = 0.0;
+    c.fill = GridBagConstraints.NONE;
+    c.insets = new Insets(5, 15, 15, 0);
+    c.gridwidth = 1;
 
+    ActionListener al = e -> {
+      PanelManager.removePopup(this.id);
+    };
+    btnYes.addActionListener(al);
+    btnYes.setBorderColor(colors.m_bg_2);
+    btnYes.setBackground(colors.m_bg_1);
+    btnYes.setForeground(colors.m_grey_0);
     panel.add(btnYes, c);
     c.gridx++;
 
+    c.insets = new Insets(10, 10, 15, 0);
+    btnNo.addActionListener(al);
+    btnNo.setBorderColor(colors.m_bg_2);
+    btnNo.setBackground(colors.m_bg_1);
+    btnNo.setForeground(colors.m_grey_0);
     panel.add(btnNo, c);
-
 
     panel.setMinimumSize(new Dimension(POPUP_WIDTH, POPUP_HEIGHT));
     panel.setMaximumSize(new Dimension(600, Integer.MAX_VALUE));

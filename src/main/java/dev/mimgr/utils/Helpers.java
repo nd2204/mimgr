@@ -36,9 +36,9 @@ public class Helpers {
   public static void openFileExplorer(Path path) {
     String osName = System.getProperty("os.name").toLowerCase();
     if (osName.contains("win")) {
-      runProcess("explorer", "/select," + path.getParent().toString());
+      runProcess("explorer", "/select," + path.toString());
     } else if (osName.contains("mac")) {
-      runProcess("open -R", path.toString());
+      runProcess("open", "-R", path.toString());
     } else if (osName.contains("nix")) {
       runProcess("xdg-open", path.getParent().toString());
     }
