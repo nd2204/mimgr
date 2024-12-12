@@ -7,8 +7,15 @@
  */
 
 plugins {
+  id 'java'
   id 'application'
   id 'com.github.michaelruocco.embedded-mysql-plugin' version '2.1.11'
+}
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
 }
 
 application {
@@ -25,4 +32,5 @@ dependencies {
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+    options.release = 21
 }

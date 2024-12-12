@@ -158,9 +158,13 @@ public class NotificationPopup implements PopupPanel.IPopup {
 
     c.fill = GridBagConstraints.BOTH;
     c.weightx = 1.0;
+    c.weighty = 1.0;
     c.gridwidth = 2;
     c.insets = new Insets(10, 15, 10, 10);
     panel.add(messageLabel, c);
+
+    c.gridx = 0;
+    c.gridy++;
 
     panel.setMinimumSize(new Dimension(POPUP_WIDTH, POPUP_HEIGHT));
     panel.setMaximumSize(new Dimension(600, Integer.MAX_VALUE));
