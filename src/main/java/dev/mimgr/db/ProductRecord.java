@@ -26,6 +26,21 @@ public class ProductRecord {
   public static final String QUERY_SELECT_BY_NAME = String.format("SELECT * FROM %s WHERE %s = ?", TABLE, FIELD_NAME);
   public static final String QUERY_SELECT_LIKE_NAME = String.format("SELECT * FROM %s WHERE %s LIKE ?", TABLE, FIELD_NAME);
 
+  public static final String QUERY_SELECT_TOP_BY_QUANTITY_SOLD = String.format(
+    """
+    SELECT p.*, SUM(oi.quantity) AS total_quantity_sold
+    FROM %s AS oi
+    INNER JOIN %s AS p
+    WHERE p.%s = oi.%s 
+    GROUP BY oi.%s, p.%s
+    ORDER BY total_quantity_sold DESC
+    """,
+    OrderItemRecord.TABLE,
+    ProductRecord.TABLE,
+    ProductRecord.FIELD_ID, OrderItemRecord.FIELD_PRODUCT_ID,
+    ProductRecord.FIELD_ID, OrderItemRecord.FIELD_PRODUCT_ID
+  );
+
   public static final String QUERY_INSERT = String.format(
     "INSERT INTO %s (%s, %s, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)",
     TABLE, FIELD_NAME, FIELD_PRICE, FIELD_DESCRIPTION, FIELD_STOCK_QUANTITY, FIELD_CATEGORY_ID, FIELD_IMAGE_ID
@@ -62,7 +77,7 @@ public class ProductRecord {
   public static ResultSet selectByKey(ProductRecord pr) {
     return DBQueries.select(QUERY_SELECT_BY_KEY, pr.m_id);
   }
-  
+
   public static ResultSet selectByName(String name) {
     return DBQueries.select(QUERY_SELECT_BY_NAME, name);
   }
@@ -77,6 +92,10 @@ public class ProductRecord {
 
   public static ResultSet selectLikeName(ProductRecord pr) {
     return DBQueries.select(QUERY_SELECT_LIKE_NAME, '%' + pr.m_name + '%');
+  }
+
+  public static ResultSet selectTopProductByQuantitySold() {
+    return DBQueries.select(QUERY_SELECT_TOP_BY_QUANTITY_SOLD);
   }
 
   public static ResultSet selectColumnsName() {
@@ -103,7 +122,7 @@ public class ProductRecord {
     int result = DBQueries.update(
       QUERY_INSERT, name, price, description,
       stock_quantity, category_id,
-      (image_id < 0) ? null : image_id
+    (image_id < 0) ? null : image_id
     );
     return result;
   }
@@ -112,7 +131,7 @@ public class ProductRecord {
     int result = DBQueries.update(
       QUERY_INSERT, pr.m_name, pr.m_price, pr.m_description,
       pr.m_stock_quantity, pr.m_category_id,
-      (pr.m_image_id < 0) ? null : pr.m_image_id
+    (pr.m_image_id < 0) ? null : pr.m_image_id
     );
     return result;
   }

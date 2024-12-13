@@ -30,8 +30,7 @@ import dev.mimgr.theme.builtin.ColorScheme;
 import dev.mimgr.utils.Helpers.MultiClickHandler;
 import dev.mimgr.theme.ColorTheme;
 
-public class OrderNotificationTableView extends JPanel implements TableModelListener {
-  public OrderNotificationTableView() {
+public class OrderNotificationTableView extends JPanel implements TableModelListener { public OrderNotificationTableView() {
     this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.notifications = new ArrayList<>();
 
@@ -84,7 +83,6 @@ public class OrderNotificationTableView extends JPanel implements TableModelList
 
   public void updateView() {
     model.setRowCount(0);
-
     for (Notification n : notifications) {
       Icon icon = IconManager.getIcon("dot.png", 16, 16, colors.m_blue);
       List<JButton> buttons = new ArrayList<>();
@@ -116,6 +114,15 @@ public class OrderNotificationTableView extends JPanel implements TableModelList
   public void addNotification(String s, String btn, Runnable b) {
     notifications.add(new Notification(s, btn, b));
     updateView();
+  }
+
+  public void clearNotification() {
+    notifications.clear();
+    updateView();
+  }
+
+  public boolean isEmpty() {
+    return notifications.isEmpty();
   }
 
   @Override

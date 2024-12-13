@@ -1,6 +1,5 @@
 package dev.mimgr;
 
-import javax.swing.Box;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -14,9 +13,10 @@ import java.awt.Insets;
 import java.awt.event.HierarchyEvent;
 
 import dev.mimgr.component.OrderNotificationTableView;
+import dev.mimgr.component.QuickActionPanel;
+import dev.mimgr.component.TopProductPanel;
 import dev.mimgr.component.TotalOrderPanel;
 import dev.mimgr.component.TotalSalePanel;
-import dev.mimgr.custom.MScrollPane;
 import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
@@ -28,10 +28,25 @@ public class FormHome extends JPanel {
     this.colors = ColorTheme.getInstance().getCurrentScheme();
     this.setBackground(this.colors.m_bg_dim);
 
+    topProductPanel = new TopProductPanel();
+    greetPanel = new GreetPanel();
+    totalOrderPanel = new TotalOrderPanel();
+    totalSalePanel = new TotalSalePanel();
+    quickActionPanel = new QuickActionPanel();
+    orderNotification = new OrderNotification();
+
     this.setLayout(new BorderLayout());
     this.add(new LeftPanel(), BorderLayout.CENTER);
-
     this.add(new RightPanel(), BorderLayout.EAST);
+
+    quickActionPanel.btnRefresh.addActionListener((ev) -> {
+      topProductPanel.refresh();
+      greetPanel.refresh();
+      totalOrderPanel.refresh();
+      totalSalePanel.refresh();
+      orderNotification.refresh();
+    });
+
   }
 
   private class RightPanel extends JPanel {
@@ -43,24 +58,27 @@ public class FormHome extends JPanel {
       GridBagConstraints gc = new GridBagConstraints();
       gc.gridx = 0;
       gc.gridy = 0;
+      gc.weighty = 1.0;
 
       gc.weightx = 1.0;
-      gc.fill = GridBagConstraints.HORIZONTAL;
+      gc.fill = GridBagConstraints.BOTH;
       gc.insets = new Insets(20, 0, 20, 20);
-      TotalSalePanel totalSalePanel = new TotalSalePanel();
       totalSalePanel.legendsPanel.setVisible(false);
+      totalSalePanel.setBorderColor(colors.m_bg_1);
+      totalSalePanel.setBorderWidth(1);
       this.add(totalSalePanel, gc);
       gc.gridy++;
 
       gc.insets = new Insets(0, 0, 20, 20);
-      TotalOrderPanel totalOrderPanel = new TotalOrderPanel();
       totalOrderPanel.legendsPanel.setVisible(false);
+      totalOrderPanel.setBorderColor(colors.m_bg_1);
+      totalOrderPanel.setBorderWidth(1);
       this.add(totalOrderPanel, gc);
       gc.gridy++;
 
-      gc.weighty = 1.0;
+      gc.weighty = 0.0;
       gc.fill = GridBagConstraints.HORIZONTAL;
-      this.add(Box.createVerticalGlue(), gc);
+      this.add(quickActionPanel, gc);
     }
   }
 
@@ -76,18 +94,19 @@ public class FormHome extends JPanel {
       gc.fill = GridBagConstraints.BOTH;
       gc.insets = new Insets(20, 20, 20, 20);
       gc.weightx = 1.0;
-      this.add(new GreetPanel(), gc);
+      this.add(greetPanel, gc);
 
       gc.gridx = 0;
       gc.gridy++;
 
       gc.insets = new Insets(0, 20, 20, 20);
-      this.add(new OrderNotification(), gc);
+      this.add(orderNotification, gc);
 
       gc.gridx = 0;
       gc.gridy++;
       gc.weighty = 1.0;
-      this.add(Box.createVerticalGlue(), gc);
+
+      this.add(topProductPanel, gc);
     }
   }
 
@@ -103,14 +122,22 @@ public class FormHome extends JPanel {
       gc.fill = GridBagConstraints.BOTH;
       gc.weightx = gc.weighty = 1.0;
       orderNotificationTableView = new OrderNotificationTableView();
+      this.setVisible(false);
 
-      {
+      refresh();
+
+      this.add(orderNotificationTableView, gc);
+    }
+
+    public void refresh() {
+      orderNotificationTableView.clearNotification();
+    {
         int count = Helpers.getUnpaidOrderCount();
         if (count > 0) {
           orderNotificationTableView.addNotification(
             count + " orders have payments that need to be captured",
             "Go to orders",
-            () -> {
+          () -> {
               JPanel panel = PanelManager.get_panel("DASHBOARD");
               if (panel instanceof Dashboard dashboard) {
                 dashboard.setCurrentMenu(dashboard.menuButtons.get(1));
@@ -120,13 +147,13 @@ public class FormHome extends JPanel {
         }
       }
 
-      {
+    {
         int count = Helpers.getOpenOrderCount();
         if (count > 0) {
           orderNotificationTableView.addNotification(
             count + " orders need to be fulfilled",
             "View orders",
-            () -> {
+          () -> {
               JPanel panel = PanelManager.get_panel("DASHBOARD");
               if (panel instanceof Dashboard dashboard) {
                 dashboard.setCurrentMenu(dashboard.menuButtons.get(1));
@@ -135,10 +162,8 @@ public class FormHome extends JPanel {
           );
         }
       }
-
-      this.add(orderNotificationTableView, gc);
+      this.setVisible(!orderNotificationTableView.isEmpty());
     }
-
 
     private OrderNotificationTableView orderNotificationTableView;
   }
@@ -147,7 +172,9 @@ public class FormHome extends JPanel {
     public GreetPanel() {
       super(new GreetPanelShader(), 200, 100);
       this.setLayout(new GridBagLayout());
+      this.setMinimumSize(new Dimension(200, 250));
       this.setPreferredSize(new Dimension(200, 250));
+      this.setMaximumSize(new Dimension(200, 300));
       this.setBorderRadius(15);
       this.setBorderWidth(2);
       this.setBackground(null);
@@ -255,8 +282,14 @@ public class FormHome extends JPanel {
     public JTextArea ta1;
   }
 
+  private TopProductPanel   topProductPanel;
+  private GreetPanel        greetPanel;
+  private TotalOrderPanel   totalOrderPanel;
+  private TotalSalePanel    totalSalePanel;
+  private QuickActionPanel  quickActionPanel;
+  private OrderNotification orderNotification;
+
   private Font nunito_bold_18 = FontManager.getFont("NunitoBold", 18f);
-  private Font nunito_bold_20 = FontManager.getFont("NunitoBold", 20f);
   private Font nunito_bold_22 = FontManager.getFont("NunitoBold", 22f);
   private Font nunito_bold_26 = FontManager.getFont("NunitoBold", 26f);
 
