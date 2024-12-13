@@ -29,6 +29,7 @@ import dev.mimgr.db.OrderRecord;
 import dev.mimgr.db.QueryAdapter;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers;
 
 public class FormOrder extends JPanel implements ActionListener, DocumentListener {
   public FormOrder() {
@@ -46,7 +47,11 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
     c.gridy = 0;
     // Row 0 ----------------------------------------
 
-    c.insets = new Insets(25, padding, 25, padding);
+    c.insets = new Insets(20, 25, 20, 0);
+    this.add(Helpers.createHomeButton(), c);
+    c.gridx++;
+
+    c.insets = new Insets(26, 15, 20, padding);
     c.weightx = 1.0;
     c.anchor = GridBagConstraints.FIRST_LINE_START;
     this.add(topLabel, c);
@@ -59,7 +64,6 @@ public class FormOrder extends JPanel implements ActionListener, DocumentListene
     this.add(this.btnExport, c);
     c.gridx++;
 
-    c.gridx = 2;
     c.insets = new Insets(20, 5, 20, padding);
     c.weightx = 0.0;
     this.add(btnCreateOrder, c);

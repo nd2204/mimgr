@@ -18,7 +18,6 @@ import dev.mimgr.utils.ResourceManager;
 
 public class Entry extends JFrame {
   Entry() {
-    theme.setColorScheme(ColorTheme.THEME_DARK_EVERFOREST);
 
     // Main window
     // this.setLayout(new BorderLayout());
@@ -61,6 +60,9 @@ public class Entry extends JFrame {
   }
 
   public static void main(String arg[]) {
+    ColorTheme theme = ColorTheme.getInstance();
+    theme.setColorScheme(ColorTheme.THEME_LIGHT_DEFAULT);
+
     String osName = System.getProperty("os.name").toLowerCase();
     String osVersion = System.getProperty("os.version");
     String osArch = System.getProperty("os.arch");
@@ -68,6 +70,7 @@ public class Entry extends JFrame {
     System.out.println("Operating System: " + osName);
     System.out.println("Version: " + osVersion);
     System.out.println("Architecture: " + osArch);
+    System.out.println();
 
     FontManager.loadFont("Roboto", "Roboto-Regular.ttf");
     FontManager.loadFont("RobotoBold", "Roboto-Bold.ttf");
@@ -87,15 +90,10 @@ public class Entry extends JFrame {
         registerDashBoard();
       }
 
-      for (JPanel panel : PanelManager.getAllPanels()) {
-        System.out.println(panel);
-      }
-
       new Entry();
     });
   }
 
-  ColorTheme theme = ColorTheme.getInstance();
   ResourceManager resman = ResourceManager.getInstance();
 
   public static double m_aspect_ratio = 16.0f / 11.0f;

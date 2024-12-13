@@ -49,6 +49,7 @@ public class QuickActionPanel extends RoundedPanel {
       button.setBorderRadius(15);
       button.setBorderWidth(1);
       button.setPreferredSize(new Dimension(50, 50));
+      button.setPreferredSize(new Dimension(50, 50));
       button.setBackground(colors.m_bg_dim);
       button.setBorderColor(colors.m_bg_1);
       button.addActionListener((e) -> {

@@ -43,6 +43,7 @@ public class Dashboard extends JPanel {
     // ContentPanel controller
     sidebarPanel = new SidebarPanel(contentPanel);
     sidebarPanel.setPreferredSize(new Dimension(300, this.getHeight()));
+    sidebarPanel.setVisible(false);
     this.add(sidebarPanel, BorderLayout.WEST);
     {
       final int padding_horizontal = 15;

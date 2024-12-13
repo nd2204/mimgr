@@ -37,6 +37,7 @@ import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.ImageRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers;
 import dev.mimgr.utils.MTransferListener;
 import dev.mimgr.utils.ResourceManager;
 
@@ -60,8 +61,13 @@ public class FormMedia extends JPanel implements DocumentListener {
     c.gridy = 0;
 
     // Top
-    c.insets = new Insets(25, padding, 25, padding);
+    c.insets = new Insets(20, padding, 25, 5);
     c.anchor = GridBagConstraints.FIRST_LINE_START;
+
+    this.add(Helpers.createHomeButton(), c);
+    c.gridx++;
+
+    c.insets = new Insets(24, 10, 25, 10);
     this.add(topLabel, c);
     c.gridx++;
 
@@ -99,7 +105,7 @@ public class FormMedia extends JPanel implements DocumentListener {
     c.weightx = 1.0;
     c.ipady = 245;
     c.weighty = 0.0;
-    c.gridwidth = 2;
+    c.gridwidth = GridBagConstraints.REMAINDER;
     c.fill = GridBagConstraints.BOTH;
     this.add(dropPanel, c);
 

@@ -24,6 +24,7 @@ import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.UserRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers;
 
 public class FormAccount extends JPanel {
   public MButton getUpdateProfileButton() {
@@ -63,21 +64,29 @@ public class FormAccount extends JPanel {
 
     lblAccount.setFont(nunito_bold_20);
     lblAccount.setForeground(colors.m_fg_0);
-    gbc.insets = new Insets(40, 10, 20, 10);
+
     gbc.gridx = 0;
     gbc.gridy = 0;
+
+    gbc.insets = new Insets(20, 0, 20, 15);
+    thisPanel.add(Helpers.createHomeButton(), gbc);
+    gbc.gridx++;
+
+    gbc.insets = new Insets(24, 0, 20, 0);
     thisPanel.add(lblAccount, gbc);
 
-    gbc.insets = new Insets(0, 10, 10, 10);
     gbc.gridx = 0;
-    gbc.gridy = 1;
+    gbc.gridy++;
     gbc.gridwidth = 2;
+    gbc.insets = new Insets(0, 0, 10, 0);
+
     thisPanel.add(new UsernameAndPasswordPanel(), gbc);
 
-    gbc.insets = new Insets(0, 5, 40, 10);
     gbc.gridx = 0;
-    gbc.gridy = 2;
+    gbc.gridy++;
+    gbc.insets = new Insets(0, 0, 40, 0);
     gbc.gridwidth = GridBagConstraints.REMAINDER;
+
     thisPanel.add(btnSubmit, gbc);
   }
 

@@ -1,16 +1,15 @@
 package dev.mimgr.theme;
-
 import dev.mimgr.theme.builtin.*;
 
 public class ColorTheme {
-  public static final int THEME_DARK_GRUVBOX     = 0;
-  public static final int THEME_DARK_CATPUCCIN   = 1;
-  public static final int THEME_DARK_EVERFOREST  = 2;
-  public static final int THEME_DARK_DEFAULT     = 3;
-  public static final int THEME_LIGHT_GRUVBOX    = 4;
-  public static final int THEME_LIGHT_CATPUCCIN  = 5;
+  public static final int THEME_DARK_GRUVBOX     = 1;
+  public static final int THEME_LIGHT_GRUVBOX    = 2;
+  public static final int THEME_DARK_CATPUCCIN   = 3;
+  public static final int THEME_LIGHT_CATPUCCIN  = 4;
+  public static final int THEME_DARK_EVERFOREST  = 5;
   public static final int THEME_LIGHT_EVERFOREST = 6;
-  public static final int THEME_LIGHT_DEFAULT    = 7;
+  public static final int THEME_DARK_DEFAULT     = 7;
+  public static final int THEME_LIGHT_DEFAULT    = 8;
 
   public static ColorScheme getColorScheme(int theme) {
     switch(theme) {
@@ -31,12 +30,12 @@ public class ColorTheme {
       case THEME_LIGHT_EVERFOREST:
         return new EverforestLight();
       default:
-        return new EverforestDark();
+        return new DefaultLight();
     }
   }
 
   private ColorTheme() {
-    this.currentScheme = new EverforestDark();
+    this.currentScheme = new DefaultDark();
   }
 
   private class ColorThemeHolder {

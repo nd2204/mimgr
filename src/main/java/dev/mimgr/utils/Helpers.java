@@ -1,5 +1,6 @@
 package dev.mimgr.utils;
 
+import java.awt.Dimension;
 import java.awt.List;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -13,12 +14,20 @@ import java.time.ZoneId; import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+import javax.swing.Icon;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import dev.mimgr.Dashboard;
+import dev.mimgr.IconManager;
+import dev.mimgr.PanelManager;
 import dev.mimgr.component.DataPoint;
+import dev.mimgr.custom.MButton;
 import dev.mimgr.db.DBQueries;
 import dev.mimgr.db.OrderRecord;
 import dev.mimgr.db.QueryBuilder;
+import dev.mimgr.theme.ColorTheme;
+import dev.mimgr.theme.builtin.ColorScheme;
 
 public class Helpers {
   public static char CURRENCY_SYMBOL = '€';
@@ -307,5 +316,25 @@ public class Helpers {
     ZonedDateTime zdt = instant.atZone(ZoneId.systemDefault());
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern(format);
     return zdt.format(dtf);
+  }
+
+  public static MButton createHomeButton() {
+    ColorScheme colors = ColorTheme.getInstance().getCurrentScheme();
+    Icon home_icon  = IconManager.getIcon("home_1.png", 16, 16, colors.m_fg_0);
+    MButton button = new MButton(home_icon); 
+    button.setBorderRadius(15);
+    button.setBorderWidth(1);
+    button.setMinimumSize(new Dimension(40, 40));
+    button.setPreferredSize(new Dimension(40, 40));
+    button.setMaximumSize(new Dimension(50, 50));
+    button.setBackground(colors.m_bg_0);
+    button.setBorderColor(colors.m_bg_1);
+    button.addActionListener((e) -> {
+      JPanel panel = PanelManager.get_panel("DASHBOARD");
+      if (panel instanceof Dashboard dashboard) {
+        dashboard.setCurrentMenu(dashboard.menuButtons.get(0));
+      }
+    });
+    return button;
   }
 }

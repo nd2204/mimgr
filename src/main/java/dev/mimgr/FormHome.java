@@ -114,7 +114,7 @@ public class FormHome extends JPanel {
     public OrderNotification() {
       this.setLayout(new GridBagLayout());
       this.setBorderRadius(15);
-      this.setBorderWidth(2);
+      this.setBorderWidth(1);
       this.setBackground(colors.m_bg_0);
       this.setBorderColor(colors.m_bg_1);
       GridBagConstraints gc = new GridBagConstraints();

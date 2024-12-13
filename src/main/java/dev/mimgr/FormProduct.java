@@ -23,6 +23,7 @@ import dev.mimgr.custom.RoundedPanel;
 import dev.mimgr.db.ProductRecord;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers;
 
 /**
  *
@@ -39,10 +40,14 @@ public class FormProduct extends JPanel implements ActionListener, DocumentListe
     // Top
     GridBagConstraints c = new GridBagConstraints();
 
-    c.insets = new Insets(25, padding, 25, padding);
     c.gridx = 0;
     c.gridy = 0;
 
+    c.insets = new Insets(20, 25, 20, 15);
+    this.add(Helpers.createHomeButton(), c);
+    c.gridx++;
+
+    c.insets = new Insets(26, 0, 25, padding);
     c.weightx = 1.0;
     c.anchor = GridBagConstraints.FIRST_LINE_START;
     this.add(topLabel, c);

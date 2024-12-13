@@ -18,6 +18,7 @@ import dev.mimgr.component.TotalSalePanel;
 import dev.mimgr.custom.MButton;
 import dev.mimgr.theme.ColorTheme;
 import dev.mimgr.theme.builtin.ColorScheme;
+import dev.mimgr.utils.Helpers;
 import dev.mimgr.utils.RandomOrderGenerator;
 
 public class FormAnalytic extends JPanel implements ActionListener {
@@ -37,7 +38,11 @@ public class FormAnalytic extends JPanel implements ActionListener {
     c.gridy = 0;
     // ---------
 
-    c.insets = new Insets(25, padding, 5, padding);
+    c.insets = new Insets(20, 25, 20, 15);
+    this.add(Helpers.createHomeButton(), c);
+    c.gridx++;
+
+    c.insets = new Insets(25, 0, 5, padding);
     c.anchor = GridBagConstraints.FIRST_LINE_START;
     this.add(lblAnalytic, c);
     c.gridx++;
