@@ -12,9 +12,18 @@ plugins {
   id 'com.github.michaelruocco.embedded-mysql-plugin' version '2.1.11'
 }
 
+def minJavaVersion = 21
+def currentJavaVersion = JavaVersion.current().majorVersion.toInteger()
+
+if (currentJavaVersion >= minJavaVersion) {
+    println "Java version ${currentJavaVersion} is supported."
+} else {
+    throw new GradleException("Java version ${currentJavaVersion} is not supported. Please use Java ${minJavaVersion} or higher.")
+}
+
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(21)
+    languageVersion = JavaLanguageVersion.of(currentJavaVersion)
   }
 }
 
